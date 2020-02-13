@@ -13,17 +13,9 @@ namespace TestConsoleApplication
         {
             if (args.Length >= 1) // 4
             {               
-                // bool ouputExcel = false;
-                //  string fcsFileName = args[0];
-                //  string filePath_gates = args[1];
-                //  string channelNomenclature = args[2];
-                //  string sampleType = args[3];
-                //int[] NLME_counts = new int[3];
-                //NLME_counts = 
-                 string Total_ExcelFileName = args[0];
-               // string Total_ExcelFileName = "C:/Users/begem/OneDrive/Desktop/General Fluidics/Data/Experiment List for analysis for Fixed Gating.xlsx";
+                string Total_ExcelFileName = "F:/VisualStudio/C#/MAX_WORK/FCS-Analysis/Experiment List for analysis for Fixed Gating.xlsx";
                 Console.WriteLine(String.Format("Starting Processing Folder Data" +
-                    " according to Excel List\n{0}", Total_ExcelFileName));
+                    " according to Excel List/n{0}", Total_ExcelFileName));
                 FlowCytometry.FCMeasurement.FG_folder_analysis(Total_ExcelFileName);
                 Console.WriteLine("Finished Processing Folder Data according to Excel List");
                 //FlowCytometry.FCMeasurement.WBC_analysis(args, ouputExcel);                       

@@ -39,13 +39,13 @@ namespace MeansClustering
             //double[,] dataSet
             double shift_x = 0;
             double shift_y = 0;
-            double scale_factor = 0;
-            double dist;
-            double weight;
-            double[][] p_temp;
+            //double scale_factor = 0;
+            //double dist;
+            //double weight;
+            //double[][] p_temp;
             //            this.testData = testData;
-            double kernel;
-            double BandWidth = 0.8;
+            //double kernel;
+            //double BandWidth = 0.8;
 
             int dataLength = dataSet.GetLength(0);
 
@@ -59,10 +59,10 @@ namespace MeansClustering
                 onlyY[j] = dataSet[1, j];
             }
 
-            double MeanX = onlyX.Average();  // do not need to
-            double MeanY = onlyY.Average();
-            double[] CalcValue = new double[dataLength];
-            double distance;
+            //double MeanX = onlyX.Average();  // do not need to
+            //double MeanY = onlyY.Average();
+            //double[] CalcValue = new double[dataLength];
+            //double distance;
             //myArray.GetLength(0) 
             //dataSet //   phiCalc
             //TESTING KERNEL 
@@ -465,7 +465,7 @@ namespace MeansClustering
             // List<Tuple<double,double>> clearedList = new List<Tuple<double, double>>();
             List<double> clearedList = new List<double>();
             double x;
-            double y;
+            //double y;
             double[] result;
             int lengthData = org_data.GetLength(0);
             for (int j = 0; j < lengthData; j++)
@@ -552,84 +552,5 @@ namespace MeansClustering
             
             return sd;
         }
-   
-
-        /*
-
-        ///public static CreateIsobars: IEnumerable:  (double[][] data, double stepSize = 1)
-        public static IEnumerable CreateIsobars(double[][] data, double stepSize = 1)
-        {
-            if (data == null)
-            {
-                return null;
-            }
-            double x;
-            double y;
-            IEnumerable[][] hgrid = new IEnumerable[data.Length][];
-            IEnumerable[][] vgrid = new IEnumerable[data.Length – 1][];
-            for (int x = 0; x < data.Length; x++)
-            {
-                if (x != data.Length – 1)
-                {
-                vgrid[x] = new IEnumerable[data[x].Length];
-                }                
-            }
-            hgrid[x] = new IEnumerable[data[x].Length – 1];
-            for (int y = 0; y < data[x].Length; y++)
-            {
-                var value = data[x][y];
-                if (x != 0)
-                {
-                    double value2 = data[x – 1][y];
-                    int rem0 = (int)(value / stepSize);
-                    int rem1 = (int)(value2 / stepSize);
-                    var newS = new List();
-                    // IF we're crossing a threshold
-                    if (rem0 != rem1)
-                    {
-                        newS = Enumerable.Range(Math.Min(rem0, rem1) + 1, Math.Abs(rem0 – rem1)).Select(a => a * stepSize).ToList();
-                    }
-                    vgrid[x – 1][y] = newS
-                    .Select(v => new IsobarPoint
-                    {
-                        Coordinate = new Coordinate(x – 1, y),
-                        Location = new
-                    Point((x – (v – value) / (data[x – 1][y] – value)), y),
-Direction = (value > data[x – 1][y]) ? IsobarDirection.East : IsobarDirection.West,
-Value = v
-}).ToList();
-    }
-if (y<data[x].Length - 1)
-{
-double value2 = data[x][y + 1];
-    int rem0 = (int)(value / stepSize);
-    int rem1 = (int)(value2 / stepSize);
-    var newS = new List();
-// IF we're crossing a threshold
-if (rem0 != rem1)
-{
-newS = Enumerable.Range(Math.Min(rem0, rem1) + 1, Math.Abs(rem0 – rem1)).Select(a => a* stepSize).ToList();
-}
-hgrid[x][y] = newS
-.Select(v => new IsobarPoint
-{
-Coordinate = new Coordinate(x, y),
-Location = new Point(x, (y + (v – value) / (data[x][y + 1] – value))),
-Direction = (value > data[x][y + 1]) ? IsobarDirection.South : IsobarDirection.North,
-Value = v
-}).ToList();
-}
-}
-}
-return GenerateIsobars(vgrid, hgrid);
-}
-
-Like
-Reply
-
-    */
-
-      
-
     }
 }

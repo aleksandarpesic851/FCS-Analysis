@@ -536,8 +536,8 @@ namespace FlowCytometry
             FCMeasurement sample = new FCMeasurement(fcsFileName);
             int TotalDataLength = sample.Counts;// GateIntactCells_array.GetLength(0);
 
-            string threeDiffGated = "threeDiffGated";
-            string outsideFixedGates = "OutsideGates";
+            //string threeDiffGated = "threeDiffGated";
+            //string outsideFixedGates = "OutsideGates";
             bool[,] indexGate_IntactCells;// = new bool[TotalDataLength, 2];
             bool[,] indexGate_Singlets;// = new bool[TotalDataLength, 2];
             bool[,] indexGate_CellTypes = new bool[TotalDataLength, 2];
@@ -552,7 +552,7 @@ namespace FlowCytometry
 
             HashSet<double[]> Gate1_hs;
             HashSet<double[]> Gate2_hs;
-            HashSet<double[]> Gate3_hs;
+            //HashSet<double[]> Gate3_hs;
 
             bool OutputExcel = false; // true ;
             if (OutputExcel)
@@ -773,7 +773,7 @@ namespace FlowCytometry
         {
             FCMeasurement sample = new FlowCytometry.FCMeasurement(fcsFileName);
             int TotalDataLength = sample.Counts;
-            string sampleType = "EOS";
+            //string sampleType = "EOS";
             //double sampleVolume_uL = getSampleVolume(sample, sampleType, channelNomenclature);
 
             string FL_H = GetChannelName("FLpeak", channelNomenclature);
@@ -923,7 +923,7 @@ namespace FlowCytometry
                     centers[i][1] = Convert.ToDouble(cells[1].Trim());
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 centers = null;
             }
@@ -1006,7 +1006,7 @@ namespace FlowCytometry
                 //                this.polygons = polygons.ToArray();
                 // this.polygons = polygons.ToArray();
             }
-            catch (Exception ex)
+            catch
             {
 
             }
@@ -1184,21 +1184,6 @@ namespace FlowCytometry
             return testArray1D.Count(c => c == val);
         }
 
-        /*
-        public static bool[] getColumn(bool[,] testArray2D, int dimension)
-        {
-            bool val = true;
-            int Ndata = testArray2D.Length;
-            bool[] testArray1D = new bool[Ndata];
-            for (int i = 0; i < Ndata; i++)
-            {
-                testArray1D[i] = testArray2D[i, dimension];
-                // System.IndexOutOfRangeException: 'Index was outside the bounds of the array.'
-            }
-
-            return testArray1D;
-        }
-               */
         public static bool[] GetColumn(bool[,] matrix, int columnNumber)
         {
             return Enumerable.Range(0, matrix.GetLength(0))
@@ -1280,7 +1265,7 @@ namespace FlowCytometry
             int RowStart = Convert.ToInt32(RowStart_String);
             int RowCount = Convert.ToInt32(RowCount_String);
             */
-            int RowStart = 45; // 69 for 2014 DataFile
+            int RowStart = 69; // 69 for 2014 DataFile
             int RowCount = 14;          // number of files in the list to be analyzed   
 
             //   string Total_ExcelFileName = Path.Combine(excelPath, Path.GetFileName(excelFileName));
@@ -1346,86 +1331,78 @@ namespace FlowCytometry
             wb.Close();
             excel.Quit();
         }
+
         public static List<string[]> ReadExcelList(string ExcelPath, int Row, int rowCount)
         {
-            //List<Tuple<string, string, double>> 
             _Application excel = new _Excel.Application();
             int SheetNum = 1;
             Workbook wb = excel.Workbooks.Open(@ExcelPath);
-//            Worksheet ws = (Worksheet)wb.Worksheets[SheetNum];
             Worksheet ws = (wb.Worksheets[SheetNum] as Worksheet);
-            var FN_AT_FR_List = new List<string[]>(); //Nullable<double>>> // FileName_AnalysisType_FlowRate
-            // var FN_RF_List = new List<Tuple<string, string, double>>();
+            var FN_AT_FR_List = new List<string[]>();
             string FCS_name;
-            string FCS_path;
-            string FCS_PathName;
-            string Flow_rate; //double
-            string FCS_type;
-            // string ExcelCellString;
-            bool data2014 = false;
-            bool data2016 = !data2014;
-            int Column_FileNames;
-            int Column_FilePaths;
-            int Column_SampleVolume;
-            int Column_AnalysisType;
-            if (data2014)
+
+            Range xlRange = ws.UsedRange;
+            int totalRowCount = xlRange.Rows.Count;
+            int totalColCount = xlRange.Columns.Count;
+            int i, k;
+            List<string> colNames = new List<string>() 
             {
-                Column_FileNames = 1;
-                Column_FilePaths = 3;
-                Column_SampleVolume = 18;
-                Column_AnalysisType = 4;
-            } 
-            else
+                "Filename",
+                "FileLocation",
+                "Analysis Type",
+                "Volume",
+            };
+
+            int[] colIdxs = new int[4];
+            int idx;
+            for (i = 1; i <= totalColCount; i ++)
             {
-                Column_FileNames = 13;
-                Column_FilePaths = 14;
-                Column_SampleVolume = 10;
-                Column_AnalysisType = 15;
-                Console.Write(String.Format("Using 2016 column locations.\n Column for files ={0}", Column_FileNames));
+                var tmpRange = (ws.Cells[1, i] as Range);
+                if (tmpRange == null || tmpRange.Value == null)
+                    continue;
+
+                idx = colNames.IndexOf(tmpRange.Value.ToString());
+                if ( idx > -1)
+                {
+                    colIdxs[idx] = i;
+                }
             }
 
-
-            Range ExcelCell_asRange;
-            string Test;
-
-            Console.WriteLine(String.Join("Excel file read:\n{0}", ExcelPath));
-            ExcelCell_asRange = (ws.Cells[1, 2] as Range);
-           // ExcelCell_asRange = (Range)ws.Cells[1, 2];
-            Test = ExcelCell_asRange.Value.ToString();
-            //System.NullReferenceException: 'Object reference not set to an instance of an object.'
-            Console.WriteLine(String.Join("Test read (1,2):\n{0}", Test));
-
-            Console.WriteLine(String.Join("Starting Row is:\n{0}", Row));
+            Console.WriteLine("Column Idxs:{0}, {1}, {2}, {3}", colIdxs[0], colIdxs[1], colIdxs[2], colIdxs[3] );
             Console.WriteLine("Press a button...");
             Console.ReadKey();
+
             try
             {
-                for (int i = Row; i <= Row + rowCount; i++)
+                for (i = Row; i <= Row + rowCount; i++)
                 {
-                    ExcelCell_asRange = (ws.Cells[i, Column_FileNames] as Range);
-                    if ((Range)ExcelCell_asRange != null)
+                    if (i > totalRowCount)
+                        break;
+                    string[] newData = new string[4];
+
+                    for (k = 0; k < colNames.Count; k++)
                     {
-                        FCS_name = ExcelCell_asRange.Value.ToString();
-                        Console.WriteLine(String.Join("FCS file name:\n{0}", FCS_name));
-                        ExcelCell_asRange = (ws.Cells[i, Column_FilePaths] as Range);
+                        var tmpRange = (ws.Cells[i, colIdxs[k]] as Range);
+                        if (tmpRange == null || tmpRange.Value == null)
+                            break;
 
-                        FCS_path = ExcelCell_asRange.Value.ToString();
-                        Console.WriteLine(String.Join("FCS file path:\n{0}", FCS_path));
-                        FCS_PathName = Path.Combine(FCS_path, FCS_name);
-
-                        ExcelCell_asRange = (ws.Cells[i, Column_SampleVolume] as Range);
-                        Flow_rate = ExcelCell_asRange.Value.ToString();
-
-                        ExcelCell_asRange = (ws.Cells[i, Column_AnalysisType] as Range);
-                        FCS_type = ExcelCell_asRange.Value.ToString();
-
-                        FN_AT_FR_List.Add(new string[3] { FCS_PathName, FCS_type, Flow_rate });
+                        newData[k] = tmpRange.Value.ToString();
                     }
+
+                    if (newData[0] == null)
+                        continue;
+
+                    FN_AT_FR_List.Add(new string[3] 
+                        {
+                            Path.Combine(newData[1], newData[0]),
+                            newData[2],
+                            newData[3]
+                        });
                 }
                 wb.Close();
                 excel.Quit();
             }          
-            catch
+            catch (Exception ex)
             {
                 System.Runtime.InteropServices.Marshal.ReleaseComObject(ws);
                 wb.Close();
