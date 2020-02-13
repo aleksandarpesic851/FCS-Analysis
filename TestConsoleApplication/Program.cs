@@ -13,7 +13,7 @@ namespace TestConsoleApplication
         {
             if (args.Length >= 1) // 4
             {               
-                bool ouputExcel = false;
+                // bool ouputExcel = false;
                 //  string fcsFileName = args[0];
                 //  string filePath_gates = args[1];
                 //  string channelNomenclature = args[2];

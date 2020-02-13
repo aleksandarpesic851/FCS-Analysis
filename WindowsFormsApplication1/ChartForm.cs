@@ -24,17 +24,17 @@ namespace WindowsFormsApplication1
         Polygon[] polygons = null;
  
         string channelNomenclature = "old_names";// "middleaged_names"; //"new_names";//
-        PaintEventArgs pEventArg;
+        //PaintEventArgs pEventArg;
 
         string FSC1_H, SSC_H;
 
         string Loaded_TotalFileName;
         string WBC_file_type;
-        string Gating_Type;
+        //string Gating_Type;
 
-        string Loaded_filePath;
-        string Loaded_fileName;
-        bool[] indexGatesTotal;// = new bool[TotalDataLength];
+        //string Loaded_filePath;
+        //string Loaded_fileName;
+        //bool[] indexGatesTotal;// = new bool[TotalDataLength];
 
         // string filePath_gates_default = "C:/Users/begem/OneDrive/Desktop/General Fluidics/Fixed gating";
         // string FixedGatesLocationName = "Fixed Gating folder location.txt";
@@ -305,7 +305,7 @@ namespace WindowsFormsApplication1
                 }
                 catch (Exception ex)
                 {
-
+                    MessageBox.Show(ex.Message);
                 }
             }
         }
@@ -491,9 +491,9 @@ namespace WindowsFormsApplication1
             string filePath = null;
             string fileName = null;
 
-            string Output_appendix;
-            string Joined_output_filename;
-            string Total_output_filename;
+            //string Output_appendix;
+            //string Joined_output_filename;
+            //string Total_output_filename;
 
             string fileTot;
 
@@ -593,15 +593,15 @@ namespace WindowsFormsApplication1
             */
             #endregion
 
-            bool ProcessEOS = false;
-            string Gate1_file;
-            double[][] Gate1_array;
-            int count_Gate1out_Max;
-            List<Polygon> polygons;
+            //bool ProcessEOS = false;
+            //string Gate1_file;
+            //double[][] Gate1_array;
+            //int count_Gate1out_Max;
+            //List<Polygon> polygons;
 
             double x;
             double y;
-            int FSC1_H_max = sample.Channels[FSC1_H].Range;
+            //int FSC1_H_max = sample.Channels[FSC1_H].Range;
             int SSC_H_max = sample.Channels[SSC_H].Range;
 
             sample = new FlowCytometry.FCMeasurement(Loaded_TotalFileName);
@@ -1622,11 +1622,11 @@ namespace WindowsFormsApplication1
                 string FL_H = FlowCytometry.FCMeasurement.GetChannelName("FLpeak", channelNomenclature);
                 int FL_H_max = sample.Channels[FL_H].Range;
             
-                bool plotFixedGates = true;//  false; ///
-                bool plotKmeansGated = false;
+                //bool plotFixedGates = true;//  false; ///
+                //bool plotKmeansGated = false;
                 //   bool plotClustering = !plotFixedGates;
-                int countInside = 0;
-                int countOutside = 0;
+                //int countInside = 0;
+                //int countOutside = 0;
 
                 HashSet<double[]> GateEOS_hs = GenerateDataSet(FL_H, SSC_H);
                // GenerateDataSet(FSC1_H, SSC_H);
@@ -1781,7 +1781,7 @@ namespace WindowsFormsApplication1
             }
             catch (Exception ex)
             {
-
+                MessageBox.Show(ex.Message);
             }
             return polygons;
         }
@@ -1919,8 +1919,8 @@ namespace WindowsFormsApplication1
                     chartData.Series[clusterNameOutside].MarkerStyle = MarkerStyle.Circle;
                     chartData.Series[clusterNameOutside].MarkerColor = colors[index];
 
-                    double centerX;
-                    double centerY;
+                    //double centerX;
+                    //double centerY;
 
                     foreach (SharpCluster.Pattern pattern in Cluster.GetAllPatterns())
                     {
@@ -2132,12 +2132,12 @@ namespace WindowsFormsApplication1
             bool localDensity = false;
             int nbinsX = nbins;
             int nbinsY = nbins;
-            double NormalizationFactor = 0;
+            //double NormalizationFactor = 0;
             double[] localDens;
-            double DensityMax = 0;
+            //double DensityMax = 0;
             double denseMax;
             double denseMin;
-            Color[] localColor;
+            //Color[] localColor;
             double[] array_1D = new double[nbinsX];
 
             if (solveKDE1D)
@@ -2765,7 +2765,7 @@ namespace WindowsFormsApplication1
                 MessageBox.Show(String.Format("Number of clusters = {0}", clusters.Count)); //Console.WriteLine
                 MeansShift.ClearSeries(chartData);
                 int cluster_id = 0;
-                int point_id;
+                //int point_id;
                 double cluster_centerX;
                 double cluster_centerY;
                 foreach (MyCustomDatasetItem[] Cluster in clusters)
@@ -3032,16 +3032,16 @@ namespace WindowsFormsApplication1
                 fileTot = Path.Combine(default_filePath, Path.GetFileName(default_fileName));
             }
 
-            int[] index_Cells;
-            int[] index_Singles;
-            int[] index_SizeGated;
-            int number = 5;
+            //int[] index_Cells;
+            //int[] index_Singles;
+            //int[] index_SizeGated;
+            //int number = 5;
 
             sample = new FlowCytometry.FCMeasurement(fileTot);
 
             if (!channel1.Equals(channel2))
             {
-                bool hasClass = false;
+                //bool hasClass = false;
                 //       HashSet<double[]> Gate1_hs = new HashSet<double[]>();
                 HashSet<double[]> dataSet_hs = GenerateDataSet(channel1, channel2);
                 HashSet<double[]> gatedData_hs = new HashSet<double[]>();
@@ -3218,7 +3218,7 @@ namespace WindowsFormsApplication1
                                                       // double logVal = - Math.Log10(value);
                                                       // double val = (logVal - logMin) / (logMax - logMin);
             double logVal = Math.Log(value / min);
-            double logMin = 0; // = Math.Log(min/min);
+            //double logMin = 0; // = Math.Log(min/min);
             double logMax = Math.Log(max / min);
             double log_Sval = logVal / logMax;
 
