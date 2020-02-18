@@ -1553,8 +1553,14 @@ namespace FlowCytometry
             return indexGate;
         }
 
-        public static void calculateDynamicGates(List<Polygon> polygons, double[][] arrData)
+        public static void calculateDynamicGates(List<Polygon> polygons, double[][] arrData, out List<CustomCluster.Cluster> clusters)
         {
+            if (polygons.Count < 3)
+            {
+                clusters = null;
+                return;
+            }
+
             int i = 0;
             List<double[]> totalData = new List<double[]>();
             for (i = 0; i < arrData.Length; i ++)
@@ -1567,8 +1573,13 @@ namespace FlowCytometry
                 CustomCluster.Global.CELL_CENTER[i] = CustomCluster.Global.GetCentroid(polygons[i].poly);
             }
 
+            CustomCluster.Global.diff3_enable = true;
+            CustomCluster.Global.T_Y_1 = (int)polygons[2].poly[0].Y;
+            CustomCluster.Global.T_Y_2 = (int)polygons[0].poly[0].Y;
 
-
+            CustomCluster.Custom_Meanshift meanshift = new CustomCluster.Custom_Meanshift(totalData);
+            meanshift.CalculateKDE();
+            clusters = meanshift.CalculateCluster();
         }
     }
 }

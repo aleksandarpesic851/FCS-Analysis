@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FlowCytometry.CustomCluster
 {
-    class Cluster
+    public class Cluster
     {
         public int centerX { get; set; }
         public int centerY { get; set; }
