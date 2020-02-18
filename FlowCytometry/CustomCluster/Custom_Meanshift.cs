@@ -426,25 +426,36 @@ namespace FlowCytometry.CustomCluster
             MergeSmallClusters();
             if (Global.diff3_enable)
             {
-                RemoveBLDebris();
+                Cluster debrisCluster = RemoveBLDebris();
                 //MergeBottomClusters();
                 DetectCellType();
                 ManualAction();
+
+                if (debrisCluster != null)
+                {
+                    clusters.Add(debrisCluster);
+                }
             }
         }
 
         //Remove bottom-left debris
-        private void RemoveBLDebris()
+        private Cluster RemoveBLDebris()
         {
             if (clusters.Count < 3)
-                return;
+                return null;
+
             int i;
             int nMinX_T = nGridCnt / 10;
 
+            Cluster debrisCluster = new Cluster();
+            
             for (i = clusters.Count - 1; i > -1; i--)
             {
                 if (clusters[i].centerX < nMinX_T)
+                {
+                    debrisCluster.points.AddRange(clusters[i].points);
                     clusters.RemoveAt(i);
+                }
                 if (clusters.Count < 3)
                     break;
             }
@@ -453,10 +464,14 @@ namespace FlowCytometry.CustomCluster
             for (i = clusters.Count - 1; i > -1; i--)
             {
                 if (clusters[i].points.Count < totalData.Count() / nRate)
+                {
+                    debrisCluster.points.AddRange(clusters[i].points);
                     clusters.RemoveAt(i);
+                }
                 if (clusters.Count < 3)
                     break;
             }
+            return debrisCluster;
         }
 
         //Merge bottom clusters

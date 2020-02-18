@@ -139,6 +139,8 @@ namespace WindowsFormsApplication1
             // if (Loaded_TotalFileName != null)
             //  {
             sample = new FlowCytometry.FCMeasurement(fileWBC); //fileWBC
+            comboBox1.Items.Clear();
+            comboBox2.Items.Clear();
 
             foreach (String name in sample.ChannelsNames)
             {
@@ -211,7 +213,7 @@ namespace WindowsFormsApplication1
                     string clusterNameInside = "InsideCluster" + cluster.Id;
                     chartData.Series.Add(clusterNameInside);
                     chartData.Series[clusterNameInside].ChartType = SeriesChartType.Point;
-                    chartData.Series[clusterNameInside].MarkerSize = 3;
+                    chartData.Series[clusterNameInside].MarkerSize = 4;;
                     chartData.Series[clusterNameInside].MarkerStyle = MarkerStyle.Diamond;
                     chartData.Series[clusterNameInside].MarkerColor = colors[index];
 
@@ -261,11 +263,11 @@ namespace WindowsFormsApplication1
                     else
                         chartData.Series["Vf2"].Points.AddXY(sample.Channels[channel1].Data.ElementAt(i), sample.Channels[channel2].Data.ElementAt(i));
                 }
-                chartData.Series["Vf2"].MarkerSize = 3;
+                chartData.Series["Vf2"].MarkerSize = 4;;
                 chartData.Series["Vf2"].MarkerStyle = MarkerStyle.Circle;
                 chartData.Series["Vf2"].MarkerColor = Color.Maroon;                
                 
-                chartData.Series["Vf3"].MarkerSize = 3;
+                chartData.Series["Vf3"].MarkerSize = 4;;
                 chartData.Series["Vf3"].MarkerStyle = MarkerStyle.Circle;
                 chartData.Series["Vf3"].MarkerColor = Color.Green;*/
                 #endregion
@@ -521,6 +523,7 @@ namespace WindowsFormsApplication1
             {
                 filePath = Path.GetDirectoryName(Loaded_TotalFileName);
                 fileName = Path.GetFileName(Loaded_TotalFileName);
+                sample = new FlowCytometry.FCMeasurement(Loaded_TotalFileName);
             }
             else
             {
@@ -535,14 +538,25 @@ namespace WindowsFormsApplication1
                     }
                 }
                 FileNameBox.Text = Loaded_TotalFileName;
+                sample = new FlowCytometry.FCMeasurement(Loaded_TotalFileName);
+
+                comboBox1.Items.Clear();
+                comboBox2.Items.Clear();
+                foreach (String name in sample.ChannelsNames)
+                {
+                    comboBox1.Items.Add(name);
+                    comboBox2.Items.Add(name);
+                }
             }
+            comboBox1.Text = FSC1_H;
+            comboBox2.Text = SSC_H;
 
             #endregion
 
 
             #region generate dataset, initialize HashSets
 
-            sample = new FlowCytometry.FCMeasurement(Loaded_TotalFileName);
+
             bool OutputExcel = false; // true ;
             if (OutputExcel)
             {
@@ -554,18 +568,23 @@ namespace WindowsFormsApplication1
             #region chart initialization
   
             chartData.Series.Clear();
+            chartData.ChartAreas[0].AxisX.Title = FSC1_H;
+            chartData.ChartAreas[0].AxisY.Title = SSC_H;
+            chartData.ChartAreas[0].AxisX.IsMarginVisible = false;
+            chartData.ChartAreas[0].AxisY.IsMarginVisible = false;
+
             string threeDiffGated = "threeDiffGated";
             string outsideFixedGates = "OutsideGates";
 
             chartData.Series.Add(threeDiffGated);
             chartData.Series[threeDiffGated].ChartType = SeriesChartType.Point;
-            chartData.Series[threeDiffGated].MarkerSize = 3;
+            chartData.Series[threeDiffGated].MarkerSize = 4;;
             chartData.Series[threeDiffGated].MarkerStyle = MarkerStyle.Circle; //Diamond
             chartData.Series[threeDiffGated].MarkerColor = Color.Blue;// colors[index];
 
             chartData.Series.Add(outsideFixedGates);
             chartData.Series[outsideFixedGates].ChartType = SeriesChartType.Point;
-            chartData.Series[outsideFixedGates].MarkerSize = 3;
+            chartData.Series[outsideFixedGates].MarkerSize = 4;;
             chartData.Series[outsideFixedGates].MarkerStyle = MarkerStyle.Circle;
             chartData.Series[outsideFixedGates].MarkerColor = Color.Red; //colors[index];
 
@@ -807,14 +826,14 @@ namespace WindowsFormsApplication1
                     string clusterNameInside = "InsideCluster" + Cluster.Id;
                     chartData.Series.Add(clusterNameInside);
                     chartData.Series[clusterNameInside].ChartType = SeriesChartType.Point;
-                    chartData.Series[clusterNameInside].MarkerSize = 3;
+                    chartData.Series[clusterNameInside].MarkerSize = 4;;
                     chartData.Series[clusterNameInside].MarkerStyle = MarkerStyle.Circle;
                     chartData.Series[clusterNameInside].MarkerColor = colors[index];
 
                     string clusterNameOutside = "OutsideCluster" + Cluster.Id;
                     chartData.Series.Add(clusterNameOutside);
                     chartData.Series[clusterNameOutside].ChartType = SeriesChartType.Point;
-                    chartData.Series[clusterNameOutside].MarkerSize = 3;
+                    chartData.Series[clusterNameOutside].MarkerSize = 4;;
                     chartData.Series[clusterNameOutside].MarkerStyle = MarkerStyle.Circle;
                     chartData.Series[clusterNameOutside].MarkerColor = colors[index];
 
@@ -858,7 +877,7 @@ namespace WindowsFormsApplication1
                     string clusterNameInside = "InsideCluster" + Cluster.Id;
                     chartData.Series.Add(clusterNameInside);
                     chartData.Series[clusterNameInside].ChartType = SeriesChartType.Point;
-                    chartData.Series[clusterNameInside].MarkerSize = 3;
+                    chartData.Series[clusterNameInside].MarkerSize = 4;;
                     chartData.Series[clusterNameInside].MarkerStyle = MarkerStyle.Circle;
                     chartData.Series[clusterNameInside].MarkerColor = colors[index];
 
@@ -1261,6 +1280,9 @@ namespace WindowsFormsApplication1
             int count_Gate1out = CountBoolTrue(indexGate1);
             if (checkBoxGate1.Checked)
             {
+                chartData.ChartAreas[0].AxisX.Title = FSC1_H;
+                chartData.ChartAreas[0].AxisY.Title = SSC_H;
+
                 chartData.BringToFront();
                 chartData.Invalidate();
                 // MessageBox.Show(String.Format("Total data length = {0} \n Inside Cells gate = {1}", TotalDataLength, count_Gate1out));
@@ -1304,8 +1326,10 @@ namespace WindowsFormsApplication1
                 {
                     series.Points.Clear();
                 }
+                chartData.ChartAreas[0].AxisX.Title = FSC1_A;
+                chartData.ChartAreas[0].AxisY.Title = FSC1_H;
             }
-            
+
             for (int j = 0; j < TotalDataLength; j++)
             {
                 x = Gate2_array[j][0];    //x = Gate1_arrayMax[j][0];
@@ -1345,11 +1369,39 @@ namespace WindowsFormsApplication1
 
             #region Clustering
 
+            bool[] NeutrophilsTF = new bool[TotalDataLength];
+            string fileName_Gate3 = "gating Cell Types.csv"; // gating2.csv"; //4
+            string path_gate3 = Path.Combine(filePath_gates, Path.GetFileName(fileName_Gate3));
+            polygons = loadPolygon(path_gate3);
+            indexGate3_Max = FlowCytometry.FCMeasurement.findMaxValues(sample, Gate1_array, FSC1_A, FSC1_H);
+
+            for (int j = 0; j < TotalDataLength; j++)//Gate2Max_Length 
+            {
+                x = Gate1_array[j][0]; //Gate1_array = GateFinal_array, so using already created Gate1_array
+                y = Gate1_array[j][1];
+                indexGateFinal[j, 1] = false;
+                if (polygons != null)
+                {
+                    for (int k = 0; k < polygons.Count; k++)
+                    {
+                        if (polygons[k].IsInsidePoly(x, y))                   //  (Polygon.IsInsidePoly(x, y))
+                        {
+                            indexGateFinal[j, 1] = true;
+                            indexGate3[j] = true;
+                            if (k == 0)
+                            {
+                                NeutrophilsTF[j] = true;
+                            }
+                        }
+                        else
+                        {
+                            indexGate3[j] = false;
+                        }
+                    }
+                }
+            }
             if (checkBoxGate3.Checked)
             {
-                string fileName_Gate3 = "gating Cell Types.csv"; // gating2.csv"; //4
-                string path_gate3 = Path.Combine(filePath_gates, Path.GetFileName(fileName_Gate3));
-                polygons = loadPolygon(path_gate3);
                 string[] CELL_NAME = new string[] { "Neutrophils", "Lymphocytes", "Monocytes" };
 
                 List<FlowCytometry.CustomCluster.Cluster> clusters;
@@ -1359,6 +1411,8 @@ namespace WindowsFormsApplication1
                 if (clusters != null)
                 {
                     chartData.Series.Clear();
+                    chartData.ChartAreas[0].AxisX.Title = FSC1_H;
+                    chartData.ChartAreas[0].AxisY.Title = SSC_H;
 
                     i = 0;
                     // Draw Gate lines
@@ -1376,19 +1430,19 @@ namespace WindowsFormsApplication1
 
                     chartData.Series.Add(outsideFixedGates);
                     chartData.Series[outsideFixedGates].ChartType = SeriesChartType.Point;
-                    chartData.Series[outsideFixedGates].MarkerSize = 3;
+                    chartData.Series[outsideFixedGates].MarkerSize = 4;;
                     chartData.Series[outsideFixedGates].MarkerStyle = MarkerStyle.Circle;
                     chartData.Series[outsideFixedGates].MarkerColor = Color.Red; //colors[index];
 
                     chartData.Series.Add(KernelPlot);
                     chartData.Series[KernelPlot].ChartType = SeriesChartType.Point;
-                    chartData.Series[KernelPlot].MarkerSize = 4;
+                    chartData.Series[KernelPlot].MarkerSize = 4;;
                     chartData.Series[KernelPlot].MarkerStyle = MarkerStyle.Circle; //Diamond
                     chartData.Series[KernelPlot].MarkerColor = Color.Green;
 
                     chartData.Series.Add(threeDiffGated);
                     chartData.Series[threeDiffGated].ChartType = SeriesChartType.Point;
-                    chartData.Series[threeDiffGated].MarkerSize = 3;
+                    chartData.Series[threeDiffGated].MarkerSize = 4;;
                     chartData.Series[threeDiffGated].MarkerStyle = MarkerStyle.Circle; //Diamond
                     chartData.Series[threeDiffGated].MarkerColor = Color.Blue;// colors[index];
 
@@ -1401,22 +1455,29 @@ namespace WindowsFormsApplication1
                             chartData.Series.Add(seryName);
                             int idx = Array.IndexOf(CELL_NAME, seryName);
                             chartData.Series[seryName].ChartType = SeriesChartType.Point;
-                            chartData.Series[seryName].MarkerColor = polygons[idx].color;
+                            chartData.Series[seryName].MarkerSize = 4;
                             chartData.Series[seryName].MarkerStyle = MarkerStyle.Circle;
-                            chartData.Series[seryName].MarkerSize = 3;
+                            chartData.Series[seryName].MarkerColor = polygons[idx].color;
 
                             strMsg += "\n" +  seryName + " : " + cluster.points.Count;
-
-                        } else if (indexGate1[cluster.points[0]])
-                        {
-                            seryName = threeDiffGated;
-                        } else
-                        {
-                            seryName = outsideFixedGates;
                         }
 
                         foreach (int idx in cluster.points)
                         {
+                            if (indexGate1[idx])
+                            {
+                                if (!string.IsNullOrEmpty(cluster.clusterName))
+                                {
+                                    seryName = cluster.clusterName;
+                                } else
+                                {
+                                    seryName = threeDiffGated;
+                                }
+                            } 
+                            else
+                            {
+                                seryName = outsideFixedGates;
+                            }
                             chartData.Series[seryName].Points.AddXY(Gate1_array[idx][0], Gate1_array[idx][1]);
                         }
                     }
@@ -1426,8 +1487,8 @@ namespace WindowsFormsApplication1
             }
             #endregion
 
-
             #region origin dynamic gates
+            /*
             // GATE 4: Neutrophils,Lymphocytes, Monocytes
             // Channels for Gate 3 are the same as Gate 1 (FCS1 vs SSC)
 
@@ -1495,6 +1556,8 @@ namespace WindowsFormsApplication1
 
             #endregion
 
+            
+*/
             #endregion
 
             #region putting the gates together
@@ -1557,35 +1620,41 @@ namespace WindowsFormsApplication1
 
             if (plotFixedGates)
             {
-                stopwatch.Start();
-                foreach (var series in chartData.Series)
+                if (!checkBoxGate3.Checked)
                 {
-                    series.Points.Clear();
-                }
+                    stopwatch.Start();
+                    chartData.ChartAreas[0].AxisX.Title = FSC1_H;
+                    chartData.ChartAreas[0].AxisY.Title = SSC_H;
 
-                for (int j = 0; j < TotalDataLength; j++)//Gate2Max_Length 
-                {
-                    if (indexDataShown[j])
+                    foreach (var series in chartData.Series)
                     {
-                        x = Gate1_array[j][0]; //Gate1_array = GateFinal_array, so using already created Gate1_array
-                        y = Gate1_array[j][1];
+                        series.Points.Clear();
+                    }
 
-                        if (indexGatesG1G2[j])
+                    for (int j = 0; j < TotalDataLength; j++)//Gate2Max_Length 
+                    {
+                        if (indexDataShown[j])
                         {
-                            chartData.Series[threeDiffGated].Points.AddXY(x, y);
-                            countInside++;
-                        }
-                        else
-                        {
-                            chartData.Series[outsideFixedGates].Points.AddXY(x, y);
-                            countOutside++;
+                            x = Gate1_array[j][0]; //Gate1_array = GateFinal_array, so using already created Gate1_array
+                            y = Gate1_array[j][1];
+
+                            if (indexGatesG1G2[j])
+                            {
+                                chartData.Series[threeDiffGated].Points.AddXY(x, y);
+                                countInside++;
+                            }
+                            else
+                            {
+                                chartData.Series[outsideFixedGates].Points.AddXY(x, y);
+                                countOutside++;
+                            }
                         }
                     }
-                }
-                stopwatch.Stop();
+                    stopwatch.Stop();
 
-                MessageBox.Show(String.Format("Time for plotting = {0}", stopwatch.ElapsedMilliseconds));
-                MessageBox.Show(String.Format("Overall Gating: In = {0}, , out = {1}", countInside, countOutside));
+                    MessageBox.Show(String.Format("Time for plotting = {0}", stopwatch.ElapsedMilliseconds));
+                    MessageBox.Show(String.Format("Overall Gating: In = {0}, , out = {1}", countInside, countOutside));
+                }
             }
             else if (plotKmeansGated)
             {
@@ -1913,21 +1982,6 @@ namespace WindowsFormsApplication1
             NML = FlowCytometry.FCMeasurement.WBC_analysis(argumentsIn, ouputExcel);
             MessageBox.Show(String.Format("NML Report: {0},{1},{2}\n", NML[0], NML[1], NML[2]));
 
-            #region charts finish
-
-            chartData.ChartAreas[0].AxisX.Title = FSC1_H;
-            chartData.ChartAreas[0].AxisY.Title = SSC_H;
-
-            chartData.ChartAreas[0].AxisX.RoundAxisValues();
-            chartData.ChartAreas[0].AxisY.RoundAxisValues();
-
-            chartData.ChartAreas[0].AxisX.IsStartedFromZero = true;
-            chartData.ChartAreas[0].AxisY.IsStartedFromZero = true;
-
-            chartData.BringToFront();
-            chartData.Invalidate();
-            #endregion
-
             var tuple = new Tuple<int[], bool[]>(NML, NeutrophilsTF);
             return tuple; 
 
@@ -1973,9 +2027,10 @@ namespace WindowsFormsApplication1
                 // SharpCluster.Cluster[] clusters = kmeans.ExecuteClustering(number, centers);
 
                 #region initialize plots
-//                chartData.Annotations.Clear();
-//                chartData.ChartAreas.Clear();
-//                chartData.Legends.Clear();
+                chartData.ChartAreas[0].AxisX.Title = channel1;
+                chartData.ChartAreas[0].AxisY.Title = channel2;
+                chartData.ChartAreas[0].AxisX.IsMarginVisible = false;
+                chartData.ChartAreas[0].AxisY.IsMarginVisible = false;
                 chartData.Series.Clear();
 
 //                ChartArea chartArea1 = new ChartArea();
@@ -1988,21 +2043,21 @@ namespace WindowsFormsApplication1
                 string insideGate = "Inside Gate";// + cluster.Id;
                 chartData.Series.Add(insideGate);
                 chartData.Series[insideGate].ChartType = SeriesChartType.Point;
-                chartData.Series[insideGate].MarkerSize = 3; //
+                chartData.Series[insideGate].MarkerSize = 4;; //
                 chartData.Series[insideGate].MarkerStyle = MarkerStyle.Diamond;
                 chartData.Series[insideGate].MarkerColor = Color.Red; // colors[index];
 
                 string outsideGate = "Outside Gate";// + cluster.Id;
                 chartData.Series.Add(outsideGate);
                 chartData.Series[outsideGate].ChartType = SeriesChartType.Point;
-                chartData.Series[outsideGate].MarkerSize = 3;
+                chartData.Series[outsideGate].MarkerSize = 4;;
                 chartData.Series[outsideGate].MarkerStyle = MarkerStyle.Circle;
                 chartData.Series[outsideGate].MarkerColor = Color.Blue; //colors[index];
                 //wait
                 string PlotwithoutGating = "Plot without Gating";// + cluster.Id;
                 chartData.Series.Add(PlotwithoutGating);
                 chartData.Series[PlotwithoutGating].ChartType = SeriesChartType.Point;
-                chartData.Series[PlotwithoutGating].MarkerSize = 3;
+                chartData.Series[PlotwithoutGating].MarkerSize = 4;;
                 chartData.Series[PlotwithoutGating].MarkerStyle = MarkerStyle.Circle;
                 chartData.Series[PlotwithoutGating].MarkerColor = Color.Blue; //colors[index];
                 chartData.BringToFront();
@@ -2054,14 +2109,6 @@ namespace WindowsFormsApplication1
                 }
                 MessageBox.Show("Finished plotting individual data points");
                 #region finish plots
-                chartData.ChartAreas[0].AxisX.Title = channel1;
-                chartData.ChartAreas[0].AxisY.Title = channel2;
-
-                chartData.ChartAreas[0].AxisX.RoundAxisValues();
-                chartData.ChartAreas[0].AxisY.RoundAxisValues();
-
-                chartData.ChartAreas[0].AxisX.IsStartedFromZero = true;
-                chartData.ChartAreas[0].AxisY.IsStartedFromZero = true;
                 chartData.Invalidate();
                 #endregion
 
@@ -2089,6 +2136,8 @@ namespace WindowsFormsApplication1
             //  thrtb1.Start();
             // thrtb2 = new Thread(tb2ControlsUpdate);
             // .Start();
+            comboBox1.Items.Clear();
+            comboBox2.Items.Clear();
 
             //OpenFileDialog dlg = new OpenFileDialog();
             starting_filePath = starting_filePath.TrimEnd(new char[] { '\\' });
