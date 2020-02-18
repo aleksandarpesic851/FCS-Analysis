@@ -617,7 +617,7 @@ namespace WindowsFormsApplication1
                         Neutrophils_hs.Add(new double[2] { x, y });
                     }
                 }
-                double[][] Neutrophils_array = Neutrophils_hs.ToArray();
+            /*    double[][] Neutrophils_array = Neutrophils_hs.ToArray();
                 bool[,] indexGate_EOS = FlowCytometry.FCMeasurement.GateArray(Neutrophils_array, Loaded_TotalFileName, FL_H_max, SSC_H_max);
                 bool[] EOS_Max = FlowCytometry.FCMeasurement.GetColumn(indexGate_EOS, 0); //getColumn
                 bool[] EOS_Gate = FlowCytometry.FCMeasurement.GetColumn(indexGate_EOS, 1);
@@ -625,7 +625,7 @@ namespace WindowsFormsApplication1
                 int count_GateEOS = CountBoolTrue(EOS_Gate);
                 EOSreport[3] = count_GateEOS;
                 Console.WriteLine(String.Format("EOS (max): {0} \nInside EOS gate: {1}", count_EOS_Max, count_GateEOS));
-            
+            */
 
                 int[] WBC_counts = FlowCytometry.FCMeasurement.processEOS(Loaded_TotalFileName, filePath_gates, channelNomenclature); 
                 int totalWBC = WBC_counts[0] + WBC_counts[1] + WBC_counts[2] + WBC_counts[3];
