@@ -8,3 +8,8 @@ And there are static file paths, so that you have to update those with your file
     ChartForm.cs -> ChartForm_Load(). ( 111 line )
     ChartForm.cs -> BtnPlotOnly_Click(). ( 3029 line )
     
+Run 1. git clone <git repository link>
+    
+    2. git pull origin master
+    
+    
