@@ -933,8 +933,8 @@ namespace FlowCytometry
 
         public class Polygon
         {
-            private PointF[] poly;
-            private Color color;
+            public PointF[] poly;
+            public Color color;
 
             public Polygon(PointF[] poly, Color color)
             {
@@ -1339,7 +1339,6 @@ namespace FlowCytometry
             Workbook wb = excel.Workbooks.Open(@ExcelPath);
             Worksheet ws = (wb.Worksheets[SheetNum] as Worksheet);
             var FN_AT_FR_List = new List<string[]>();
-            string FCS_name;
 
             Range xlRange = ws.UsedRange;
             int totalRowCount = xlRange.Rows.Count;
@@ -1402,7 +1401,7 @@ namespace FlowCytometry
                 wb.Close();
                 excel.Quit();
             }          
-            catch (Exception ex)
+            catch
             {
                 System.Runtime.InteropServices.Marshal.ReleaseComObject(ws);
                 wb.Close();
@@ -1552,6 +1551,24 @@ namespace FlowCytometry
                 }
             }
             return indexGate;
+        }
+
+        public static void calculateDynamicGates(List<Polygon> polygons, double[][] arrData)
+        {
+            int i = 0;
+            List<double[]> totalData = new List<double[]>();
+            for (i = 0; i < arrData.Length; i ++)
+            {
+                totalData.Add(arrData[i]);
+            }
+
+            for (i = 0; i < 3; i++)
+            {
+                CustomCluster.Global.CELL_CENTER[i] = CustomCluster.Global.GetCentroid(polygons[i].poly);
+            }
+
+
+
         }
     }
 }

@@ -10,7 +10,7 @@ namespace MeansClustering
     public class MeansCluster //
     {
         private SharpCluster.Pattern pattern;
-        private SharpCluster.PatternMatrix patternMatrix; // matrix of patterns
+//        private SharpCluster.PatternMatrix patternMatrix; // matrix of patterns
         private int index = 0; // index of pattern - identifier
 
         public MeansCluster(HashSet<double[]> dataSet)
@@ -22,7 +22,7 @@ namespace MeansClustering
                 pattern = new SharpCluster.Pattern();
                 pattern.Id = index;
                 pattern.AddAttributes(item);
-                patternMatrix.AddPattern(pattern);
+ //               patternMatrix.AddPattern(pattern);
 
                 index++;
             }

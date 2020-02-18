@@ -28,11 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series7 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series8 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series9 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.button_SetGateFolder = new System.Windows.Forms.Button();
             this.checkBox_FinalGate = new System.Windows.Forms.CheckBox();
@@ -88,7 +88,7 @@
             // button_SetGateFolder
             // 
             this.button_SetGateFolder.Location = new System.Drawing.Point(13, 16);
-            this.button_SetGateFolder.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.button_SetGateFolder.Margin = new System.Windows.Forms.Padding(2);
             this.button_SetGateFolder.Name = "button_SetGateFolder";
             this.button_SetGateFolder.Size = new System.Drawing.Size(155, 22);
             this.button_SetGateFolder.TabIndex = 30;
@@ -170,10 +170,12 @@
             // radioButton_3diff
             // 
             this.radioButton_3diff.AutoSize = true;
+            this.radioButton_3diff.Checked = true;
             this.radioButton_3diff.Location = new System.Drawing.Point(15, 44);
             this.radioButton_3diff.Name = "radioButton_3diff";
             this.radioButton_3diff.Size = new System.Drawing.Size(48, 17);
             this.radioButton_3diff.TabIndex = 13;
+            this.radioButton_3diff.TabStop = true;
             this.radioButton_3diff.Text = "3-diff";
             this.radioButton_3diff.UseVisualStyleBackColor = true;
             this.radioButton_3diff.CheckedChanged += new System.EventHandler(this.radioButton_3diff_CheckedChanged);
@@ -204,7 +206,7 @@
             // loadFile
             // 
             this.loadFile.Location = new System.Drawing.Point(25, 71);
-            this.loadFile.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.loadFile.Margin = new System.Windows.Forms.Padding(2);
             this.loadFile.Name = "loadFile";
             this.loadFile.Size = new System.Drawing.Size(73, 27);
             this.loadFile.TabIndex = 10;
@@ -215,7 +217,7 @@
             // RefeshButton
             // 
             this.RefeshButton.Location = new System.Drawing.Point(213, 67);
-            this.RefeshButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.RefeshButton.Margin = new System.Windows.Forms.Padding(2);
             this.RefeshButton.Name = "RefeshButton";
             this.RefeshButton.Size = new System.Drawing.Size(83, 31);
             this.RefeshButton.TabIndex = 3;
@@ -226,7 +228,7 @@
             // btnLoadClusters
             // 
             this.btnLoadClusters.Location = new System.Drawing.Point(295, 28);
-            this.btnLoadClusters.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnLoadClusters.Margin = new System.Windows.Forms.Padding(2);
             this.btnLoadClusters.Name = "btnLoadClusters";
             this.btnLoadClusters.Size = new System.Drawing.Size(81, 27);
             this.btnLoadClusters.TabIndex = 5;
@@ -248,7 +250,7 @@
             // btnLoadPolygons
             // 
             this.btnLoadPolygons.Location = new System.Drawing.Point(208, 29);
-            this.btnLoadPolygons.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnLoadPolygons.Margin = new System.Windows.Forms.Padding(2);
             this.btnLoadPolygons.Name = "btnLoadPolygons";
             this.btnLoadPolygons.Size = new System.Drawing.Size(73, 24);
             this.btnLoadPolygons.TabIndex = 4;
@@ -261,7 +263,7 @@
             this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox1.FormattingEnabled = true;
             this.comboBox1.Location = new System.Drawing.Point(5, 15);
-            this.comboBox1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.comboBox1.Margin = new System.Windows.Forms.Padding(2);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(107, 21);
             this.comboBox1.TabIndex = 1;
@@ -271,7 +273,7 @@
             this.comboBox2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox2.FormattingEnabled = true;
             this.comboBox2.Location = new System.Drawing.Point(8, 43);
-            this.comboBox2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.comboBox2.Margin = new System.Windows.Forms.Padding(2);
             this.comboBox2.Name = "comboBox2";
             this.comboBox2.Size = new System.Drawing.Size(104, 21);
             this.comboBox2.TabIndex = 2;
@@ -317,7 +319,7 @@
             // button_ProcessList
             // 
             this.button_ProcessList.Location = new System.Drawing.Point(445, 12);
-            this.button_ProcessList.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.button_ProcessList.Margin = new System.Windows.Forms.Padding(2);
             this.button_ProcessList.Name = "button_ProcessList";
             this.button_ProcessList.Size = new System.Drawing.Size(86, 31);
             this.button_ProcessList.TabIndex = 17;
@@ -327,7 +329,7 @@
             // FileNameBox
             // 
             this.FileNameBox.Location = new System.Drawing.Point(14, 145);
-            this.FileNameBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.FileNameBox.Margin = new System.Windows.Forms.Padding(2);
             this.FileNameBox.Name = "FileNameBox";
             this.FileNameBox.Size = new System.Drawing.Size(547, 20);
             this.FileNameBox.TabIndex = 21;
@@ -393,35 +395,35 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.chartData.BackImageAlignment = System.Windows.Forms.DataVisualization.Charting.ChartImageAlignmentStyle.Center;
-            chartArea3.Name = "ChartArea1";
-            this.chartData.ChartAreas.Add(chartArea3);
-            legend3.Name = "Legend1";
-            this.chartData.Legends.Add(legend3);
+            chartArea1.Name = "ChartArea1";
+            this.chartData.ChartAreas.Add(chartArea1);
+            legend1.Name = "Legend1";
+            this.chartData.Legends.Add(legend1);
             this.chartData.Location = new System.Drawing.Point(12, 186);
             this.chartData.Name = "chartData";
-            series7.ChartArea = "ChartArea1";
-            series7.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
-            series7.Legend = "Legend1";
-            series7.MarkerSize = 4;
-            series7.MarkerStyle = System.Windows.Forms.DataVisualization.Charting.MarkerStyle.Circle;
-            series7.Name = "Cluster1";
-            series8.ChartArea = "ChartArea1";
-            series8.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
-            series8.Legend = "Legend1";
-            series8.MarkerColor = System.Drawing.Color.Red;
-            series8.MarkerSize = 4;
-            series8.MarkerStyle = System.Windows.Forms.DataVisualization.Charting.MarkerStyle.Circle;
-            series8.Name = "Cluster2";
-            series9.ChartArea = "ChartArea1";
-            series9.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
-            series9.Legend = "Legend1";
-            series9.MarkerColor = System.Drawing.Color.Black;
-            series9.MarkerSize = 4;
-            series9.MarkerStyle = System.Windows.Forms.DataVisualization.Charting.MarkerStyle.Circle;
-            series9.Name = "Cluster3";
-            this.chartData.Series.Add(series7);
-            this.chartData.Series.Add(series8);
-            this.chartData.Series.Add(series9);
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
+            series1.Legend = "Legend1";
+            series1.MarkerSize = 4;
+            series1.MarkerStyle = System.Windows.Forms.DataVisualization.Charting.MarkerStyle.Circle;
+            series1.Name = "Cluster1";
+            series2.ChartArea = "ChartArea1";
+            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
+            series2.Legend = "Legend1";
+            series2.MarkerColor = System.Drawing.Color.Red;
+            series2.MarkerSize = 4;
+            series2.MarkerStyle = System.Windows.Forms.DataVisualization.Charting.MarkerStyle.Circle;
+            series2.Name = "Cluster2";
+            series3.ChartArea = "ChartArea1";
+            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
+            series3.Legend = "Legend1";
+            series3.MarkerColor = System.Drawing.Color.Black;
+            series3.MarkerSize = 4;
+            series3.MarkerStyle = System.Windows.Forms.DataVisualization.Charting.MarkerStyle.Circle;
+            series3.Name = "Cluster3";
+            this.chartData.Series.Add(series1);
+            this.chartData.Series.Add(series2);
+            this.chartData.Series.Add(series3);
             this.chartData.Size = new System.Drawing.Size(784, 404);
             this.chartData.TabIndex = 0;
             this.chartData.Text = "chart2";
@@ -440,7 +442,7 @@
             this.Controls.Add(this.FileNameBox);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.btnSeparation);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "ChartForm";
             this.Text = "Processing FCS files";
             this.Load += new System.EventHandler(this.ChartForm_Load);
