@@ -113,7 +113,7 @@ namespace WindowsFormsApplication1
         private void ChartForm_Load(object sender, EventArgs e) //private
         {
             // Create a new Mean-Shift algorithm for 3 dimensional samples
-
+/*
             string filePath_Test = "C:/Users/begem/OneDrive/Desktop/General Fluidics/Csharp/Build4/WindowsFormsApplication1/bin/Debug/";
             string fileName_Test = "HL60_007.fcs";
             string fileTest = Path.Combine(filePath_Test, Path.GetFileName(fileName_Test));
@@ -122,22 +122,11 @@ namespace WindowsFormsApplication1
             string fileName_RBC = "t94491_01.fcs";
             string fileRBC = Path.Combine(filePath_RBC, Path.GetFileName(fileName_RBC));
 
-            //  string filePath_WBC = "C:/Users/begem/OneDrive/Desktop/General Fluidics/Data/MGH/WBC/140725/";
-            //  string fileName_WBC = "H43069_CD16APC_20mW_01.fcs";
-
-            /*            string filePath_WBC = "C:/Users/begem/OneDrive/Desktop/General Fluidics/Data/MGH/CBC/160122_CBC";
-                        string fileName_WBC = "wbc4_1.fcs";
-            */
-
             string filePath_WBC = "F:\\VisualStudio\\C#\\Clustering\\TestData\\FCS";
             string fileName_WBC = "WBC_sample.fcs";
 
             string fileWBC = Path.Combine(filePath_WBC, Path.GetFileName(fileName_WBC));
 
-            // may want to disable loading of a file on startup 
-            //Loaded_TotalFileName
-            // if (Loaded_TotalFileName != null)
-            //  {
             sample = new FlowCytometry.FCMeasurement(fileWBC); //fileWBC
             comboBox1.Items.Clear();
             comboBox2.Items.Clear();
@@ -146,12 +135,8 @@ namespace WindowsFormsApplication1
             {
                 comboBox1.Items.Add(name);
                 comboBox2.Items.Add(name);
-            }
-            // }
-
-            /*            chartData.Dock = DockStyle.Fill;
-                        ChartPanel.Controls.Add(chartData);
-            */
+            }*/
+            
         }
 
 
@@ -1998,16 +1983,37 @@ namespace WindowsFormsApplication1
             {
                 fileTot = Loaded_TotalFileName;
                 MessageBox.Show(String.Format("Loaded file {0}", Loaded_TotalFileName));
+                sample = new FlowCytometry.FCMeasurement(fileTot);
+
             }
             else
             {
-                /*                string default_filePath = "C:/Users/begem/OneDrive/Desktop/General Fluidics/Data/MGH/WBC/140725/";
-                                string default_fileName = "H43069_CD16APC_25mW_02.fcs"; //H43069_CD16APC_20mW_02.fcs";
-                */
-                string default_filePath = "F:\\VisualStudio\\C#\\Clustering\\TestData\\FCS";
-                string default_fileName = "WBC_sample.fcs";
+                using (OpenFileDialog dlg = new OpenFileDialog())
+                {
+                    dlg.InitialDirectory = starting_filePath; //GetDataPath
+                    dlg.Filter = "FCS files|*.fcs";
+                    if (dlg.ShowDialog() == DialogResult.OK)
+                    {
+                        Loaded_TotalFileName = dlg.FileName;
+                    }
+                }
+                FileNameBox.Text = Loaded_TotalFileName;
+                fileTot = Loaded_TotalFileName;
 
-                fileTot = Path.Combine(default_filePath, Path.GetFileName(default_fileName));
+                sample = new FlowCytometry.FCMeasurement(Loaded_TotalFileName);
+
+                comboBox1.Items.Clear();
+                comboBox2.Items.Clear();
+                foreach (String name in sample.ChannelsNames)
+                {
+                    comboBox1.Items.Add(name);
+                    comboBox2.Items.Add(name);
+                }
+                channel1 = FlowCytometry.FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
+                channel2 = FlowCytometry.FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
+                comboBox1.Text = channel1;
+                comboBox2.Text = channel2;
+                
             }
 
             //int[] index_Cells;
@@ -2015,7 +2021,6 @@ namespace WindowsFormsApplication1
             //int[] index_SizeGated;
             //int number = 5;
 
-            sample = new FlowCytometry.FCMeasurement(fileTot);
 
             if (!channel1.Equals(channel2))
             {
@@ -2163,7 +2168,11 @@ namespace WindowsFormsApplication1
                 comboBox1.Items.Add(name);
                 comboBox2.Items.Add(name);
             }
-            // }
+
+            string channel1 = FlowCytometry.FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
+            string channel2 = FlowCytometry.FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
+            comboBox1.Text = channel1;
+            comboBox2.Text = channel2;
         }
 
         private void CheckBox1_CheckedChanged(object sender, EventArgs e)
