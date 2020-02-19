@@ -1581,5 +1581,18 @@ namespace FlowCytometry
             meanshift.CalculateKDE();
             clusters = meanshift.CalculateCluster();
         }
+
+        public static CustomCluster.Custom_Meanshift CalculateKDE(double[][] arrData)
+        {
+            int i = 0;
+            List<double[]> totalData = new List<double[]>();
+            for (i = 0; i < arrData.Length; i++)
+            {
+                totalData.Add(arrData[i]);
+            }
+            CustomCluster.Custom_Meanshift meanshift = new CustomCluster.Custom_Meanshift(totalData);
+            meanshift.CalculateKDE();
+            return meanshift;
+        }
     }
 }

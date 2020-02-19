@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FlowCytometry.CustomCluster
 {
-    class Custom_Meanshift
+    public class Custom_Meanshift
     {
         private int nRate = 500;                 // ignore cluster when the number of it is less than total/nRate
         private double[][] totalData;             // origin data
@@ -233,16 +233,17 @@ namespace FlowCytometry.CustomCluster
         {
             int i = 0, k = 0;
             int nSum = 0;
+            int n = 2;
 
-            for (i = -2; i < 3; i++)
+            for (i = -n; i < n+1; i++)
             {
                 if (x + i < 0 || x + i > nGridCnt - 1)
                     continue;
-                for (k = -2; k < 3; k++)
+                for (k = -n; k < n+1; k++)
                 {
                     if (y + k < 0 || y + k > nGridCnt - 1)
                         continue;
-                    nSum += gridWeight[x, y];
+                    nSum += gridWeight[x+i, y+k];
                 }
             }
 

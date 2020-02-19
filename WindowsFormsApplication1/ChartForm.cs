@@ -49,9 +49,22 @@ namespace WindowsFormsApplication1
        // string GateEOS_file = Path.Combine(filePath_gates, Path.GetFileName(fileName_GateEOS)); 
         // List<Polygon> polygons = new List<Polygon>();
 
+        public List<Color> ColorsOfMap = new List<Color>();
+
         public ChartForm()
         {
             InitializeComponent();
+
+            ColorsOfMap.AddRange(new Color[]{
+                Color.FromArgb(Alpha, 0, 0, 0) ,//Black
+                Color.FromArgb(Alpha, 0, 0, 0xFF) ,//Blue
+                Color.FromArgb(Alpha, 0, 0xFF, 0xFF) ,//Cyan
+                Color.FromArgb(Alpha, 0, 0xFF, 0) ,//Green
+                Color.FromArgb(Alpha, 0xFF, 0xFF, 0) ,//Yellow
+                Color.FromArgb(Alpha, 0xFF, 0, 0) ,//Red
+                Color.FromArgb(Alpha, 0xFF, 0xFF, 0xFF) // White
+            });
+
             chartData.PostPaint += chartData_PostPaint;
                        
             try
@@ -1840,21 +1853,21 @@ namespace WindowsFormsApplication1
                 string insideGate = "Inside Gate";// + cluster.Id;
                 chartData.Series.Add(insideGate);
                 chartData.Series[insideGate].ChartType = SeriesChartType.Point;
-                chartData.Series[insideGate].MarkerSize = 4;; //
+                chartData.Series[insideGate].MarkerSize = 4; //
                 chartData.Series[insideGate].MarkerStyle = MarkerStyle.Diamond;
                 chartData.Series[insideGate].MarkerColor = Color.Red; // colors[index];
 
                 string outsideGate = "Outside Gate";// + cluster.Id;
                 chartData.Series.Add(outsideGate);
                 chartData.Series[outsideGate].ChartType = SeriesChartType.Point;
-                chartData.Series[outsideGate].MarkerSize = 4;;
+                chartData.Series[outsideGate].MarkerSize = 4;
                 chartData.Series[outsideGate].MarkerStyle = MarkerStyle.Circle;
                 chartData.Series[outsideGate].MarkerColor = Color.Blue; //colors[index];
                 //wait
                 string PlotwithoutGating = "Plot without Gating";// + cluster.Id;
                 chartData.Series.Add(PlotwithoutGating);
                 chartData.Series[PlotwithoutGating].ChartType = SeriesChartType.Point;
-                chartData.Series[PlotwithoutGating].MarkerSize = 4;;
+                chartData.Series[PlotwithoutGating].MarkerSize = 4;
                 chartData.Series[PlotwithoutGating].MarkerStyle = MarkerStyle.Circle;
                 chartData.Series[PlotwithoutGating].MarkerColor = Color.Blue; //colors[index];
                 chartData.BringToFront();
@@ -2258,7 +2271,126 @@ namespace WindowsFormsApplication1
 
         private void btnPlotKde_Click(object sender, EventArgs e)
         {
+            checkValidFileName();
 
+            if (Loaded_TotalFileName != null)
+            {
+                sample = new FlowCytometry.FCMeasurement(Loaded_TotalFileName);
+            }
+            else
+            {
+                using (OpenFileDialog dlg = new OpenFileDialog())
+                {
+                    dlg.InitialDirectory = starting_filePath; //GetDataPath
+                    dlg.Filter = "FCS files|*.fcs";
+                    if (dlg.ShowDialog() == DialogResult.OK)
+                    {
+                        Loaded_TotalFileName = dlg.FileName;
+                    }
+                }
+                FileNameBox.Text = Loaded_TotalFileName;
+
+                sample = new FlowCytometry.FCMeasurement(Loaded_TotalFileName);
+
+                comboBox1.Items.Clear();
+                comboBox2.Items.Clear();
+                foreach (String name in sample.ChannelsNames)
+                {
+                    comboBox1.Items.Add(name);
+                    comboBox2.Items.Add(name);
+                }
+            }
+
+
+            string channel1 = FlowCytometry.FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
+            string channel2 = FlowCytometry.FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
+            comboBox1.Text = channel1;
+            comboBox2.Text = channel2;
+
+            HashSet<double[]> Gate1_hs = GenerateDataSet(channel1, channel2);
+            double[][] Gate1_array = Gate1_hs.ToArray();
+
+            // Draw Points first
+            chartData.ChartAreas[0].AxisX.Title = channel1;
+            chartData.ChartAreas[0].AxisY.Title = channel2;
+            chartData.ChartAreas[0].AxisX.IsMarginVisible = false;
+            chartData.ChartAreas[0].AxisY.IsMarginVisible = false;
+
+
+            chartData.Series.Clear();
+            string PlotwithoutGating = "Points";// + cluster.Id;
+            chartData.Series.Add(PlotwithoutGating);
+            chartData.Series[PlotwithoutGating].ChartType = SeriesChartType.Point;
+            chartData.Series[PlotwithoutGating].MarkerSize = 3;
+            chartData.Series[PlotwithoutGating].MarkerStyle = MarkerStyle.Circle;
+            chartData.Series[PlotwithoutGating].MarkerColor = Color.Blue; //colors[index];
+
+            int x = 0, y = 0, i = 0, nCnt = Gate1_array.Length;
+            for (i = 0; i < nCnt; i ++)
+            {
+                chartData.Series[PlotwithoutGating].Points.AddXY(Gate1_array[i][0], Gate1_array[i][1]);
+            }
+            chartData.Refresh();
+
+            // Calculate KDE
+            FlowCytometry.CustomCluster.Custom_Meanshift meanshift = CalculateKDE(Gate1_array);
+
+            // Draw KDE
+            nCnt = meanshift.nGridCnt;
+            int nMarkerSize = Math.Max(chartData.Width, chartData.Height) / nCnt;
+            chartData.Series.Clear();
+
+            chartData.Series.Add("KDE");
+            chartData.Series["KDE"].ChartType = SeriesChartType.Point;
+            chartData.Series["KDE"].MarkerSize = nMarkerSize;
+            chartData.Series["KDE"].MarkerStyle = MarkerStyle.Square;
+
+            double[] xy;
+            int nIdx = 0;
+            for (x = 0; x < nCnt; x++)
+            {
+                for (y = 0; y < nCnt; y++)
+                {
+                    xy = meanshift.ConvertGridToCoord(x, y);
+                    chartData.Series["KDE"].Points.AddXY(xy[0], xy[1]);
+                    chartData.Series["KDE"].Points[nIdx].Color = GetHeatColor(meanshift.kde[x, y], meanshift.maxKde);
+                    nIdx++;
+                }
+            }
+
+            chartData.Refresh();
+        }
+        public byte Alpha = 0xff;
+
+        public Color GetHeatColor(double val, double maxVal)
+        {
+            double valPerc = val / maxVal;// value%
+            double colorPerc = 1d / (ColorsOfMap.Count - 2);// % of each block of color. the last is the "100% Color"
+            double blockOfColor = valPerc / colorPerc;// the integer part repersents how many block to skip
+            int blockIdx = (int)Math.Truncate(blockOfColor);// Idx of 
+            double valPercResidual = valPerc - (blockIdx * colorPerc);//remove the part represented of block 
+            double percOfColor = valPercResidual / colorPerc;// % of color of this block that will be filled
+
+            Color cTarget = ColorsOfMap[blockIdx];
+            Color cNext = ColorsOfMap[blockIdx + 1];
+
+            var deltaR = cNext.R - cTarget.R;
+            var deltaG = cNext.G - cTarget.G;
+            var deltaB = cNext.B - cTarget.B;
+
+            var R = cTarget.R + (deltaR * percOfColor);
+            var G = cTarget.G + (deltaG * percOfColor);
+            var B = cTarget.B + (deltaB * percOfColor);
+
+            Color c = ColorsOfMap[0];
+            try
+            {
+                c = Color.FromArgb(Alpha, (byte)R, (byte)G, (byte)B);
+            }
+            catch
+            {
+            }
+            return c;
         }
 
         private void button_SetGateFolder_Click(object sender, EventArgs e)
