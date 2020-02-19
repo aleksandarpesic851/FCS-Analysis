@@ -59,6 +59,7 @@
             this.checkBox_DynamicGating = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.chartData = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.btnPlotKde = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chartData)).BeginInit();
@@ -75,16 +76,16 @@
             this.groupBox1.Controls.Add(this.radioButton_EOS);
             this.groupBox1.Controls.Add(this.radioButton_3diff);
             this.groupBox1.Controls.Add(this.btnGating);
-            this.groupBox1.Location = new System.Drawing.Point(576, 12);
+            this.groupBox1.Location = new System.Drawing.Point(727, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(195, 153);
+            this.groupBox1.Size = new System.Drawing.Size(220, 153);
             this.groupBox1.TabIndex = 16;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Process WBC";
             // 
             // button_SetGateFolder
             // 
-            this.button_SetGateFolder.Location = new System.Drawing.Point(13, 16);
+            this.button_SetGateFolder.Location = new System.Drawing.Point(34, 16);
             this.button_SetGateFolder.Margin = new System.Windows.Forms.Padding(2);
             this.button_SetGateFolder.Name = "button_SetGateFolder";
             this.button_SetGateFolder.Size = new System.Drawing.Size(155, 22);
@@ -98,7 +99,7 @@
             this.checkBox_FinalGate.AutoSize = true;
             this.checkBox_FinalGate.Checked = true;
             this.checkBox_FinalGate.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox_FinalGate.Location = new System.Drawing.Point(89, 126);
+            this.checkBox_FinalGate.Location = new System.Drawing.Point(132, 126);
             this.checkBox_FinalGate.Margin = new System.Windows.Forms.Padding(1);
             this.checkBox_FinalGate.Name = "checkBox_FinalGate";
             this.checkBox_FinalGate.Size = new System.Drawing.Size(48, 17);
@@ -111,7 +112,7 @@
             this.checkBoxGate1.AutoSize = true;
             this.checkBoxGate1.Checked = true;
             this.checkBoxGate1.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxGate1.Location = new System.Drawing.Point(88, 55);
+            this.checkBoxGate1.Location = new System.Drawing.Point(131, 55);
             this.checkBoxGate1.Margin = new System.Windows.Forms.Padding(1);
             this.checkBoxGate1.Name = "checkBoxGate1";
             this.checkBoxGate1.Size = new System.Drawing.Size(55, 17);
@@ -123,7 +124,7 @@
             // checkBoxGate3
             // 
             this.checkBoxGate3.AutoSize = true;
-            this.checkBoxGate3.Location = new System.Drawing.Point(88, 102);
+            this.checkBoxGate3.Location = new System.Drawing.Point(131, 102);
             this.checkBoxGate3.Margin = new System.Windows.Forms.Padding(1);
             this.checkBoxGate3.Name = "checkBoxGate3";
             this.checkBoxGate3.Size = new System.Drawing.Size(55, 17);
@@ -134,7 +135,7 @@
             // checkBoxGate2
             // 
             this.checkBoxGate2.AutoSize = true;
-            this.checkBoxGate2.Location = new System.Drawing.Point(88, 79);
+            this.checkBoxGate2.Location = new System.Drawing.Point(131, 79);
             this.checkBoxGate2.Margin = new System.Windows.Forms.Padding(1);
             this.checkBoxGate2.Name = "checkBoxGate2";
             this.checkBoxGate2.Size = new System.Drawing.Size(55, 17);
@@ -145,7 +146,7 @@
             // radioButton_BASO
             // 
             this.radioButton_BASO.AutoSize = true;
-            this.radioButton_BASO.Location = new System.Drawing.Point(15, 91);
+            this.radioButton_BASO.Location = new System.Drawing.Point(37, 91);
             this.radioButton_BASO.Name = "radioButton_BASO";
             this.radioButton_BASO.Size = new System.Drawing.Size(54, 17);
             this.radioButton_BASO.TabIndex = 15;
@@ -156,7 +157,7 @@
             // radioButton_EOS
             // 
             this.radioButton_EOS.AutoSize = true;
-            this.radioButton_EOS.Location = new System.Drawing.Point(15, 67);
+            this.radioButton_EOS.Location = new System.Drawing.Point(37, 67);
             this.radioButton_EOS.Name = "radioButton_EOS";
             this.radioButton_EOS.Size = new System.Drawing.Size(47, 17);
             this.radioButton_EOS.TabIndex = 14;
@@ -168,7 +169,7 @@
             // 
             this.radioButton_3diff.AutoSize = true;
             this.radioButton_3diff.Checked = true;
-            this.radioButton_3diff.Location = new System.Drawing.Point(15, 44);
+            this.radioButton_3diff.Location = new System.Drawing.Point(37, 44);
             this.radioButton_3diff.Name = "radioButton_3diff";
             this.radioButton_3diff.Size = new System.Drawing.Size(48, 17);
             this.radioButton_3diff.TabIndex = 13;
@@ -179,7 +180,7 @@
             // 
             // btnGating
             // 
-            this.btnGating.Location = new System.Drawing.Point(13, 118);
+            this.btnGating.Location = new System.Drawing.Point(35, 118);
             this.btnGating.Margin = new System.Windows.Forms.Padding(1);
             this.btnGating.Name = "btnGating";
             this.btnGating.Size = new System.Drawing.Size(63, 28);
@@ -191,7 +192,7 @@
             // 
             // btnSeparation
             // 
-            this.btnSeparation.Location = new System.Drawing.Point(445, 55);
+            this.btnSeparation.Location = new System.Drawing.Point(557, 55);
             this.btnSeparation.Margin = new System.Windows.Forms.Padding(1);
             this.btnSeparation.Name = "btnSeparation";
             this.btnSeparation.Size = new System.Drawing.Size(87, 30);
@@ -202,10 +203,10 @@
             // 
             // loadFile
             // 
-            this.loadFile.Location = new System.Drawing.Point(25, 71);
+            this.loadFile.Location = new System.Drawing.Point(183, 26);
             this.loadFile.Margin = new System.Windows.Forms.Padding(2);
             this.loadFile.Name = "loadFile";
-            this.loadFile.Size = new System.Drawing.Size(73, 27);
+            this.loadFile.Size = new System.Drawing.Size(81, 27);
             this.loadFile.TabIndex = 10;
             this.loadFile.Text = "Load File";
             this.loadFile.UseVisualStyleBackColor = true;
@@ -213,10 +214,10 @@
             // 
             // RefeshButton
             // 
-            this.RefeshButton.Location = new System.Drawing.Point(213, 67);
+            this.RefeshButton.Location = new System.Drawing.Point(395, 71);
             this.RefeshButton.Margin = new System.Windows.Forms.Padding(2);
             this.RefeshButton.Name = "RefeshButton";
-            this.RefeshButton.Size = new System.Drawing.Size(83, 31);
+            this.RefeshButton.Size = new System.Drawing.Size(81, 27);
             this.RefeshButton.TabIndex = 3;
             this.RefeshButton.Text = "Refresh";
             this.RefeshButton.UseVisualStyleBackColor = true;
@@ -224,7 +225,7 @@
             // 
             // btnLoadClusters
             // 
-            this.btnLoadClusters.Location = new System.Drawing.Point(295, 28);
+            this.btnLoadClusters.Location = new System.Drawing.Point(395, 26);
             this.btnLoadClusters.Margin = new System.Windows.Forms.Padding(2);
             this.btnLoadClusters.Name = "btnLoadClusters";
             this.btnLoadClusters.Size = new System.Drawing.Size(81, 27);
@@ -235,10 +236,10 @@
             // 
             // btnPlotOnly
             // 
-            this.btnPlotOnly.Location = new System.Drawing.Point(131, 71);
+            this.btnPlotOnly.Location = new System.Drawing.Point(290, 71);
             this.btnPlotOnly.Margin = new System.Windows.Forms.Padding(1);
             this.btnPlotOnly.Name = "btnPlotOnly";
-            this.btnPlotOnly.Size = new System.Drawing.Size(73, 27);
+            this.btnPlotOnly.Size = new System.Drawing.Size(81, 27);
             this.btnPlotOnly.TabIndex = 0;
             this.btnPlotOnly.Text = "Plot only";
             this.btnPlotOnly.UseVisualStyleBackColor = true;
@@ -246,10 +247,10 @@
             // 
             // btnLoadPolygons
             // 
-            this.btnLoadPolygons.Location = new System.Drawing.Point(208, 29);
+            this.btnLoadPolygons.Location = new System.Drawing.Point(290, 26);
             this.btnLoadPolygons.Margin = new System.Windows.Forms.Padding(2);
             this.btnLoadPolygons.Name = "btnLoadPolygons";
-            this.btnLoadPolygons.Size = new System.Drawing.Size(73, 24);
+            this.btnLoadPolygons.Size = new System.Drawing.Size(81, 27);
             this.btnLoadPolygons.TabIndex = 4;
             this.btnLoadPolygons.Text = "Load Gate";
             this.btnLoadPolygons.UseVisualStyleBackColor = true;
@@ -259,7 +260,7 @@
             // 
             this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(5, 15);
+            this.comboBox1.Location = new System.Drawing.Point(5, 22);
             this.comboBox1.Margin = new System.Windows.Forms.Padding(2);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(107, 21);
@@ -269,16 +270,16 @@
             // 
             this.comboBox2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox2.FormattingEnabled = true;
-            this.comboBox2.Location = new System.Drawing.Point(8, 43);
+            this.comboBox2.Location = new System.Drawing.Point(5, 52);
             this.comboBox2.Margin = new System.Windows.Forms.Padding(2);
             this.comboBox2.Name = "comboBox2";
-            this.comboBox2.Size = new System.Drawing.Size(104, 21);
+            this.comboBox2.Size = new System.Drawing.Size(107, 21);
             this.comboBox2.TabIndex = 2;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(128, 16);
+            this.label1.Location = new System.Drawing.Point(119, 30);
             this.label1.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(35, 13);
@@ -289,7 +290,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(128, 44);
+            this.label2.Location = new System.Drawing.Point(119, 60);
             this.label2.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(35, 13);
@@ -301,7 +302,7 @@
             this.checkBox_PrefilterData.AutoSize = true;
             this.checkBox_PrefilterData.Checked = true;
             this.checkBox_PrefilterData.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox_PrefilterData.Location = new System.Drawing.Point(316, 75);
+            this.checkBox_PrefilterData.Location = new System.Drawing.Point(58, 82);
             this.checkBox_PrefilterData.Name = "checkBox_PrefilterData";
             this.checkBox_PrefilterData.Size = new System.Drawing.Size(60, 17);
             this.checkBox_PrefilterData.TabIndex = 11;
@@ -315,7 +316,7 @@
             // 
             // button_ProcessList
             // 
-            this.button_ProcessList.Location = new System.Drawing.Point(445, 12);
+            this.button_ProcessList.Location = new System.Drawing.Point(557, 12);
             this.button_ProcessList.Margin = new System.Windows.Forms.Padding(2);
             this.button_ProcessList.Name = "button_ProcessList";
             this.button_ProcessList.Size = new System.Drawing.Size(86, 31);
@@ -328,7 +329,7 @@
             this.FileNameBox.Location = new System.Drawing.Point(14, 145);
             this.FileNameBox.Margin = new System.Windows.Forms.Padding(2);
             this.FileNameBox.Name = "FileNameBox";
-            this.FileNameBox.Size = new System.Drawing.Size(547, 20);
+            this.FileNameBox.Size = new System.Drawing.Size(681, 20);
             this.FileNameBox.TabIndex = 21;
             this.FileNameBox.TextChanged += new System.EventHandler(this.FileNameBox_TextChanged);
             // 
@@ -336,7 +337,7 @@
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(247, 126);
+            this.label4.Location = new System.Drawing.Point(313, 125);
             this.label4.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(109, 15);
@@ -348,7 +349,7 @@
             this.checkBox_FixedGating.AutoSize = true;
             this.checkBox_FixedGating.Checked = true;
             this.checkBox_FixedGating.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox_FixedGating.Location = new System.Drawing.Point(464, 113);
+            this.checkBox_FixedGating.Location = new System.Drawing.Point(576, 113);
             this.checkBox_FixedGating.Name = "checkBox_FixedGating";
             this.checkBox_FixedGating.Size = new System.Drawing.Size(51, 17);
             this.checkBox_FixedGating.TabIndex = 26;
@@ -359,7 +360,7 @@
             // checkBox_DynamicGating
             // 
             this.checkBox_DynamicGating.AutoSize = true;
-            this.checkBox_DynamicGating.Location = new System.Drawing.Point(464, 91);
+            this.checkBox_DynamicGating.Location = new System.Drawing.Point(576, 91);
             this.checkBox_DynamicGating.Name = "checkBox_DynamicGating";
             this.checkBox_DynamicGating.Size = new System.Drawing.Size(67, 17);
             this.checkBox_DynamicGating.TabIndex = 27;
@@ -369,6 +370,7 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.btnPlotKde);
             this.groupBox2.Controls.Add(this.checkBox_PrefilterData);
             this.groupBox2.Controls.Add(this.label2);
             this.groupBox2.Controls.Add(this.loadFile);
@@ -381,7 +383,7 @@
             this.groupBox2.Controls.Add(this.comboBox1);
             this.groupBox2.Location = new System.Drawing.Point(14, 12);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(388, 106);
+            this.groupBox2.Size = new System.Drawing.Size(497, 109);
             this.groupBox2.TabIndex = 28;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Explore FCS Data";
@@ -406,6 +408,17 @@
             this.chartData.Size = new System.Drawing.Size(1324, 610);
             this.chartData.TabIndex = 0;
             this.chartData.Text = "chart2";
+            // 
+            // btnPlotKde
+            // 
+            this.btnPlotKde.Location = new System.Drawing.Point(183, 71);
+            this.btnPlotKde.Margin = new System.Windows.Forms.Padding(1);
+            this.btnPlotKde.Name = "btnPlotKde";
+            this.btnPlotKde.Size = new System.Drawing.Size(81, 27);
+            this.btnPlotKde.TabIndex = 12;
+            this.btnPlotKde.Text = "Plot KDE";
+            this.btnPlotKde.UseVisualStyleBackColor = true;
+            this.btnPlotKde.Click += new System.EventHandler(this.btnPlotKde_Click);
             // 
             // ChartForm
             // 
@@ -466,6 +479,7 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Button button_SetGateFolder;
         private System.Windows.Forms.DataVisualization.Charting.Chart chartData;
+        private System.Windows.Forms.Button btnPlotKde;
     }
 }
 

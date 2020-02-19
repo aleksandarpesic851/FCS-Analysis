@@ -472,6 +472,19 @@ namespace WindowsFormsApplication1
             }
         }
 
+        private void checkValidFileName()
+        {
+            Loaded_TotalFileName = FileNameBox.Text;
+            if (string.IsNullOrEmpty(Loaded_TotalFileName))
+            {
+                Loaded_TotalFileName = null;
+                return;
+            }
+            if (!File.Exists(Loaded_TotalFileName))
+            {
+                Loaded_TotalFileName = null;
+            }
+        }
         private void btnGating_Click(object sender, EventArgs e) // old btnFixedGating
         {
             // Create options for 5-diff
@@ -504,6 +517,7 @@ namespace WindowsFormsApplication1
             //string Total_output_filename;
 
             #region get file from dialog box
+            checkValidFileName();
             if (Loaded_TotalFileName != null)
             {
                 filePath = Path.GetDirectoryName(Loaded_TotalFileName);
@@ -617,7 +631,8 @@ namespace WindowsFormsApplication1
                         Neutrophils_hs.Add(new double[2] { x, y });
                     }
                 }
-            /*    double[][] Neutrophils_array = Neutrophils_hs.ToArray();
+
+/*                double[][] Neutrophils_array = Neutrophils_hs.ToArray();
                 bool[,] indexGate_EOS = FlowCytometry.FCMeasurement.GateArray(Neutrophils_array, Loaded_TotalFileName, FL_H_max, SSC_H_max);
                 bool[] EOS_Max = FlowCytometry.FCMeasurement.GetColumn(indexGate_EOS, 0); //getColumn
                 bool[] EOS_Gate = FlowCytometry.FCMeasurement.GetColumn(indexGate_EOS, 1);
@@ -625,7 +640,7 @@ namespace WindowsFormsApplication1
                 int count_GateEOS = CountBoolTrue(EOS_Gate);
                 EOSreport[3] = count_GateEOS;
                 Console.WriteLine(String.Format("EOS (max): {0} \nInside EOS gate: {1}", count_EOS_Max, count_GateEOS));
-            */
+*/            
 
                 int[] WBC_counts = FlowCytometry.FCMeasurement.processEOS(Loaded_TotalFileName, filePath_gates, channelNomenclature); 
                 int totalWBC = WBC_counts[0] + WBC_counts[1] + WBC_counts[2] + WBC_counts[3];
@@ -981,253 +996,6 @@ namespace WindowsFormsApplication1
 
             double x, y;
 
-            #region Kernel calculation
-
-            #region add chart type
-            string KernelPlot = "KDE plot";
-            chartData.Series.Add(KernelPlot);
-            chartData.Series[KernelPlot].ChartType = SeriesChartType.Point;
-            chartData.Series[KernelPlot].MarkerSize = 4;
-            chartData.Series[KernelPlot].MarkerStyle = MarkerStyle.Circle; //Diamond
-            chartData.Series[KernelPlot].MarkerColor = Color.Green;
-            #endregion
-
-            double sigma = 0.5; // RELATED TO bandwidth
-            double sigma_2D = 3;
-            double sigma_localDensity = 0.125; // RELATED TO bandwidth
-            int nbins = 100;
-
-            double[,] result1D = null;
-            double[,] result2D = null;
-            //double densityExpFactor = 
-
-            bool solveKDE1D = false;
-            bool solveKDE2D = false; //true; //
-            bool localDensity = false;
-            int nbinsX = nbins;
-            int nbinsY = nbins;
-            //double NormalizationFactor = 0;
-            double[] localDens;
-            //double DensityMax = 0;
-            double denseMax;
-            double denseMin;
-            //Color[] localColor;
-            double[] array_1D = new double[nbinsX];
-
-            if (solveKDE1D)
-            {
-                result1D = MeansClustering.MeansCluster.KDE1d(Array_Y, sigma, nbins);            //double[] data, double sigma, int nbins)
-                                                                                                 // return double[,]
-                for (int j = 0; j < nbins; j++)
-                {
-                    x = result1D[j, 0]; // should equal result[j,0]  //Gate1_array = GateFinal_array, so using already created Gate1_array
-                    y = result1D[j, 1];
-                    chartData.Series[KernelPlot].Points.AddXY(x, y);                     //  y = result[j, 1];
-                }
-            }
-            else if (solveKDE2D)
-            {
-                // array_1D = MeansClustering.MeansCluster.KDE2d(Array_XY, sigma, nbins);            //double[] data, double sigma, int nbins)
-
-                result2D = MeansClustering.MeansCluster.KDE2d(Array_XY, sigma_2D, nbins);
-                StringBuilder sb = new StringBuilder();
-                // b = reader.ReadByte();
-                // if (b != textSeparator)
-                // sb.Append((char)b);
-
-                double minX = Array_X.Min();
-                double maxX = Array_X.Max();
-                double minY = Array_Y.Min();
-                double maxY = Array_Y.Max();
-                // To get index use:       int indMax = Array.IndexOf(data, Max);
-
-                // Like MATLAB linspace(MIN, MAX, nbins);
-                double result2D_min = 1000000000;
-                double result2D_max = 0;
-                double[] fields = new double[nbinsX];
-
-                for (int j = 0; j < nbinsX; j++)
-                {
-                    //x = minX + j * (maxX - minX) / nbinsX;
-                    for (int k = 0; k < nbinsY; k++)
-                    {
-                        if (result2D_min > result2D[j, k])
-                        {
-                            result2D_min = result2D[j, k];
-                        }
-                        if (result2D_max < result2D[j, k])
-                        {
-                            result2D_max = result2D[j, k];
-                        }
-                        //   fields[k] = result2D[j, k];
-                    }
-                    //  sb.AppendLine(string.Join(",", fields));
-                }
-
-
-                for (int j = 0; j < nbinsX; j++)
-                {
-                    x = minX + j * (maxX - minX) / nbinsX;
-                    for (int k = 0; k < nbinsY; k++)
-                    {
-                        fields[k] = (result2D[j, k] - result2D_min) / (result2D_max - result2D_min);
-                    }
-                    sb.AppendLine(string.Join(",", fields));
-                }
-
-                File.WriteAllText("2D_N50xN50.csv", sb.ToString());
-                MessageBox.Show(String.Format("Min density = {0}, Max density = {1}", result2D_min, result2D_max));
-
-                //  int Ndata = Array_XY.GetLength(0);
-                int point_index = 0;
-                for (int j = 0; j < nbinsX; j++)
-                {
-                    x = minX + j * (maxX - minX) / nbinsX;
-                    for (int k = 0; k < nbinsY; k++)
-                    {
-                        y = minY + k * (maxY - minY) / nbinsY;
-                        //     chartData.Series[KernelPlot].Points.AddXY(x, y);                     //  y = result[j, 1];
-
-                        //   Color colorVal = HeatColorMap(result2D[j,k], result2D_min, result2D_max);
-                        Color colorVal = RedColorMap(result2D[j, k], result2D_min, result2D_max);
-                        //  Color colorVal = RedColorMap(KDE2d_Result[j, k], result_KDE_2D_min, result_KDE_2D_max);
-
-
-                        chartData.Series[KernelPlot].Points.AddXY(x, y);
-
-                        chartData.Series[KernelPlot].Points[point_index].Color = colorVal; //j*nbinsX+k
-                        point_index++;
-
-                    }
-                }
-            }
-            else if (localDensity)
-            {
-                double[] localDensRescaled = new double[TotalDataLength];
-                localDens = MeansClustering.MeansCluster.localDensity(Array_XY, sigma_localDensity);//XY_norm
-
-                denseMax = localDens.Max();
-                denseMin = localDens.Min(); ///Ndata
-
-                for (int j = 0; j < TotalDataLength; j++)
-                {
-                    x = Array_X[j];
-                    y = Array_Y[j];
-
-                    localDensRescaled[j] = (localDens[j] - denseMin) / (denseMax - denseMin);
-                    // Color colorVal = HeatColorMap(localDens[j], denseMin, denseMax);
-                    Color colorVal = RedColorMap(localDens[j], denseMin, denseMax);
-                    //Color colorVal = HeatColorMap(localDensRescaled[j], 0, 1);
-
-                    //  R = Convert.ToByte(255 * localDensRescaled[j]);
-                    //  MessageBox.Show(String.Format("Color R = {0}", R));
-                    chartData.Series[KernelPlot].Points.AddXY(x, y);
-                    // chartData.Series[KernelPlot].Points.AddXY(j, localDensRescaled[j]);
-                    chartData.Series[KernelPlot].Points[j].Color = colorVal;
-                    //                    chartData.Series[KernelPlot].Points[j].Color = colorVal;
-                }
-
-
-                MessageBox.Show("Plotted local density, scaled");
-
-                /*
-                for (int j = 0; j < TotalDataLength; j++)
-                {
-                    //  Color colorVal = HeatColorMap(localDens[j], denseMin, denseMax);
-                    Color colorVal = HeatColorMap(localDensRescaled[j], 0, 1);
-                    //MessageBox.Show(String.Format("Normalization Factor = {0}", colorVal));
-                    //  Color colorVal = HeatColorMap(localDens[j], 0, 1);
-                    x = Array_X[j]; // should equal result[j,0]  //Gate1_array = GateFinal_array, so using already created Gate1_array
-                    y = Array_Y[j];
-
-                    chartData.Series[KernelPlot].Points.AddXY(x, y);
-                    chartData.Series[KernelPlot].Points[j].Color = colorVal;
-                    //chartData.Series[KernelPlot].Points[0].Color = HeatColorMap(localDens[j], 0, 1);
-                    NormalizationFactor += localDens[j]; // TotalDataLength
-                }
-
-                */
-
-                //chartData.Invalidate();
-            }
- 
-            #endregion
-
-            #region junk
-            /*
-             *  chartData.Series.ResumeUpdates()
-              chartData.Series[1].Points.Item[0].YValues = Double(1) {MyNewValue, 0}
-               chartData.Series[1].Points[0].Color = Color.Red
-              chartData.DataBind()
-                 chartData.Series.Invalidate()
-                 chartData.Series.SuspendUpdates()
-
-
-                        // = Z                                        // return double[,]
-            for (int j = 0; j < nbinsY; j++) // row designation -> Y
-            {
-                for (int k = 0; k < nbinsX; k++) // column designation -> X
-                {
-                    localDensity = result2D[j, k];
-
-                    NormalizationFactor += localDensity;
-                    x = result2D[j, 0]; // should equal result[j,0]  //Gate1_array = GateFinal_array, so using already created Gate1_array
-                    y = result2D[j, 1];
-                    if (localDensity > DensityMax)
-                    {
-                        DensityMax = localDensity;
-                    } //ContourLayer layer = c.addContourLayer(dataX, dataY, dataZ);
-                    //  ContourLayer layer = chartData.addContourLayer(Array_X, Array_X, Array_X);
-
-                    chartData.Series[KernelPlot].Points.AddXY(x, y);
-                    chartData.Series[KernelPlot].Points[0].Color = HeatColorMap(localDensity, 0, 1);  //Color.Red
-                                                                                                   // chartData.Series[KernelPlot].MarkerColor = HeatColorMap(localDensity, 0, 1);
-                                                                                                   // colors[index];
-                                                                                                   // HeatColorMap
-                                                                                                   // color points according to density
-                }
-            }
-
-            */
-
-            // double MaxResult = result2D.Max();
-            //  IEnumerable<int> allValues = result2D.Cast<int>();
-            //   int MinResult = allValues.Min();
-            //   int MaxResult = allValues.Max();
-
-            //  MessageBox.Show(String.Format("Normalization Factor = {0}", NormalizationFactor));
-
-            //            MessageBox.Show("Press a key...");
-            //  Console.ReadKey(true); //Console.Read
-
-
-            /*
-            for (int j = 0; j < TotalDataLength; j++)   // for (int j = 0; j < Gate1Max_Length; j++)
-            {
-                x = Gate1_array[j][0]; //Gate1_array = GateFinal_array, so using already created Gate1_array
-                y = Gate1_array[j][1];
-                //                chartData.Series[KernelPlot].Points.AddXY(x, y);
-            }
-*/
-
-
-            // Create a new Mean-Shift algorithm for 3 dimensional samples
-            // MeanShift meanShift = new MeanShift()
-            // {
-            //     // Use a uniform kernel density
-            //     Kernel = new UniformKernel(),
-            //     Bandwidth = 2.0
-            // };
-
-
-            // MessageBox.Show(String.Format("Shift X = {0}", shiftX)); //
-            // shiftXY = MeansClustering.MeansCluster.mShift(test_X, test_Y, test2D);
-
-            //  MessageBox.Show(String.Format("Kernel density = {0}", shiftXY)); //shiftX
-            //            MessageBox.Show(String.Format("Shifts X,Y = {0},{1}", shiftXY[0], shiftXY[1])); //shiftX
-            //System.FormatException: 'Index (zero based) must be greater than or equal to zero and less than the size of the argument list.'
-            #endregion
-
             List<Polygon> polygons = loadPolygon(Gate1_file);
 
             #region analyze "Cells" selection gate
@@ -1278,29 +1046,33 @@ namespace WindowsFormsApplication1
             // GATE 2: Singlets
 
             #region get Singlets gate file location
-            string filePath_gate2 = filePath_gates; // "C:/Users/begem/OneDrive/Desktop/General Fluidics/Csharp/Build9/WindowsFormsApplication1/bin/Debug";
+            /*string filePath_gate2 = filePath_gates; // "C:/Users/begem/OneDrive/Desktop/General Fluidics/Csharp/Build9/WindowsFormsApplication1/bin/Debug";
             string fileName_gatedSinglets = "gating Singlets.csv";
             string Gate2_file = Path.Combine(filePath_gate2, Path.GetFileName(fileName_gatedSinglets));
+*/
 
             string FSC1_A = FlowCytometry.FCMeasurement.GetChannelName("FCS1area", channelNomenclature);
-
             Gate2_hs = GenerateDataSet(FSC1_A, FSC1_H);
             double[][] Gate2_array = Gate2_hs.ToArray();
             #endregion
 
-            polygons = loadPolygon(Gate2_file);
+            //polygons = loadPolygon(Gate2_file);
 
             double[] SingletsFit = new double[3];
             SingletsFit = FlowCytometry.FCMeasurement.LinearRegression(Gate2_array);
             MessageBox.Show(String.Format("Slope = {0}, Y-intercept = {1}, R^2 = {2}", 
-                Math.Round(SingletsFit[0],1), Math.Round(SingletsFit[1], 1), Math.Round(SingletsFit[2],1)));
+                Math.Round(SingletsFit[0],5), Math.Round(SingletsFit[1], 1), Math.Round(SingletsFit[2],1)));
 
-            double[] X1Y1X2Y2 = new double[4];
+            double slope = SingletsFit[0];
+            double intercept = SingletsFit[1];
+            double expect = 0;
+
+            /*double[] X1Y1X2Y2 = new double[4];
             X1Y1X2Y2[0] = 0;
             X1Y1X2Y2[1] = 0;
             X1Y1X2Y2[2] = SingletsFit[0];
             X1Y1X2Y2[3] = SingletsFit[1];
-
+*/
             indexGate2_Max = FlowCytometry.FCMeasurement.findMaxValues(sample, Gate1_array, FSC1_A, FSC1_H);
             int count_Gate2Max = CountBoolTrue(indexGate2_Max);
 
@@ -1319,6 +1091,22 @@ namespace WindowsFormsApplication1
             {
                 x = Gate2_array[j][0];    //x = Gate1_arrayMax[j][0];
                 y = Gate2_array[j][1];    //y = Gate1_arrayMax[j][1];
+
+                expect = slope * x + intercept;
+
+                if (y > expect)
+                {
+                    indexGate2[j] = true;
+                    if (checkBoxGate2.Checked)
+                        chartData.Series[threeDiffGated].Points.AddXY(x, y);
+                }
+                else
+                {
+                    indexGate2[j] = false;
+                    if (checkBoxGate2.Checked)
+                        chartData.Series[outsideFixedGates].Points.AddXY(x, y);
+                }
+/*
 
                 if (polygons != null)
                 {
@@ -1339,7 +1127,7 @@ namespace WindowsFormsApplication1
                 else
                 {
                     throw new InvalidDataException("Singlets Gate not found");
-                }
+                }*/
             }
 
             int count_Gate2 = CountBoolTrue(indexGate2);
@@ -1353,8 +1141,9 @@ namespace WindowsFormsApplication1
 
 
             #region Clustering
-
+            int[] NML = new int[3];
             bool[] NeutrophilsTF = new bool[TotalDataLength];
+
             string fileName_Gate3 = "gating Cell Types.csv"; // gating2.csv"; //4
             string path_gate3 = Path.Combine(filePath_gates, Path.GetFileName(fileName_Gate3));
             polygons = loadPolygon(path_gate3);
@@ -1387,7 +1176,7 @@ namespace WindowsFormsApplication1
             }
             if (checkBoxGate3.Checked)
             {
-                string[] CELL_NAME = new string[] { "Neutrophils", "Lymphocytes", "Monocytes" };
+                string[] CELL_NAME = new string[] { "Neutrophils", "Monocytes", "Lymphocytes" };
 
                 List<FlowCytometry.CustomCluster.Cluster> clusters;
                 calculateDynamicGates(polygons, Gate1_array, out clusters);
@@ -1419,12 +1208,6 @@ namespace WindowsFormsApplication1
                     chartData.Series[outsideFixedGates].MarkerStyle = MarkerStyle.Circle;
                     chartData.Series[outsideFixedGates].MarkerColor = Color.Red; //colors[index];
 
-                    chartData.Series.Add(KernelPlot);
-                    chartData.Series[KernelPlot].ChartType = SeriesChartType.Point;
-                    chartData.Series[KernelPlot].MarkerSize = 4;;
-                    chartData.Series[KernelPlot].MarkerStyle = MarkerStyle.Circle; //Diamond
-                    chartData.Series[KernelPlot].MarkerColor = Color.Green;
-
                     chartData.Series.Add(threeDiffGated);
                     chartData.Series[threeDiffGated].ChartType = SeriesChartType.Point;
                     chartData.Series[threeDiffGated].MarkerSize = 4;;
@@ -1445,6 +1228,8 @@ namespace WindowsFormsApplication1
                             chartData.Series[seryName].MarkerColor = polygons[idx].color;
 
                             strMsg += "\n" +  seryName + " : " + cluster.points.Count;
+
+                            NML[idx] = 100 * cluster.points.Count / TotalDataLength;
                         }
 
                         foreach (int idx in cluster.points)
@@ -1957,16 +1742,20 @@ namespace WindowsFormsApplication1
             #endregion
            
             string[] argumentsIn = new string[4];
-            int[] NML = new int[3];
             argumentsIn[0] = Loaded_TotalFileName; // full FCS filename with path an extension
             argumentsIn[1] = filePath_gates; // file path to folder with fixed gates
             argumentsIn[2] = channelNomenclature; //  type of nomeclature: "old_names", "new_names", "middleaged_names"
             argumentsIn[3] = "3-diff";//sampleType ; // type of analysis: "EOS", "BASO",
 
+            if (checkBoxGate3.Checked)
+            {
+                MessageBox.Show(String.Format("NML Report: {0},{1},{2}\n", NML[0], NML[1], NML[2]));
+            }
+            /*
             bool ouputExcel = false;
             NML = FlowCytometry.FCMeasurement.WBC_analysis(argumentsIn, ouputExcel);
             MessageBox.Show(String.Format("NML Report: {0},{1},{2}\n", NML[0], NML[1], NML[2]));
-
+*/
             var tuple = new Tuple<int[], bool[]>(NML, NeutrophilsTF);
             return tuple; 
 
@@ -1979,6 +1768,9 @@ namespace WindowsFormsApplication1
             string channel1 = comboBox1.Text;
             string channel2 = comboBox2.Text;
             string fileTot;
+            
+            checkValidFileName();
+
             if (Loaded_TotalFileName != null)
             {
                 fileTot = Loaded_TotalFileName;
@@ -2462,6 +2254,11 @@ namespace WindowsFormsApplication1
                 }
             }            
             return filePath_gates;
+        }
+
+        private void btnPlotKde_Click(object sender, EventArgs e)
+        {
+
         }
 
         private void button_SetGateFolder_Click(object sender, EventArgs e)
