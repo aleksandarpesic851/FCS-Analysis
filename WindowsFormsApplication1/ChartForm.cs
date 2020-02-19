@@ -560,6 +560,13 @@ namespace WindowsFormsApplication1
                     comboBox2.Items.Add(name);
                 }
             }
+
+            if (!checkCultureCorrect())
+            {
+                MessageBox.Show("Please check culture is set correctly", "Incorrect Culture");
+                return;
+            }
+
             comboBox1.Text = FSC1_H;
             comboBox2.Text = SSC_H;
 
@@ -1824,6 +1831,12 @@ namespace WindowsFormsApplication1
                 
             }
 
+            if (!checkCultureCorrect())
+            {
+                MessageBox.Show("Please check culture is set correctly", "Incorrect Culture");
+                return;
+            }
+
             //int[] index_Cells;
             //int[] index_Singles;
             //int[] index_SizeGated;
@@ -1975,6 +1988,12 @@ namespace WindowsFormsApplication1
             {
                 comboBox1.Items.Add(name);
                 comboBox2.Items.Add(name);
+            }
+
+            if (!checkCultureCorrect())
+            {
+                MessageBox.Show("Please check culture is set correctly", "Incorrect Culture");
+                return;
             }
 
             string channel1 = FlowCytometry.FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
@@ -2304,6 +2323,11 @@ namespace WindowsFormsApplication1
                 }
             }
 
+            if (!checkCultureCorrect())
+            {
+                MessageBox.Show("Please check culture is set correctly", "Incorrect Culture");
+                return;
+            }
 
             string channel1 = FlowCytometry.FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
             string channel2 = FlowCytometry.FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
@@ -2396,10 +2420,31 @@ namespace WindowsFormsApplication1
             return c;
         }
 
+        private void radioNewName_CheckedChanged(object sender, EventArgs e)
+        {
+            channelNomenclature = "new_names";
+        }
+
+        private void radioOldName_CheckedChanged(object sender, EventArgs e)
+        {
+            channelNomenclature = "old_names";
+        }
+
         private void button_SetGateFolder_Click(object sender, EventArgs e)
         {
             //string filePath_gates = " C:/Users/begem/OneDrive/Desktop/General Fluidics/Fixed gating";
             filePath_gates = Set_FixedGatingFolder();
+        }
+
+        private bool checkCultureCorrect()
+        {
+            if (sample == null)
+                return false;
+
+            string FSC1_H = FlowCytometry.FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
+            string SSC_H = FlowCytometry.FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
+
+            return sample.ChannelsNames.Contains(FSC1_H) && sample.ChannelsNames.Contains(SSC_H);
         }
     }
 }

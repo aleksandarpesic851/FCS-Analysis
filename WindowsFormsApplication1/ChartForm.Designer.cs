@@ -64,6 +64,8 @@
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabWBC = new System.Windows.Forms.TabPage();
             this.tabRBC = new System.Windows.Forms.TabPage();
+            this.radioNewName = new System.Windows.Forms.RadioButton();
+            this.radioOldName = new System.Windows.Forms.RadioButton();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chartData)).BeginInit();
@@ -198,10 +200,10 @@
             // 
             // btnSeparation
             // 
-            this.btnSeparation.Location = new System.Drawing.Point(646, 52);
+            this.btnSeparation.Location = new System.Drawing.Point(641, 52);
             this.btnSeparation.Margin = new System.Windows.Forms.Padding(1);
             this.btnSeparation.Name = "btnSeparation";
-            this.btnSeparation.Size = new System.Drawing.Size(119, 30);
+            this.btnSeparation.Size = new System.Drawing.Size(178, 30);
             this.btnSeparation.TabIndex = 12;
             this.btnSeparation.Text = "Load + Cluster";
             this.btnSeparation.UseVisualStyleBackColor = true;
@@ -322,10 +324,10 @@
             // 
             // button_ProcessList
             // 
-            this.button_ProcessList.Location = new System.Drawing.Point(646, 13);
+            this.button_ProcessList.Location = new System.Drawing.Point(641, 13);
             this.button_ProcessList.Margin = new System.Windows.Forms.Padding(2);
             this.button_ProcessList.Name = "button_ProcessList";
-            this.button_ProcessList.Size = new System.Drawing.Size(119, 30);
+            this.button_ProcessList.Size = new System.Drawing.Size(178, 30);
             this.button_ProcessList.TabIndex = 17;
             this.button_ProcessList.Text = "Process List";
             this.button_ProcessList.UseVisualStyleBackColor = true;
@@ -355,7 +357,7 @@
             this.checkBox_FixedGating.AutoSize = true;
             this.checkBox_FixedGating.Checked = true;
             this.checkBox_FixedGating.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox_FixedGating.Location = new System.Drawing.Point(672, 117);
+            this.checkBox_FixedGating.Location = new System.Drawing.Point(641, 117);
             this.checkBox_FixedGating.Name = "checkBox_FixedGating";
             this.checkBox_FixedGating.Size = new System.Drawing.Size(56, 19);
             this.checkBox_FixedGating.TabIndex = 26;
@@ -366,7 +368,7 @@
             // checkBox_DynamicGating
             // 
             this.checkBox_DynamicGating.AutoSize = true;
-            this.checkBox_DynamicGating.Location = new System.Drawing.Point(672, 95);
+            this.checkBox_DynamicGating.Location = new System.Drawing.Point(641, 95);
             this.checkBox_DynamicGating.Name = "checkBox_DynamicGating";
             this.checkBox_DynamicGating.Size = new System.Drawing.Size(74, 19);
             this.checkBox_DynamicGating.TabIndex = 27;
@@ -442,6 +444,8 @@
             // 
             // tabWBC
             // 
+            this.tabWBC.Controls.Add(this.radioOldName);
+            this.tabWBC.Controls.Add(this.radioNewName);
             this.tabWBC.Controls.Add(this.button_ProcessList);
             this.tabWBC.Controls.Add(this.chartData);
             this.tabWBC.Controls.Add(this.btnSeparation);
@@ -470,6 +474,30 @@
             this.tabRBC.TabIndex = 1;
             this.tabRBC.Text = "RBC";
             this.tabRBC.UseVisualStyleBackColor = true;
+            // 
+            // radioNewName
+            // 
+            this.radioNewName.AutoSize = true;
+            this.radioNewName.Location = new System.Drawing.Point(730, 95);
+            this.radioNewName.Name = "radioNewName";
+            this.radioNewName.Size = new System.Drawing.Size(87, 19);
+            this.radioNewName.TabIndex = 29;
+            this.radioNewName.Text = "New Name";
+            this.radioNewName.UseVisualStyleBackColor = true;
+            this.radioNewName.CheckedChanged += new System.EventHandler(this.radioNewName_CheckedChanged);
+            // 
+            // radioOldName
+            // 
+            this.radioOldName.AutoSize = true;
+            this.radioOldName.Checked = true;
+            this.radioOldName.Location = new System.Drawing.Point(730, 115);
+            this.radioOldName.Name = "radioOldName";
+            this.radioOldName.Size = new System.Drawing.Size(81, 19);
+            this.radioOldName.TabIndex = 30;
+            this.radioOldName.TabStop = true;
+            this.radioOldName.Text = "Old Name";
+            this.radioOldName.UseVisualStyleBackColor = true;
+            this.radioOldName.CheckedChanged += new System.EventHandler(this.radioOldName_CheckedChanged);
             // 
             // ChartForm
             // 
@@ -530,6 +558,8 @@
         private System.Windows.Forms.TabControl tabControl;
         private System.Windows.Forms.TabPage tabWBC;
         private System.Windows.Forms.TabPage tabRBC;
+        private System.Windows.Forms.RadioButton radioOldName;
+        private System.Windows.Forms.RadioButton radioNewName;
     }
 }
 
