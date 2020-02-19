@@ -1065,7 +1065,7 @@ namespace WindowsFormsApplication1
 */
 
             string FSC1_A = FlowCytometry.FCMeasurement.GetChannelName("FCS1area", channelNomenclature);
-            Gate2_hs = GenerateDataSet(FSC1_A, FSC1_H);
+            Gate2_hs = GenerateDataSet(FSC1_H, FSC1_A);
             double[][] Gate2_array = Gate2_hs.ToArray();
             #endregion
 
@@ -1088,7 +1088,7 @@ namespace WindowsFormsApplication1
             X1Y1X2Y2[2] = SingletsFit[0];
             X1Y1X2Y2[3] = SingletsFit[1];
 */
-            indexGate2_Max = FlowCytometry.FCMeasurement.findMaxValues(sample, Gate1_array, FSC1_A, FSC1_H);
+            indexGate2_Max = FlowCytometry.FCMeasurement.findMaxValues(sample, Gate1_array, FSC1_H, FSC1_A);
             int count_Gate2Max = CountBoolTrue(indexGate2_Max);
 
             #region analyze Gate2 "Singlets"
@@ -1098,8 +1098,8 @@ namespace WindowsFormsApplication1
                 {
                     series.Points.Clear();
                 }
-                chartData.ChartAreas[0].AxisX.Title = FSC1_A;
-                chartData.ChartAreas[0].AxisY.Title = FSC1_H;
+                chartData.ChartAreas[0].AxisX.Title = FSC1_H;
+                chartData.ChartAreas[0].AxisY.Title = FSC1_A;
             }
 
             for (int j = 0; j < TotalDataLength; j++)
