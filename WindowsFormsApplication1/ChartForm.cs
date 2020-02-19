@@ -1078,7 +1078,9 @@ namespace WindowsFormsApplication1
 
             double slope = SingletsFit[0];
             double intercept = SingletsFit[1];
-            double expect = 0;
+            double expect1=0, expect2 = 0;
+            double delta_slope = 0.5;
+            double delta_intercept = 0.5;
 
             /*double[] X1Y1X2Y2 = new double[4];
             X1Y1X2Y2[0] = 0;
@@ -1105,9 +1107,10 @@ namespace WindowsFormsApplication1
                 x = Gate2_array[j][0];    //x = Gate1_arrayMax[j][0];
                 y = Gate2_array[j][1];    //y = Gate1_arrayMax[j][1];
 
-                expect = slope * x + intercept;
+                expect1 = slope * ( 1 + delta_slope ) *  x + intercept * (1 + delta_slope);
+                expect2 = slope * ( 1 - delta_slope ) *  x + intercept * (1 - delta_slope);
 
-                if (y > expect)
+                if (y > expect2 && y < expect1)
                 {
                     indexGate2[j] = true;
                     if (checkBoxGate2.Checked)

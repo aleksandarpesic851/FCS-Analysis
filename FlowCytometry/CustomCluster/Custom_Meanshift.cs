@@ -9,17 +9,17 @@ namespace FlowCytometry.CustomCluster
 {
     public class Custom_Meanshift
     {
-        private int nRate = 500;                 // ignore cluster when the number of it is less than total/nRate
-        private double[][] totalData;             // origin data
+        private int nRate = 500;                // ignore cluster when the number of it is less than total/nRate
+        private double[][] totalData;           // origin data
         private double bandWidth;               // bandwidth to use in KDE
 
-        public double[,] kde;                  // estimated kernel data
+        public double[,] kde;                   // estimated kernel data
         private List<GridWeight> gridWeights;
         private int[,] gridWeight;
         private double[,] expWeight;
         private int nPtCnt;                     // total number of data 
         private double gridSize;                // grid size to pre-calculate, this is used for speed up
-        public int nGridCnt = 300;                   // total number of grids
+        public int nGridCnt = 300;              // total number of grids
         private double[] variations;            // the variaction of data
 
         private double normalX = 0;             // normalize param
