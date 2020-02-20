@@ -14,8 +14,7 @@ using System.Windows.Forms;
 //using ChartDirector;
 using System.Windows.Forms.DataVisualization.Charting;
 using ClusterAPI;
-
-using static FlowCytometry.FCMeasurement;
+using FlowCytometry;
 
 namespace WindowsFormsApplication1
 {
@@ -33,21 +32,9 @@ namespace WindowsFormsApplication1
         string WBC_file_type = "3-diff";
         string Gating_Type;
 
-        //string Loaded_filePath;
-        //string Loaded_fileName;
-        //bool[] indexGatesTotal;// = new bool[TotalDataLength];
-
-        // string filePath_gates_default = "C:/Users/begem/OneDrive/Desktop/General Fluidics/Fixed gating";
-        // string FixedGatesLocationName = "Fixed Gating folder location.txt";
-        // string gates_filePath = "Fixed Gating folder location.txt";
-        // File.WriteAllText(gates_filePath, filePath_gates);
-
-
-        string filePath_gates = "C:/Users/begem/OneDrive/Desktop/General Fluidics/Fixed gating";//null;// null;//
+        string filePath_gates;
         string starting_filePath = "C:/Users/begem/OneDrive/Desktop/General Fluidics/Data/MGH";
         bool drawPolygons = false;
-       // string GateEOS_file = Path.Combine(filePath_gates, Path.GetFileName(fileName_GateEOS)); 
-        // List<Polygon> polygons = new List<Polygon>();
 
         public List<Color> ColorsOfMap = new List<Color>();
 
@@ -66,22 +53,31 @@ namespace WindowsFormsApplication1
             });
 
             chartData.PostPaint += chartData_PostPaint;
-                       
             try
             {
-                string FixedGatesLocationName = File.ReadAllText("Fixed Gating folder location.txt");
+                filePath_gates = File.ReadAllText("Fixed Gating folder location.txt");
             }
             catch (FileNotFoundException)
             {
                 MessageBox.Show(String.Format("Select a folder with fixed Gates"));
-                string filePath_gates = Set_FixedGatingFolder();
+                filePath_gates = Set_FixedGatingFolder();
             }
-                                   
 
-            //if (filePath_gates == null)
-            //{
-            //   Set_FixedGatingFolder(); // object,EventArgs
-            //}
+            RBCForm rbcForm = new RBCForm();
+            rbcForm.TopLevel = false;
+            rbcForm.Visible = true;
+            rbcForm.FormBorderStyle = FormBorderStyle.None;
+            rbcForm.Dock = DockStyle.Fill;
+            tabControl.TabPages[1].Controls.Add(rbcForm);
+            rbcForm.setGatePath(filePath_gates);
+
+            MieScatterForm mieForm = new MieScatterForm();
+            mieForm.TopLevel = false;
+            mieForm.Visible = true;
+            mieForm.FormBorderStyle = FormBorderStyle.None;
+            mieForm.Dock = DockStyle.Fill;
+            tabControl.TabPages[2].Controls.Add(mieForm);
+            //mieForm.setGatePath(filePath_gates);
         }
 
         void chartData_PostPaint(object sender, ChartPaintEventArgs e)
@@ -121,7 +117,7 @@ namespace WindowsFormsApplication1
             }
         }
 
-        FlowCytometry.FCMeasurement sample;
+        FCMeasurement sample;
          
         private void ChartForm_Load(object sender, EventArgs e) //private
         {
@@ -140,7 +136,7 @@ namespace WindowsFormsApplication1
 
             string fileWBC = Path.Combine(filePath_WBC, Path.GetFileName(fileName_WBC));
 
-            sample = new FlowCytometry.FCMeasurement(fileWBC); //fileWBC
+            sample = new FCMeasurement(fileWBC); //fileWBC
             comboBox1.Items.Clear();
             comboBox2.Items.Clear();
 
@@ -373,11 +369,11 @@ namespace WindowsFormsApplication1
             // Read Excel file, convert to array?
 
             int[] cellsLMG = new int[3];
-            FSC1_H = FlowCytometry.FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
-            SSC_H = FlowCytometry.FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
+            FSC1_H = FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
+            SSC_H = FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
             string fileTot = Path.Combine(filePath, Path.GetFileName(fileName));
-            FlowCytometry.FCMeasurement sampleFC;
-            sampleFC = new FlowCytometry.FCMeasurement(fileTot);
+            FCMeasurement sampleFC;
+            sampleFC = new FCMeasurement(fileTot);
             //var FileNameSplit = fileTot.Split('/', '.')[1];
             string FileNameSplit = fileName.Split('.')[0];
 
@@ -519,8 +515,8 @@ namespace WindowsFormsApplication1
             }
           //  MessageBox.Show(String.Format("Btn Gating: filePath_gates = {0}", filePath_gates));
 
-            string FSC1_H = FlowCytometry.FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
-            string SSC_H = FlowCytometry.FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
+            string FSC1_H = FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
+            string SSC_H = FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
 
             string filePath = null;
             string fileName = null;
@@ -535,7 +531,7 @@ namespace WindowsFormsApplication1
             {
                 filePath = Path.GetDirectoryName(Loaded_TotalFileName);
                 fileName = Path.GetFileName(Loaded_TotalFileName);
-                sample = new FlowCytometry.FCMeasurement(Loaded_TotalFileName);
+                sample = new FCMeasurement(Loaded_TotalFileName);
             }
             else
             {
@@ -550,7 +546,7 @@ namespace WindowsFormsApplication1
                     }
                 }
                 FileNameBox.Text = Loaded_TotalFileName;
-                sample = new FlowCytometry.FCMeasurement(Loaded_TotalFileName);
+                sample = new FCMeasurement(Loaded_TotalFileName);
 
                 comboBox1.Items.Clear();
                 comboBox2.Items.Clear();
@@ -560,6 +556,13 @@ namespace WindowsFormsApplication1
                     comboBox2.Items.Add(name);
                 }
             }
+
+            if (!checkCultureCorrect())
+            {
+                MessageBox.Show("Please check culture is set correctly", "Incorrect Culture");
+                return;
+            }
+
             comboBox1.Text = FSC1_H;
             comboBox2.Text = SSC_H;
 
@@ -572,7 +575,7 @@ namespace WindowsFormsApplication1
             bool OutputExcel = false; // true ;
             if (OutputExcel)
             {
-                FlowCytometry.FCMeasurement.outputFCSasExcel(sample);
+                FCMeasurement.outputFCSasExcel(sample);
             }
 
             #endregion
@@ -626,7 +629,7 @@ namespace WindowsFormsApplication1
                 EOSreport[1] = TupleIn.Item1[1];
                 EOSreport[2] = TupleIn.Item1[2];
 
-                string FL_H = FlowCytometry.FCMeasurement.GetChannelName("FLpeak", channelNomenclature);
+                string FL_H = FCMeasurement.GetChannelName("FLpeak", channelNomenclature);
                 int FL_H_max = sample.Channels[FL_H].Range;
             
                 HashSet<double[]> GateEOS_hs = GenerateDataSet(FL_H, SSC_H);
@@ -646,16 +649,16 @@ namespace WindowsFormsApplication1
                 }
 
 /*                double[][] Neutrophils_array = Neutrophils_hs.ToArray();
-                bool[,] indexGate_EOS = FlowCytometry.FCMeasurement.GateArray(Neutrophils_array, Loaded_TotalFileName, FL_H_max, SSC_H_max);
-                bool[] EOS_Max = FlowCytometry.FCMeasurement.GetColumn(indexGate_EOS, 0); //getColumn
-                bool[] EOS_Gate = FlowCytometry.FCMeasurement.GetColumn(indexGate_EOS, 1);
+                bool[,] indexGate_EOS = FCMeasurement.GateArray(Neutrophils_array, Loaded_TotalFileName, FL_H_max, SSC_H_max);
+                bool[] EOS_Max = FCMeasurement.GetColumn(indexGate_EOS, 0); //getColumn
+                bool[] EOS_Gate = FCMeasurement.GetColumn(indexGate_EOS, 1);
                 int count_EOS_Max = CountBoolTrue(EOS_Max);
                 int count_GateEOS = CountBoolTrue(EOS_Gate);
                 EOSreport[3] = count_GateEOS;
                 Console.WriteLine(String.Format("EOS (max): {0} \nInside EOS gate: {1}", count_EOS_Max, count_GateEOS));
 */            
 
-                int[] WBC_counts = FlowCytometry.FCMeasurement.processEOS(Loaded_TotalFileName, filePath_gates, channelNomenclature); 
+                int[] WBC_counts = FCMeasurement.processEOS(Loaded_TotalFileName, filePath_gates, channelNomenclature); 
                 int totalWBC = WBC_counts[0] + WBC_counts[1] + WBC_counts[2] + WBC_counts[3];
 
                 double pctNeutrophils = 100 * WBC_counts[0] / totalWBC; // percent Neutrophils
@@ -749,7 +752,7 @@ namespace WindowsFormsApplication1
         }
         */                          
 
-        private void gate_Basophils(FlowCytometry.FCMeasurement sample)
+        private void gate_Basophils(FCMeasurement sample)
         {
             //  DynamicGating.Checked();
             // MessageBox.Show("Inside Gating Basophils Function");
@@ -771,8 +774,8 @@ namespace WindowsFormsApplication1
 
             List<Polygon> polygons = loadPolygon(Gate1_file);
 
-            FSC1_H = FlowCytometry.FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
-            SSC_H = FlowCytometry.FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
+            FSC1_H = FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
+            SSC_H = FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
 
             HashSet<double[]> Gate1_hs = GenerateDataSet(FSC1_H, SSC_H);
             double[][] Gate1_array = Gate1_hs.ToArray();
@@ -780,12 +783,12 @@ namespace WindowsFormsApplication1
             #endregion
 
             #region remove max values
-            bool[] indexGate1_Max = FlowCytometry.FCMeasurement.findMaxValues(sample, Gate1_array, FSC1_H, SSC_H);
-            int count_Gate1out_Max = FlowCytometry.FCMeasurement.CountBoolTrue(indexGate1_Max);
+            bool[] indexGate1_Max = FCMeasurement.findMaxValues(sample, Gate1_array, FSC1_H, SSC_H);
+            int count_Gate1out_Max = FCMeasurement.CountBoolTrue(indexGate1_Max);
             #endregion
 
             //  Want to replace explicit loops below with a function of polygon gate
-            //  indexGate1 = FlowCytometry.FCMeasurement.onePolygonGate(polygons, Gate1_array); 
+            //  indexGate1 = FCMeasurement.onePolygonGate(polygons, Gate1_array); 
             #region perform fixed and dynamic gating
             int TotalDataLength = Gate1_array.GetLength(0);
             double x, y;
@@ -819,7 +822,7 @@ namespace WindowsFormsApplication1
                 }
             }
 
-            double[][] centers = FlowCytometry.FCMeasurement.LoadClusterCenters(BasoClusterCenters);
+            double[][] centers = FCMeasurement.LoadClusterCenters(BasoClusterCenters);
 
             int numberOfClusters = 11; //Number of clusters for the debris (10) and Basopihils (1)
                                        // This allows to pick out all of the clustered debris
@@ -949,7 +952,7 @@ namespace WindowsFormsApplication1
             #endregion
         }
         
-        public Tuple<int[], bool[]> gate_3diff(FlowCytometry.FCMeasurement sample) //static 
+        public Tuple<int[], bool[]> gate_3diff(FCMeasurement sample) //static 
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
             stopwatch.Start();
@@ -969,8 +972,8 @@ namespace WindowsFormsApplication1
             string diff3_ClusterCentersFile = "clusterCenters 3diff.csv";
             string diff3_ClusterCenters = Path.Combine(filePath_gates, Path.GetFileName(diff3_ClusterCentersFile));
 
-            string FSC1_H = FlowCytometry.FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
-            string SSC_H = FlowCytometry.FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
+            string FSC1_H = FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
+            string SSC_H = FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
 
             
             string source_dir = Path.GetDirectoryName(Loaded_TotalFileName);
@@ -1013,7 +1016,7 @@ namespace WindowsFormsApplication1
 
             #region analyze "Cells" selection gate
 
-            indexGate1_Max = FlowCytometry.FCMeasurement.findMaxValues(sample, Gate1_array, FSC1_H, SSC_H);
+            indexGate1_Max = FCMeasurement.findMaxValues(sample, Gate1_array, FSC1_H, SSC_H);
             int count_Gate1out_Max = CountBoolTrue(indexGate1_Max);
             
             for (int j = 0; j < TotalDataLength; j++)   // for (int j = 0; j < Gate1Max_Length; j++)
@@ -1038,7 +1041,7 @@ namespace WindowsFormsApplication1
                     }
                 }
             }
-            //  indexGateFinal = FlowCytometry.FCMeasurement.GateArray(Gate1_array, Gate1_file);
+            //  indexGateFinal = FCMeasurement.GateArray(Gate1_array, Gate1_file);
           
             //MessageBox.Show("Supposed to draw chartData here. Press a button...");
             //Console.ReadKey();
@@ -1064,7 +1067,7 @@ namespace WindowsFormsApplication1
             string Gate2_file = Path.Combine(filePath_gate2, Path.GetFileName(fileName_gatedSinglets));
 */
 
-            string FSC1_A = FlowCytometry.FCMeasurement.GetChannelName("FCS1area", channelNomenclature);
+            string FSC1_A = FCMeasurement.GetChannelName("FCS1area", channelNomenclature);
             Gate2_hs = GenerateDataSet(FSC1_A, FSC1_H);
             double[][] Gate2_array = Gate2_hs.ToArray();
             #endregion
@@ -1072,7 +1075,7 @@ namespace WindowsFormsApplication1
             //polygons = loadPolygon(Gate2_file);
 
             double[] SingletsFit = new double[3];
-            SingletsFit = FlowCytometry.FCMeasurement.LinearRegression(Gate2_array);
+            SingletsFit = FCMeasurement.LinearRegression(Gate2_array);
             MessageBox.Show(String.Format("Slope = {0}, Y-intercept = {1}, R^2 = {2}", 
                 Math.Round(SingletsFit[0],5), Math.Round(SingletsFit[1], 1), Math.Round(SingletsFit[2],1)));
 
@@ -1088,7 +1091,7 @@ namespace WindowsFormsApplication1
             X1Y1X2Y2[2] = SingletsFit[0];
             X1Y1X2Y2[3] = SingletsFit[1];
 */
-            indexGate2_Max = FlowCytometry.FCMeasurement.findMaxValues(sample, Gate1_array, FSC1_A, FSC1_H);
+            indexGate2_Max = FCMeasurement.findMaxValues(sample, Gate1_array, FSC1_A, FSC1_H);
             int count_Gate2Max = CountBoolTrue(indexGate2_Max);
 
             #region analyze Gate2 "Singlets"
@@ -1163,7 +1166,7 @@ namespace WindowsFormsApplication1
             string fileName_Gate3 = "gating Cell Types.csv"; // gating2.csv"; //4
             string path_gate3 = Path.Combine(filePath_gates, Path.GetFileName(fileName_Gate3));
             polygons = loadPolygon(path_gate3);
-            indexGate3_Max = FlowCytometry.FCMeasurement.findMaxValues(sample, Gate1_array, FSC1_A, FSC1_H);
+            indexGate3_Max = FCMeasurement.findMaxValues(sample, Gate1_array, FSC1_A, FSC1_H);
 
             for (int j = 0; j < TotalDataLength; j++)//Gate2Max_Length 
             {
@@ -1195,7 +1198,7 @@ namespace WindowsFormsApplication1
                 string[] CELL_NAME = new string[] { "Neutrophils", "Monocytes", "Lymphocytes" };
 
                 List<FlowCytometry.CustomCluster.Cluster> clusters;
-                calculateDynamicGates(polygons, Gate1_array, out clusters);
+                FCMeasurement.calculateDynamicGates(polygons, Gate1_array, out clusters);
 
                 // Draw 3 clusters on Chart
                 if (clusters != null)
@@ -1295,7 +1298,7 @@ namespace WindowsFormsApplication1
             bool testCombinedGate = false;
             if (testCombinedGate)
             {
-                indexGateFinal = FlowCytometry.FCMeasurement.GateArray(Gate1_array, Gate1_file, FSC1_H_max, SSC_H_max);
+                indexGateFinal = FCMeasurement.GateArray(Gate1_array, Gate1_file, FSC1_H_max, SSC_H_max);
                 // only works for one gate
 
             }
@@ -1307,7 +1310,7 @@ namespace WindowsFormsApplication1
                 {
                     cytes[j] = new HashSet<double[]>();
                 }
-                indexGate3_Max = FlowCytometry.FCMeasurement.findMaxValues(sample, Gate1_array, FSC1_A, FSC1_H);
+                indexGate3_Max = FCMeasurement.findMaxValues(sample, Gate1_array, FSC1_A, FSC1_H);
 
                 for (int j = 0; j < TotalDataLength; j++)//Gate2Max_Length 
                 {
@@ -1364,10 +1367,10 @@ namespace WindowsFormsApplication1
                 indexGatesG1G2Gfin[j] = indexDataShown[j] && indexGate1[j] && indexGate2[j] && indexGateFinal[j, 1];
                 indexDataShownNotGated[j] = indexDataShown[j] && !indexGatesTotal[j];
             }
-            int totalGatedCells = FlowCytometry.FCMeasurement.CountBoolTrue(indexGatesTotal);
-            //int GateFinalCells = FlowCytometry.FCMeasurement.CountBoolTrue2D(indexGateFinal,1);
+            int totalGatedCells = FCMeasurement.CountBoolTrue(indexGatesTotal);
+            //int GateFinalCells = FCMeasurement.CountBoolTrue2D(indexGateFinal,1);
 
-            bool[] Final_Gate = FlowCytometry.FCMeasurement.GetColumn(indexGateFinal, 1);
+            bool[] Final_Gate = FCMeasurement.GetColumn(indexGateFinal, 1);
 
             //  Console.WriteLine(stopwatch.ElapsedMilliseconds);
 
@@ -1375,7 +1378,7 @@ namespace WindowsFormsApplication1
             bool output_Gating_Stats = false;
             if (output_Gating_Stats)
             {
-                int GateFinalCells = FlowCytometry.FCMeasurement.CountBoolTrue(Final_Gate);
+                int GateFinalCells = FCMeasurement.CountBoolTrue(Final_Gate);
                 stopwatch.Stop();
                 // MessageBox.Show(String.Format("Time for fixed gating = {0}ms", stopwatch.ElapsedMilliseconds));
                 string Count_Ini = String.Format("Length of initial / raw data  = {0}", TotalDataLength);
@@ -1492,10 +1495,10 @@ namespace WindowsFormsApplication1
             }
             else
             {
-                double[][] arrayInit;  // FlowCytometry.FCMeasurement sample = new FlowCytometry.FCMeasurement(@DataFile.FileName);
+                double[][] arrayInit;  // FCMeasurement sample = new FCMeasurement(@DataFile.FileName);
                 double[][] arrayG1;
 
-                //  FCS1_H = FlowCytometry.FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
+                //  FCS1_H = FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
 
                 // MessageBox.Show(String.Format("FSC1_H = {0}\n SSC_H = {1}", FSC1_H, SSC_H));
                 HashSet<double[]> filteredData_hs = GenerateDataSet(FSC1_H, SSC_H); //firstGate
@@ -1649,7 +1652,7 @@ namespace WindowsFormsApplication1
                         //   centers = LoadClusterCenters(BasoClusterCenters);
                         int nCentroids = 12;
                         bool hasClass = false;
-                        centers = FlowCytometry.FCMeasurement.LoadClusterCenters(diff3_ClusterCenters); // double[][] 
+                        centers = FCMeasurement.LoadClusterCenters(diff3_ClusterCenters); // double[][] 
                         double[][] JoinedCentroidResult = dbsCentroids.Union(centers).ToArray();
                         SharpCluster.Partitional.KMeans kmeans = new SharpCluster.Partitional.KMeans(Gate1_hs, hasClass);
                         // SharpCluster.Cluster[] kMeansClusters = kmeans.ExecuteClustering(nCentroids, centers);
@@ -1769,7 +1772,7 @@ namespace WindowsFormsApplication1
             }
             /*
             bool ouputExcel = false;
-            NML = FlowCytometry.FCMeasurement.WBC_analysis(argumentsIn, ouputExcel);
+            NML = FCMeasurement.WBC_analysis(argumentsIn, ouputExcel);
             MessageBox.Show(String.Format("NML Report: {0},{1},{2}\n", NML[0], NML[1], NML[2]));
 */
             var tuple = new Tuple<int[], bool[]>(NML, NeutrophilsTF);
@@ -1791,7 +1794,7 @@ namespace WindowsFormsApplication1
             {
                 fileTot = Loaded_TotalFileName;
                 MessageBox.Show(String.Format("Loaded file {0}", Loaded_TotalFileName));
-                sample = new FlowCytometry.FCMeasurement(fileTot);
+                sample = new FCMeasurement(fileTot);
 
             }
             else
@@ -1808,7 +1811,7 @@ namespace WindowsFormsApplication1
                 FileNameBox.Text = Loaded_TotalFileName;
                 fileTot = Loaded_TotalFileName;
 
-                sample = new FlowCytometry.FCMeasurement(Loaded_TotalFileName);
+                sample = new FCMeasurement(Loaded_TotalFileName);
 
                 comboBox1.Items.Clear();
                 comboBox2.Items.Clear();
@@ -1817,11 +1820,17 @@ namespace WindowsFormsApplication1
                     comboBox1.Items.Add(name);
                     comboBox2.Items.Add(name);
                 }
-                channel1 = FlowCytometry.FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
-                channel2 = FlowCytometry.FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
+                channel1 = FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
+                channel2 = FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
                 comboBox1.Text = channel1;
                 comboBox2.Text = channel2;
                 
+            }
+
+            if (!checkCultureCorrect())
+            {
+                MessageBox.Show("Please check culture is set correctly", "Incorrect Culture");
+                return;
             }
 
             //int[] index_Cells;
@@ -1969,7 +1978,7 @@ namespace WindowsFormsApplication1
             FileNameBox.Text = Loaded_TotalFileName;
 
 
-            sample = new FlowCytometry.FCMeasurement(Loaded_TotalFileName); //fileWBC
+            sample = new FCMeasurement(Loaded_TotalFileName); //fileWBC
 
             foreach (String name in sample.ChannelsNames)
             {
@@ -1977,8 +1986,14 @@ namespace WindowsFormsApplication1
                 comboBox2.Items.Add(name);
             }
 
-            string channel1 = FlowCytometry.FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
-            string channel2 = FlowCytometry.FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
+            if (!checkCultureCorrect())
+            {
+                MessageBox.Show("Please check culture is set correctly", "Incorrect Culture");
+                return;
+            }
+
+            string channel1 = FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
+            string channel2 = FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
             comboBox1.Text = channel1;
             comboBox2.Text = channel2;
         }
@@ -2108,7 +2123,7 @@ namespace WindowsFormsApplication1
                     DataFile.Filter = "FCS file (*.fcs)| *.fcs";
 
                     // MeansShift ms = new MeansShift(File.ReadAllLines(@DataFile.FileName));
-                    FlowCytometry.FCMeasurement sample = new FlowCytometry.FCMeasurement(@DataFile.FileName);
+                    FCMeasurement sample = new FCMeasurement(@DataFile.FileName);
 
                     arrayG1 = firstGate.ToArray();
                     Array_XY = MeansClustering.MeansCluster.To2D(arrayG1);
@@ -2261,8 +2276,6 @@ namespace WindowsFormsApplication1
                     string gates_filePath = "Fixed Gating folder location.txt";
                     File.WriteAllText(@gates_filePath, filePath_gates);
                     MessageBox.Show(String.Format("Wrote Fixed Gating folder location to {0}", filePath_gates));
-
-                    //filePath_gates = " C:/Users/begem/OneDrive/Desktop/General Fluidics/Fixed gating";
                 }
                 else
                 {
@@ -2278,7 +2291,7 @@ namespace WindowsFormsApplication1
 
             if (Loaded_TotalFileName != null)
             {
-                sample = new FlowCytometry.FCMeasurement(Loaded_TotalFileName);
+                sample = new FCMeasurement(Loaded_TotalFileName);
             }
             else
             {
@@ -2293,7 +2306,7 @@ namespace WindowsFormsApplication1
                 }
                 FileNameBox.Text = Loaded_TotalFileName;
 
-                sample = new FlowCytometry.FCMeasurement(Loaded_TotalFileName);
+                sample = new FCMeasurement(Loaded_TotalFileName);
 
                 comboBox1.Items.Clear();
                 comboBox2.Items.Clear();
@@ -2304,9 +2317,14 @@ namespace WindowsFormsApplication1
                 }
             }
 
+            if (!checkCultureCorrect())
+            {
+                MessageBox.Show("Please check culture is set correctly", "Incorrect Culture");
+                return;
+            }
 
-            string channel1 = FlowCytometry.FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
-            string channel2 = FlowCytometry.FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
+            string channel1 = FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
+            string channel2 = FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
             comboBox1.Text = channel1;
             comboBox2.Text = channel2;
 
@@ -2336,7 +2354,7 @@ namespace WindowsFormsApplication1
             chartData.Refresh();
 
             // Calculate KDE
-            FlowCytometry.CustomCluster.Custom_Meanshift meanshift = CalculateKDE(Gate1_array);
+            FlowCytometry.CustomCluster.Custom_Meanshift meanshift = FCMeasurement.CalculateKDE(Gate1_array);
 
             // Draw KDE
             nCnt = meanshift.nGridCnt;
@@ -2396,10 +2414,31 @@ namespace WindowsFormsApplication1
             return c;
         }
 
+        private void radioNewName_CheckedChanged(object sender, EventArgs e)
+        {
+            channelNomenclature = "new_names";
+        }
+
+        private void radioOldName_CheckedChanged(object sender, EventArgs e)
+        {
+            channelNomenclature = "old_names";
+        }
+
         private void button_SetGateFolder_Click(object sender, EventArgs e)
         {
             //string filePath_gates = " C:/Users/begem/OneDrive/Desktop/General Fluidics/Fixed gating";
             filePath_gates = Set_FixedGatingFolder();
+        }
+
+        private bool checkCultureCorrect()
+        {
+            if (sample == null)
+                return false;
+
+            string FSC1_H = FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
+            string SSC_H = FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
+
+            return sample.ChannelsNames.Contains(FSC1_H) && sample.ChannelsNames.Contains(SSC_H);
         }
     }
 }

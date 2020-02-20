@@ -61,6 +61,10 @@
     <Compile Include="CustomCluster\Global.cs" />
     <Compile Include="MeansCluster.cs" />
     <Compile Include="FCMeasurement.cs" />
+    <Compile Include="Mie_Scatter\Mie_abcd.cs" />
+    <Compile Include="Mie_Scatter\Mie_pt.cs" />
+    <Compile Include="Mie_Scatter\Mie_si12.cs" />
+    <Compile Include="Mie_Scatter\Record.cs" />
     <Compile Include="PicoXLSX\Cell.cs" />
     <Compile Include="PicoXLSX\Exceptions.cs" />
     <Compile Include="PicoXLSX\LowLevel.cs" />
