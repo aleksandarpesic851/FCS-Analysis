@@ -8,7 +8,7 @@ using System.Windows.Forms.DataVisualization.Charting;
 
 namespace FlowCytometry.CustomCluster
 {
-    class Global
+    public class Global
     {
         public const int LEFT_BOTTOM_T = 2100;
         public static string[] CELL_NAME = new string[] { "Neutrophils", "Monocytes", "Lymphocytes" };
