@@ -1128,7 +1128,7 @@ namespace FlowCytometry
             
             for (i = 0; i < nCnt; i++)
             {
-                if (xyVals[i][0] > 3000000)
+                if (xyVals[i][0] > 1500000)
                     continue;
                 arrX.Add(xyVals[i][0]);
                 arrY.Add(xyVals[i][1]);
