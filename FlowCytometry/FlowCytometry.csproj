@@ -73,6 +73,7 @@
     <Compile Include="PicoXLSX\StyleManager.cs" />
     <Compile Include="PicoXLSX\Workbook.cs" />
     <Compile Include="PicoXLSX\Worksheet.cs" />
+    <Compile Include="ProcessStates.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SharpCluster\Agnes.cs" />
     <Compile Include="SharpCluster\Cluster.cs" />

@@ -2433,10 +2433,18 @@ namespace WindowsFormsApplication1
 
         private void button_ProcessList_Click(object sender, EventArgs e)
         {
+            OpenFileDialog dlg = new OpenFileDialog();
+            dlg.Filter = "Excel File | *.xlsx";
+            dlg.Title = "Choose Excel file to process.";
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                ProcessListForm processListForm = new ProcessListForm(dlg.FileName, filePath_gates, channelNomenclature);
+                processListForm.ShowDialog();
+            }
 
         }
 
-        private bool checkCultureCorrect()
+            private bool checkCultureCorrect()
         {
             if (sample == null)
                 return false;

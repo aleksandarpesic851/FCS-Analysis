@@ -8,6 +8,7 @@ using System.Drawing;
 using Microsoft.Office.Interop.Excel;
 using _Excel = Microsoft.Office.Interop.Excel;
 using Accord.Statistics.Models.Regression.Linear;
+using System.ComponentModel;
 
 namespace FlowCytometry
 {
@@ -1285,23 +1286,12 @@ namespace FlowCytometry
 
             return diffSec;
         }
-        public static void FG_folder_analysis(string Total_ExcelFileName) //(string excelPathName, bool ouputExcel) //void Main(string[] args)
+        public static void FG_folder_analysis(string Total_ExcelFileName, string filePath_gates, string channelNomenclature, bool isCosole = true, BackgroundWorker worker = null, DoWorkEventArgs e = null)
         {
             #region Read Excel file Generate list FileName_FlowRate
              
-            string filePath_gates = "C:/Users/begem/OneDrive/Desktop/General Fluidics/Fixed gating";
-            // int SheetNum = 1;        
-            /*   string Total_ExcelFileName = args[0];
-            string RowStart_String = args[1];
-            string RowCount_String = args[2];
-            int RowStart = Convert.ToInt32(RowStart_String);
-            int RowCount = Convert.ToInt32(RowCount_String);
-            */
-            int RowStart = 69; // 69 for 2014 DataFile
-            int RowCount = 14;          // number of files in the list to be analyzed   
-
             //   string Total_ExcelFileName = Path.Combine(excelPath, Path.GetFileName(excelFileName));
-            var FN_AT_FR_List = FlowCytometry.FCMeasurement.ReadExcelList(Total_ExcelFileName, RowStart, RowCount);
+            var FN_AT_FR_List = ReadExcelList(Total_ExcelFileName, isCosole);
             //   Console.WriteLine(String.Format("String in cell A69:\n{0}", ExcelCell_String));
             #endregion
             
@@ -1309,7 +1299,6 @@ namespace FlowCytometry
             bool ouputExcel = false;
             string[] arguments = new string[4];
             arguments[1] = filePath_gates; // file path to folder with fixed gates
-            string channelNomenclature = "new_names";// type of nomeclature: "old_names", "middleaged_names"
             arguments[2] = channelNomenclature;         
 
             double FlowRate;
@@ -1322,34 +1311,87 @@ namespace FlowCytometry
             sb.AppendLine(string.Join(",", "FileName", "Analysis Type", "Volume(mL)",
                                      "Neutrophils", "Monocytes", "Lymphocytes", "Eosinophils",
                                      "Neut(K/mL)", "Mono(K/mL)", "Lymph(K/mL)", "Eos(K/mL)"));
+
+            int nTotalCnt = FN_AT_FR_List.Count;
+
+            string strMsg = "Process List was started. The number of total files is " + nTotalCnt + "\n";
+            int percentage = 1;
+
+            worker.ReportProgress(percentage, new ProcessState() { nTotalCnt = nTotalCnt, nCurr = 0, strMsg = strMsg });
+
             foreach (var listItem in FN_AT_FR_List) //Iterating over rows ... RowCount
             {
+                if (!isCosole && worker != null)
+                {
+                    if (worker.CancellationPending)
+                    {
+                        e.Cancel = true;
+                        break;
+                    }
+                }
                 FileNumber++; //RowCount 
-                Console.Write(String.Format("Processing file #{0}", FileNumber));
-                
+
                 arguments[0] = listItem[0]; // full FCS filename with path an extension
                 arguments[3] = listItem[1]; // type of analysis: "3-diff", "EOS", "BASO"
                 FlowRateString = listItem[2];
-                Console.Write(String.Format("Sample Volume associated with file = {0}mL", FlowRateString));
+                
+                if (isCosole)
+                {
+                    Console.Write(String.Format("\n Processing file #{0} : {1} \n", FileNumber, listItem[0]));
+                    Console.Write(String.Format("Sample Volume associated with file = {0}mL", FlowRateString));
+                }
+                else
+                {
+                    strMsg = String.Format("\n Processing file #{0} : {1} \n", FileNumber, listItem[0]);
+                    strMsg += String.Format("Sample Volume associated with file = {0}mL", FlowRateString);
+
+                    percentage = ( FileNumber - 1 ) * 100 / nTotalCnt;
+                    worker.ReportProgress(percentage, new ProcessState() { nTotalCnt = nTotalCnt, nCurr = FileNumber, strMsg = strMsg });
+                }
+
                 FileName_WO_Ext = Path.GetFileNameWithoutExtension(arguments[0]);
 
                 FlowRate = Convert.ToDouble(FlowRateString);
                 NMLE = WBC_analysis(arguments, ouputExcel);
 
+                percentage = (int)((FileNumber - 0.5) * 100 / nTotalCnt);
                 for (int i = 0; i < NMLE.Length; i++)
                 {
                     NMLE_1k_Per_mL[i] = Math.Round(NMLE[i] / FlowRate, 2);
                     NMLE_report[i] = Math.Round(NMLE_1k_Per_mL[i]/1000,2).ToString();
-                    Console.Write(String.Format("NMLE{0} TC:{1}\n",i, NMLE[i])); //NMLE_report
+                    if (isCosole)
+                    {
+                        Console.Write(String.Format("NMLE{0} TC : {1}\n", i, NMLE[i])); //NMLE_report
+                    }
+                    else
+                    {
+                        percentage++;
+                        strMsg = String.Format("NMLE{0} TC : {1}", i, NMLE[i]); //NMLE_report
+                        worker.ReportProgress(percentage, new ProcessState() { nTotalCnt = nTotalCnt, nCurr = FileNumber, strMsg = strMsg });
+                    }
+                    
                 }
-                Console.Write(String.Format("NMLE_Report: {0},{1},{2},{3}\n", NMLE_report));
+
+                if (isCosole)
+                {
+                    Console.Write(String.Format("NMLE_Report: {0}, {1}, {2}, {3}\n", NMLE_report));
+                }
+                else
+                {
+                    percentage = (int)((FileNumber - 0.2) * 100 / nTotalCnt);
+                    strMsg = String.Format("NMLE_Report: {0}, {1}, {2}, {3}", NMLE_report);
+                    worker.ReportProgress(percentage, new ProcessState() { nTotalCnt = nTotalCnt, nCurr = FileNumber, strMsg = strMsg });
+                }
                 sb.AppendLine(string.Join(",", FileName_WO_Ext, arguments[3], FlowRateString, NMLE[0], NMLE[1], NMLE[2], NMLE[3],
                     NMLE_report[0], NMLE_report[1], NMLE_report[2], NMLE_report[3]));
             }
             File.WriteAllText("Fixed Gating output.csv", sb.ToString());
-            Console.Write("Wrote Fixed Gating output\n");
-            Console.Write("Press a button ...");
-            Console.ReadKey();
+            if (isCosole)
+            {
+                Console.Write("Wrote Fixed Gating output\n");
+                Console.Write("Press a button ...");
+                Console.ReadKey();
+            }
         }
         public void Excel(string ExcelPath, int SheetNum) // string SheetName,
         {
@@ -1364,7 +1406,7 @@ namespace FlowCytometry
             excel.Quit();
         }
 
-        public static List<string[]> ReadExcelList(string ExcelPath, int Row, int rowCount)
+        public static List<string[]> ReadExcelList(string ExcelPath, bool isConsole)
         {
             _Application excel = new _Excel.Application();
             int SheetNum = 1;
@@ -1399,29 +1441,33 @@ namespace FlowCytometry
                 }
             }
 
-            Console.WriteLine("Column Idxs:{0}, {1}, {2}, {3}", colIdxs[0], colIdxs[1], colIdxs[2], colIdxs[3] );
-            Console.WriteLine("Press a button...");
-            Console.ReadKey();
+            if (isConsole)
+            {
+                Console.WriteLine("Column Idxs:{0}, {1}, {2}, {3}", colIdxs[0], colIdxs[1], colIdxs[2], colIdxs[3]);
+                Console.WriteLine("Press a button...");
+                Console.ReadKey();
+            }
 
             try
             {
-                for (i = Row; i <= Row + rowCount; i++)
+                for (i = 2; i <= totalRowCount; i++)
                 {
-                    if (i > totalRowCount)
-                        break;
                     string[] newData = new string[4];
 
                     for (k = 0; k < colNames.Count; k++)
                     {
                         var tmpRange = (ws.Cells[i, colIdxs[k]] as Range);
-                        if (tmpRange == null || tmpRange.Value == null)
-                            break;
-
-                        newData[k] = tmpRange.Value.ToString();
+                        if (tmpRange != null && tmpRange.Value != null)
+                            newData[k] = tmpRange.Value.ToString();
                     }
 
                     if (newData[0] == null)
                         continue;
+
+                    if (newData[0].IndexOf(".fcs", StringComparison.OrdinalIgnoreCase) < 0)
+                    {
+                        newData[0] += ".fcs";
+                    }
 
                     FN_AT_FR_List.Add(new string[3] 
                         {
@@ -1455,7 +1501,7 @@ namespace FlowCytometry
                 string fcsFileName = args[0]; // full FCS filename with path an extension
                 string filePath_gates = args[1]; // file path to folder with fixed gates
                 string channelNomenclature = args[2]; //  type of nomeclature: "old_names", "new_names", "middleaged_names"
-                string sampleType = args[3]; // type of analysis: "EOS", "BASO", "3-diff"
+                string sampleType = string.IsNullOrEmpty(args[3]) ? "3-diff" : args[3]; // type of analysis: "EOS", "BASO", "3-diff"
                                              //  bool ouputExcel = args[4];
                                              //  ouputExcel = false;
                 double pctNeutrophils; // percent Neutrophils
