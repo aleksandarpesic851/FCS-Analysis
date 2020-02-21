@@ -67,8 +67,8 @@
             this.label4 = new System.Windows.Forms.Label();
             this.chartData = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.tabControl = new System.Windows.Forms.TabControl();
-            this.DataFile = new System.Windows.Forms.OpenFileDialog();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.DataFile = new System.Windows.Forms.OpenFileDialog();
             this.tabWBC.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -156,6 +156,7 @@
             this.button_ProcessList.TabIndex = 17;
             this.button_ProcessList.Text = "Process List";
             this.button_ProcessList.UseVisualStyleBackColor = true;
+            this.button_ProcessList.Click += new System.EventHandler(this.button_ProcessList_Click);
             // 
             // btnSeparation
             // 
@@ -537,10 +538,6 @@
             this.tabControl.Size = new System.Drawing.Size(1348, 964);
             this.tabControl.TabIndex = 29;
             // 
-            // DataFile
-            // 
-            this.DataFile.FileName = "openFileDialog1";
-            // 
             // tabPage1
             // 
             this.tabPage1.Location = new System.Drawing.Point(4, 43);
@@ -549,6 +546,10 @@
             this.tabPage1.TabIndex = 2;
             this.tabPage1.Text = "Mie Scatter";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // DataFile
+            // 
+            this.DataFile.FileName = "openFileDialog1";
             // 
             // ChartForm
             // 

@@ -7,6 +7,7 @@ using System.Text;
 using System.Drawing;
 using Microsoft.Office.Interop.Excel;
 using _Excel = Microsoft.Office.Interop.Excel;
+using Accord.Statistics.Models.Regression.Linear;
 
 namespace FlowCytometry
 {
@@ -1113,6 +1114,36 @@ namespace FlowCytometry
                 }
             }
             return indexGate_Inside_Max_ROI;
+        }
+
+
+        // Linear Regression using Accord Library
+        public static double[] NewLinearRegression(double[][] xyVals)
+        {
+            int i = 0, nCnt = xyVals.Length;
+            
+            double[] regCoeff = new double[3];  // slope, intercept, rSquared
+            List<double> arrX = new List<double>();
+            List<double> arrY = new List<double>();
+            
+            for (i = 0; i < nCnt; i++)
+            {
+                if (xyVals[i][0] > 3000000)
+                    continue;
+                arrX.Add(xyVals[i][0]);
+                arrY.Add(xyVals[i][1]);
+            }
+            
+            double[] output = arrX.ToArray();
+            double[] input = arrY.ToArray();
+
+            OrdinaryLeastSquares ols = new OrdinaryLeastSquares();
+            SimpleLinearRegression regression = ols.Learn(input, output);
+            
+            regCoeff[0] = 1 / regression.Slope;
+            regCoeff[1] = - regression.Intercept / regression.Slope;
+            regCoeff[2] = regression.GetStandardError(input, output);
+            return regCoeff;
         }
 
         public static double[] LinearRegression(double[][] xyVals) //double[] xVals, double[] yVals,

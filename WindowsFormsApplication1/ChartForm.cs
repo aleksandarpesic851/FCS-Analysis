@@ -1075,8 +1075,9 @@ namespace WindowsFormsApplication1
             //polygons = loadPolygon(Gate2_file);
 
             double[] SingletsFit = new double[3];
-            SingletsFit = FCMeasurement.LinearRegression(Gate2_array);
-            MessageBox.Show(String.Format("Slope = {0}, Y-intercept = {1}, R^2 = {2}", 
+            // SingletsFit = FCMeasurement.LinearRegression(Gate2_array);
+            SingletsFit = FCMeasurement.NewLinearRegression(Gate2_array);
+            MessageBox.Show(String.Format("Slope = {0}, Y-intercept = {1}, Standard Error = {2}", 
                 Math.Round(SingletsFit[0],5), Math.Round(SingletsFit[1], 1), Math.Round(SingletsFit[2],1)));
 
             double slope = SingletsFit[0];
@@ -1110,7 +1111,7 @@ namespace WindowsFormsApplication1
                 x = Gate2_array[j][0];    //x = Gate1_arrayMax[j][0];
                 y = Gate2_array[j][1];    //y = Gate1_arrayMax[j][1];
 
-                expect1 = slope * ( 1 + delta_slope ) *  x + intercept * (1 + delta_slope);
+                expect1 = slope * ( 1 + delta_slope * 2 ) *  x + intercept * (1 + delta_slope);
                 expect2 = slope * ( 1 - delta_slope ) *  x + intercept * (1 - delta_slope);
 
                 if (y > expect2 && y < expect1)
@@ -2428,6 +2429,11 @@ namespace WindowsFormsApplication1
         {
             //string filePath_gates = " C:/Users/begem/OneDrive/Desktop/General Fluidics/Fixed gating";
             filePath_gates = Set_FixedGatingFolder();
+        }
+
+        private void button_ProcessList_Click(object sender, EventArgs e)
+        {
+
         }
 
         private bool checkCultureCorrect()
