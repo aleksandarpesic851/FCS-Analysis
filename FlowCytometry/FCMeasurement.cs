@@ -577,8 +577,8 @@ namespace FlowCytometry
             //resultCsvFile //   channelNomenclature = "new_names";//"old_names";
             int[] NML_count = new int[3]; //output: Neutrophils, Monocytes, Lymphocytes (in order)
             string sampleType = "3-diff";
-            string FCS1_H = FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
-            string SSC_H = FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
+            string FCS1_H = GetChannelName("FCS1peak", channelNomenclature);
+            string SSC_H = GetChannelName("SSCpeak", channelNomenclature);
 
             Console.WriteLine(String.Format("Starting analysis of:\n{0}", fcsFileName));
 
@@ -634,43 +634,6 @@ namespace FlowCytometry
             bool[] intactCol_Gate = GetColumn(indexGate_IntactCells, 1);
             int count_Gate1out_Max = CountBoolTrue(intactCol_Max);
             int count_Gate1out = CountBoolTrue(intactCol_Gate);
-
-            //indexGate_IntactCells write to file == OUTPUT
-            #region Explicit gating (not used)
-            /*
-            for (int j = 0; j < TotalDataLength; j++)   // for (int j = 0; j < Gate1Max_Length; j++)
-            {
-                x = GateIntactCells_array[j][0];    //x = GateIntactCells_arrayMax[j][0];
-                y = GateIntactCells_array[j][1];    //y = GateIntactCells_arrayMax[j][1];
-                                          // indexGate_Cells[j] = false;
-                if (x >= 16383 || y >= 16383)
-                {
-                    indexGate_Cells_Max[j] = false;
-                    indexGate_Cells[j] = false;
-                }
-                else
-                {
-                    indexGate_Cells_Max[j] = true;
-                    if (polygons != null)
-                    {
-                        if (polygons[0].IsInsidePoly(x, y))
-                        {
-                            indexGate_Cells[j] = true;
-                        }
-                        else
-                        {
-                            indexGate_Cells[j] = false;
-                        }
-                    }
-                }
-            }
-            */
-            #endregion
-
-            //  indexGate_CellTypes = FlowCytometry.FCMeasurement.GateArray(GateIntactCells_array, GateIntactCells_file);
-
-            //            int count_Gate1out_Max = CountBoolTrue2D(indexGate_CellTypes, 0);
-            //           int count_Gate1out = CountBoolTrue2D(indexGate_CellTypes, 1);
             #endregion
 
             // GATE 2: Singlets
@@ -1140,9 +1103,11 @@ namespace FlowCytometry
 
             OrdinaryLeastSquares ols = new OrdinaryLeastSquares();
             SimpleLinearRegression regression = ols.Learn(input, output);
-            
-            regCoeff[0] = 1 / regression.Slope;
-            regCoeff[1] = - regression.Intercept / regression.Slope;
+
+            /*regCoeff[0] = 1 / regression.Slope;
+            regCoeff[1] = - regression.Intercept / regression.Slope;*/
+            regCoeff[0] = regression.Slope;
+            regCoeff[1] = regression.Intercept;
             regCoeff[2] = regression.GetStandardError(input, output);
             return regCoeff;
         }
@@ -1516,7 +1481,7 @@ namespace FlowCytometry
 
                 if (ouputExcel)
                 {
-                    FlowCytometry.FCMeasurement.ExtractInfo(args[0]); //, args[1], args[2]);
+                    ExtractInfo(args[0]); //, args[1], args[2]);
                 }
 
                 if (sampleType == "BASO") //"BASO" "EOS" "3-diff"
@@ -1671,6 +1636,323 @@ namespace FlowCytometry
             CustomCluster.Custom_Meanshift meanshift = new CustomCluster.Custom_Meanshift(totalData);
             meanshift.CalculateKDE();
             return meanshift;
+        }
+
+        #region Gate 3-Diff Modules
+
+        // Gate 1
+        public static GateResult Gate_1(string gateFile, FCMeasurement fcsData, string channelNomenclature)
+        {
+            string channel1 = GetChannelName("FCS1peak", channelNomenclature);
+            string channel2 = GetChannelName("SSCpeak", channelNomenclature);
+            int i = -1;
+            int Channel1_Max = fcsData.Channels[channel1].Range;
+            int Channel2_Max = fcsData.Channels[channel2].Range;
+
+            List<double[]> arrData = GetChannelData(fcsData, channel1, channel2);
+            GateResult result = new GateResult(arrData);
+            List<Polygon> polygons = loadPolygon(gateFile);
+            
+            foreach (double[] xy in arrData)
+            {
+                i++;
+                // Gate Max
+                if (xy[0] > Channel1_Max || xy[1] > Channel2_Max)
+                    continue;
+
+                result.arrValid_Max[i] = true;
+                
+                // Gate by Polygon
+                if (polygons != null)
+                {
+                    foreach(Polygon polygon in polygons)
+                    {
+                        if (polygon.IsInsidePoly(xy[0], xy[1]))
+                        {
+                            result.arrValid[i] = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        // Gate 2
+        public static GateResult Gate_2(string gateFile, FCMeasurement fcsData, string channelNomenclature)
+        {
+            string channel1 = GetChannelName("FCS1area", channelNomenclature);
+            string channel2 = GetChannelName("FCS1peak", channelNomenclature);
+
+            int i = -1;
+            int Channel1_Max = fcsData.Channels[channel1].Range;
+            int Channel2_Max = fcsData.Channels[channel2].Range;
+
+            List<double[]> arrData = GetChannelData(fcsData, channel1, channel2);
+            GateResult result = new GateResult(arrData);
+            // List<Polygon> polygons = loadPolygon(gateFile);
+
+            result.SingletsFit = NewLinearRegression(arrData.ToArray());
+            double slope = result.SingletsFit[0];
+            double intercept = result.SingletsFit[1];
+            double expect1, expect2;
+            double delta_slope = 0.2;
+            double delta_intercept = 0.5;
+            double minDelta = 7000 * slope * delta_slope;
+            double exp_delta;
+            foreach (double[] xy in arrData)
+            {
+                i++;
+                // Gate Max
+                if (xy[0] > Channel1_Max || xy[1] > Channel2_Max)
+                    continue;
+
+                result.arrValid_Max[i] = true;
+                /*
+                                // Gate by Polygon
+                                if (polygons != null)
+                                {
+                                    foreach (Polygon polygon in polygons)
+                                    {
+                                        if (polygon.IsInsidePoly(xy[0], xy[1]))
+                                        {
+                                            result.arrValid[i] = true;
+                                            break;
+                                        }
+                                    }
+                                }*/
+
+                // Gate by Linear Regression
+                // if (result.arrValid[i])
+                // {
+                /*                expect1 = slope * (1 + delta_slope * 2) * xy[0] + intercept * (1 + delta_intercept);
+                                expect2 = slope * (1 - delta_slope) * xy[0] + intercept * (1 - delta_intercept);
+
+                                if (xy[1] > expect2 && xy[1] < expect1)
+                                    result.arrValid[i] = true;
+                */
+                exp_delta = Math.Max(minDelta, slope * xy[1] * delta_slope);
+                expect1 = slope * xy[1] + intercept * (1 + delta_intercept) + exp_delta;
+                expect2 = slope * xy[1] + intercept * (1 - delta_intercept) - exp_delta;
+
+                if (xy[0] > expect2 && xy[0] < expect1)
+                    result.arrValid[i] = true;
+
+                // }
+            }
+
+            return result;
+        }
+
+        // Gate 3
+        public static GateResult Gate_3(string gateFile, FCMeasurement fcsData, string channelNomenclature, bool isDynamic)
+        {
+            string channel1 = GetChannelName("FCS1peak", channelNomenclature);
+            string channel2 = GetChannelName("SSCpeak", channelNomenclature);
+            int i = -1, k = 0;
+            int Channel1_Max = fcsData.Channels[channel1].Range;
+            int Channel2_Max = fcsData.Channels[channel2].Range;
+
+            List<double[]> arrData = GetChannelData(fcsData, channel1, channel2);
+            GateResult result = new GateResult(arrData);
+            List<Polygon> polygons = loadPolygon(gateFile);
+            result.isGate3 = true;
+
+            foreach (double[] xy in arrData)
+            {
+                i++;
+                // Gate Max
+                if (xy[0] < Channel1_Max && xy[1] < Channel2_Max)
+                   result.arrValid_Max[i] = true;
+            }
+
+            foreach (Polygon polygon in polygons)
+            {
+                result.arrColor.Add(polygon.color);
+            }
+            
+            i = 0;
+            List<CustomCluster.Cluster> clusters;
+            if (isDynamic)
+            {
+                calculateDynamicGates(polygons, arrData.ToArray(), out clusters);
+                foreach(CustomCluster.Cluster cluster in clusters)
+                {
+                    if (string.IsNullOrEmpty(cluster.clusterName))
+                        continue;
+                    int idx = Array.IndexOf(CustomCluster.Global.CELL_NAME, cluster.clusterName);
+
+                    foreach(int point in cluster.points)
+                    {
+                        if (!result.arrValid_Max[point])
+                            continue;
+                        switch (idx)
+                        {
+                            case 0:
+                                result.arrN[point] = true;
+                                break;
+                            case 1:
+                                result.arrM[point] = true;
+                                break;
+                            case 2:
+                                result.arrL[point] = true;
+                                break;
+                        }
+                        result.arrValid[point] = true;
+                    }
+                }
+            }
+            else
+            {
+                // Gate by Polygon
+                if (polygons != null)
+                {
+
+                    foreach (double[] xy in arrData)
+                    {
+                        if (!result.arrValid_Max[i])
+                            continue;
+
+                        k = 0;
+                        foreach (Polygon polygon in polygons)
+                        {
+                            if (polygon.IsInsidePoly(xy[0], xy[1]))
+                            {
+                                result.arrValid[i] = true;
+                                switch(k)
+                                {
+                                    case 0:
+                                        result.arrN[i] = true;
+                                        break;
+                                    case 1:
+                                        result.arrM[i] = true;
+                                        break;
+                                    case 2:
+                                        result.arrL[i] = true;
+                                        break;
+                                }
+                            }
+                            k++;
+                        }
+                        i++;
+                    }
+                }
+            }
+            return result;
+        }
+
+        public static List<double[]> GetChannelData(FCMeasurement fcsData, string channel1, string channel2)
+        {
+            List<double[]> arrData = new List<double[]>();
+            for (int i = 0; i < fcsData.Counts; i++) //sample.Counts     5000
+            {
+                arrData.Add(new double[2] { fcsData.Channels[channel1].Data.ElementAt(i), fcsData.Channels[channel2].Data.ElementAt(i) });
+            }
+            return arrData;
+        }
+        #endregion
+    }
+
+    public class GateResult
+    {
+        public List<double[]> arrData;
+        public List<bool> arrValid;
+        public List<bool> arrValid_Max;
+        public List<bool> arrN;
+        public List<bool> arrM;
+        public List<bool> arrL;
+        public double[] SingletsFit { get; set; }
+        public List<Color> arrColor;
+        public bool isGate3;
+        public GateResult(List<double[]> arrData)
+        {
+            this.arrData = arrData;
+            arrValid = new List<bool>(new bool[arrData.Count]);
+            arrValid_Max = new List<bool>(new bool[arrData.Count]);
+            arrN = new List<bool>(new bool[arrData.Count]);
+            arrM = new List<bool>(new bool[arrData.Count]);
+            arrL = new List<bool>(new bool[arrData.Count]);
+            arrColor = new List<Color>();
+        }
+
+        public void initAllAsTrue()
+        {
+            int nCnt = arrData.Count, i;
+            for (i = 0; i < nCnt; i++)
+            {
+                arrValid[i] = true;
+                arrValid_Max[i] = true;
+                arrN[i] = true;
+                arrM[i] = true;
+                arrL[i] = true;
+            }
+        }
+
+        public int nInvalidCnt
+        { 
+            get
+            { 
+                return getInvalidCnt(arrValid); 
+            }
+        }
+
+        public int nInvalidCnt_Max
+        {
+            get
+            {
+                return getInvalidCnt(arrValid_Max);
+            }
+        }
+
+        public int nValidCnt
+        {
+            get
+            {
+                return getValidCnt(arrValid);
+            }
+        }
+
+        public int nValidCnt_Max
+        {
+            get
+            {
+                return getValidCnt(arrValid_Max);
+            }
+        }
+
+        public int nNCnt
+        {
+            get
+            {
+                return getValidCnt(arrN);
+            }
+        }
+
+        public int nMCnt
+        {
+            get
+            {
+                return getValidCnt(arrM);
+            }
+        }
+
+        public int nLCnt
+        {
+            get
+            {
+                return getValidCnt(arrL);
+            }
+        }
+
+        private int getInvalidCnt(List<bool> arrData)
+        {
+            return arrData.Count(e => !e);
+        }
+
+        private int getValidCnt(List<bool> arrData)
+        {
+            return arrData.Count(e => e);
         }
     }
 }

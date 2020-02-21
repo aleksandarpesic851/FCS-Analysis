@@ -61,20 +61,24 @@
             this.radioButton_EOS = new System.Windows.Forms.RadioButton();
             this.radioButton_3diff = new System.Windows.Forms.RadioButton();
             this.btnGating = new System.Windows.Forms.Button();
-            this.checkBox_DynamicGating = new System.Windows.Forms.CheckBox();
             this.FileNameBox = new System.Windows.Forms.TextBox();
-            this.checkBox_FixedGating = new System.Windows.Forms.CheckBox();
             this.label4 = new System.Windows.Forms.Label();
             this.chartData = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.DataFile = new System.Windows.Forms.OpenFileDialog();
+            this.btnDynamic = new System.Windows.Forms.RadioButton();
+            this.btnFixed = new System.Windows.Forms.RadioButton();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.tabWBC.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chartData)).BeginInit();
             this.tabControl.SuspendLayout();
+            this.groupBox3.SuspendLayout();
+            this.groupBox5.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabRBC
@@ -104,15 +108,13 @@
             // groupBox4
             // 
             this.groupBox4.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.groupBox4.Controls.Add(this.radioOldName);
-            this.groupBox4.Controls.Add(this.radioNewName);
+            this.groupBox4.Controls.Add(this.groupBox5);
+            this.groupBox4.Controls.Add(this.groupBox3);
             this.groupBox4.Controls.Add(this.button_ProcessList);
             this.groupBox4.Controls.Add(this.btnSeparation);
             this.groupBox4.Controls.Add(this.groupBox2);
             this.groupBox4.Controls.Add(this.groupBox1);
-            this.groupBox4.Controls.Add(this.checkBox_DynamicGating);
             this.groupBox4.Controls.Add(this.FileNameBox);
-            this.groupBox4.Controls.Add(this.checkBox_FixedGating);
             this.groupBox4.Controls.Add(this.label4);
             this.groupBox4.Location = new System.Drawing.Point(122, 5);
             this.groupBox4.Name = "groupBox4";
@@ -125,7 +127,7 @@
             this.radioOldName.AutoSize = true;
             this.radioOldName.Checked = true;
             this.radioOldName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.radioOldName.Location = new System.Drawing.Point(730, 117);
+            this.radioOldName.Location = new System.Drawing.Point(12, 37);
             this.radioOldName.Name = "radioOldName";
             this.radioOldName.Size = new System.Drawing.Size(89, 19);
             this.radioOldName.TabIndex = 30;
@@ -138,7 +140,7 @@
             // 
             this.radioNewName.AutoSize = true;
             this.radioNewName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.radioNewName.Location = new System.Drawing.Point(730, 97);
+            this.radioNewName.Location = new System.Drawing.Point(12, 13);
             this.radioNewName.Name = "radioNewName";
             this.radioNewName.Size = new System.Drawing.Size(95, 19);
             this.radioNewName.TabIndex = 29;
@@ -149,10 +151,10 @@
             // button_ProcessList
             // 
             this.button_ProcessList.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button_ProcessList.Location = new System.Drawing.Point(641, 13);
+            this.button_ProcessList.Location = new System.Drawing.Point(614, 13);
             this.button_ProcessList.Margin = new System.Windows.Forms.Padding(2);
             this.button_ProcessList.Name = "button_ProcessList";
-            this.button_ProcessList.Size = new System.Drawing.Size(178, 35);
+            this.button_ProcessList.Size = new System.Drawing.Size(228, 35);
             this.button_ProcessList.TabIndex = 17;
             this.button_ProcessList.Text = "Process List";
             this.button_ProcessList.UseVisualStyleBackColor = true;
@@ -161,10 +163,10 @@
             // btnSeparation
             // 
             this.btnSeparation.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnSeparation.Location = new System.Drawing.Point(641, 52);
+            this.btnSeparation.Location = new System.Drawing.Point(614, 52);
             this.btnSeparation.Margin = new System.Windows.Forms.Padding(1);
             this.btnSeparation.Name = "btnSeparation";
-            this.btnSeparation.Size = new System.Drawing.Size(178, 35);
+            this.btnSeparation.Size = new System.Drawing.Size(228, 35);
             this.btnSeparation.TabIndex = 12;
             this.btnSeparation.Text = "Load + Cluster";
             this.btnSeparation.UseVisualStyleBackColor = true;
@@ -186,7 +188,7 @@
             this.groupBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox2.Location = new System.Drawing.Point(11, 13);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(569, 125);
+            this.groupBox2.Size = new System.Drawing.Size(569, 129);
             this.groupBox2.TabIndex = 28;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Explore FCS Data";
@@ -374,7 +376,6 @@
             this.checkBoxGate1.TabIndex = 18;
             this.checkBoxGate1.Text = "Gate1";
             this.checkBoxGate1.UseVisualStyleBackColor = true;
-            this.checkBoxGate1.CheckedChanged += new System.EventHandler(this.checkBoxGate1_CheckedChanged);
             // 
             // checkBoxGate3
             // 
@@ -451,18 +452,6 @@
             this.btnGating.UseVisualStyleBackColor = true;
             this.btnGating.Click += new System.EventHandler(this.btnGating_Click);
             // 
-            // checkBox_DynamicGating
-            // 
-            this.checkBox_DynamicGating.AutoSize = true;
-            this.checkBox_DynamicGating.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkBox_DynamicGating.Location = new System.Drawing.Point(641, 97);
-            this.checkBox_DynamicGating.Name = "checkBox_DynamicGating";
-            this.checkBox_DynamicGating.Size = new System.Drawing.Size(81, 19);
-            this.checkBox_DynamicGating.TabIndex = 27;
-            this.checkBox_DynamicGating.Text = "Dynamic";
-            this.checkBox_DynamicGating.UseVisualStyleBackColor = true;
-            this.checkBox_DynamicGating.CheckedChanged += new System.EventHandler(this.checkBox_DynamicGating_CheckedChanged);
-            // 
             // FileNameBox
             // 
             this.FileNameBox.Location = new System.Drawing.Point(11, 169);
@@ -470,21 +459,6 @@
             this.FileNameBox.Name = "FileNameBox";
             this.FileNameBox.Size = new System.Drawing.Size(853, 21);
             this.FileNameBox.TabIndex = 21;
-            this.FileNameBox.TextChanged += new System.EventHandler(this.FileNameBox_TextChanged);
-            // 
-            // checkBox_FixedGating
-            // 
-            this.checkBox_FixedGating.AutoSize = true;
-            this.checkBox_FixedGating.Checked = true;
-            this.checkBox_FixedGating.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox_FixedGating.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkBox_FixedGating.Location = new System.Drawing.Point(641, 119);
-            this.checkBox_FixedGating.Name = "checkBox_FixedGating";
-            this.checkBox_FixedGating.Size = new System.Drawing.Size(61, 19);
-            this.checkBox_FixedGating.TabIndex = 26;
-            this.checkBox_FixedGating.Text = "Fixed";
-            this.checkBox_FixedGating.UseVisualStyleBackColor = true;
-            this.checkBox_FixedGating.CheckedChanged += new System.EventHandler(this.checkBox_FixedGating_CheckedChanged);
             // 
             // label4
             // 
@@ -551,6 +525,52 @@
             // 
             this.DataFile.FileName = "openFileDialog1";
             // 
+            // btnDynamic
+            // 
+            this.btnDynamic.AutoSize = true;
+            this.btnDynamic.Checked = true;
+            this.btnDynamic.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnDynamic.Location = new System.Drawing.Point(8, 13);
+            this.btnDynamic.Name = "btnDynamic";
+            this.btnDynamic.Size = new System.Drawing.Size(80, 19);
+            this.btnDynamic.TabIndex = 31;
+            this.btnDynamic.TabStop = true;
+            this.btnDynamic.Text = "Dynamic";
+            this.btnDynamic.UseVisualStyleBackColor = true;
+            this.btnDynamic.CheckedChanged += new System.EventHandler(this.btnDynamic_CheckedChanged);
+            // 
+            // btnFixed
+            // 
+            this.btnFixed.AutoSize = true;
+            this.btnFixed.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnFixed.Location = new System.Drawing.Point(8, 37);
+            this.btnFixed.Name = "btnFixed";
+            this.btnFixed.Size = new System.Drawing.Size(60, 19);
+            this.btnFixed.TabIndex = 32;
+            this.btnFixed.Text = "Fixed";
+            this.btnFixed.UseVisualStyleBackColor = true;
+            this.btnFixed.CheckedChanged += new System.EventHandler(this.btnFixed_CheckedChanged);
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.btnFixed);
+            this.groupBox3.Controls.Add(this.btnDynamic);
+            this.groupBox3.Location = new System.Drawing.Point(614, 93);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(96, 64);
+            this.groupBox3.TabIndex = 33;
+            this.groupBox3.TabStop = false;
+            // 
+            // groupBox5
+            // 
+            this.groupBox5.Controls.Add(this.radioOldName);
+            this.groupBox5.Controls.Add(this.radioNewName);
+            this.groupBox5.Location = new System.Drawing.Point(718, 93);
+            this.groupBox5.Name = "groupBox5";
+            this.groupBox5.Size = new System.Drawing.Size(125, 64);
+            this.groupBox5.TabIndex = 34;
+            this.groupBox5.TabStop = false;
+            // 
             // ChartForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -573,6 +593,10 @@
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chartData)).EndInit();
             this.tabControl.ResumeLayout(false);
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
+            this.groupBox5.ResumeLayout(false);
+            this.groupBox5.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -608,14 +632,16 @@
         private System.Windows.Forms.RadioButton radioButton_EOS;
         private System.Windows.Forms.RadioButton radioButton_3diff;
         private System.Windows.Forms.Button btnGating;
-        private System.Windows.Forms.CheckBox checkBox_DynamicGating;
         private System.Windows.Forms.TextBox FileNameBox;
-        private System.Windows.Forms.CheckBox checkBox_FixedGating;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.DataVisualization.Charting.Chart chartData;
         private System.Windows.Forms.TabControl tabControl;
         private System.Windows.Forms.OpenFileDialog DataFile;
         private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.GroupBox groupBox5;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.RadioButton btnFixed;
+        private System.Windows.Forms.RadioButton btnDynamic;
     }
 }
 

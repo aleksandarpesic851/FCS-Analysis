@@ -30,7 +30,7 @@ namespace WindowsFormsApplication1
 
         string Loaded_TotalFileName;
         string WBC_file_type = "3-diff";
-        string Gating_Type;
+        bool isDynamicGating = true;
 
         string filePath_gates;
         string starting_filePath = "C:/Users/begem/OneDrive/Desktop/General Fluidics/Data/MGH";
@@ -616,11 +616,11 @@ namespace WindowsFormsApplication1
             }
             else if (WBC_file_type == "3-diff")
             {
-                gate_3diff(sample);
+                new_gate_3diff(sample);
             }
             else if (WBC_file_type == "EOS")
             {
-                var TupleIn = gate_3diff(sample);
+                var TupleIn = new_gate_3diff(sample);
 
                 bool[] NeutrophilsTF = TupleIn.Item2;
 
@@ -951,7 +951,175 @@ namespace WindowsFormsApplication1
             File.WriteAllText(@Total_output_filename, BasophilsReport); 
             #endregion
         }
-        
+
+        public Tuple<int[], bool[]> new_gate_3diff(FCMeasurement sample)
+        {
+            string FSC1_H = FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
+            string SSC_H = FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
+            string FSC1_A = FCMeasurement.GetChannelName("FCS1area", channelNomenclature);
+
+            string gate1File = Path.Combine(filePath_gates, "gating Cells.csv");
+            string gate2File = Path.Combine(filePath_gates, "gating Singlets.csv");
+            string gate3File = Path.Combine(filePath_gates, "gating Cell Types.csv");
+
+            int nTotalCnt = sample.Counts, i;
+            int[] NML = new int[3];
+            bool[] NeutrophilsTF = new bool[nTotalCnt];
+            string strMsg;
+
+            List<GateResult> arrGateResults = new List<GateResult>();
+
+            // Do always gate1, even though it's not checked so that it can draw at least gate1.
+            GateResult gate1Result = FCMeasurement.Gate_1(gate1File, sample, channelNomenclature);
+            if (checkBoxGate1.Checked)
+            {
+                DrawGateResult(gate1Result, FSC1_H, SSC_H);
+                strMsg = String.Format("Total data length = {0} \nInside gate - 1 = {1}", nTotalCnt, gate1Result.nValidCnt);
+                MessageBox.Show(strMsg, "Gate - 1 Results");
+
+                arrGateResults.Add(gate1Result);
+            }
+
+            if (checkBoxGate2.Checked)
+            {
+                GateResult gate2Result = FCMeasurement.Gate_2(gate2File, sample, channelNomenclature);
+                DrawGateResult(gate2Result, FSC1_A, FSC1_H);
+
+                strMsg = String.Format("Slope = {0}, Y-intercept = {1}, Standard Error = {2}",
+                                Math.Round(gate2Result.SingletsFit[0], 5), Math.Round(gate2Result.SingletsFit[1], 1), Math.Round(gate2Result.SingletsFit[2], 1));
+                MessageBox.Show(strMsg, "Gate - 2 Results");
+                strMsg = String.Format("Total data length = {0} \nInside Singlets gate = {1}", nTotalCnt, gate2Result.nValidCnt);
+                MessageBox.Show(strMsg, "Gate - 2 Results");
+
+                arrGateResults.Add(gate2Result);
+            }
+
+            if (checkBoxGate3.Checked)
+            {
+                GateResult gate3Result = FCMeasurement.Gate_3(gate3File, sample, channelNomenclature, isDynamicGating);
+                DrawGateResult(gate3Result, FSC1_H, SSC_H);
+
+                NML = new int[3] { gate3Result.nNCnt * 100 / nTotalCnt, gate3Result.nMCnt * 100 / nTotalCnt, gate3Result.nLCnt * 100 / nTotalCnt };
+                strMsg = String.Format("Total data length = {0} \nNeutrophils = {1} ( {2}% )\nMonocytes = {3} ( {4}% ) \nLymphocytes = {5} ( {6}% )",
+                                nTotalCnt, gate3Result.nNCnt, NML[0], gate3Result.nMCnt, NML[1], gate3Result.nLCnt, NML[2]);
+                MessageBox.Show(strMsg, "Gate - 3 Results");
+                arrGateResults.Add(gate3Result);
+            }
+
+            GateResult finalResult = new GateResult(gate1Result.arrData);
+            finalResult.initAllAsTrue();
+
+            foreach (GateResult gateResult in arrGateResults)
+            {
+                if (gateResult.isGate3)
+                {
+                    finalResult.isGate3 = true;
+                    foreach(Color color in gateResult.arrColor)
+                    {
+                        finalResult.arrColor.Add(color);
+                    }
+                }
+                
+                for (i = 0; i < nTotalCnt; i++)
+                {
+                    finalResult.arrValid[i] &= gateResult.arrValid[i];
+                    finalResult.arrValid_Max[i] &= gateResult.arrValid_Max[i];
+                    if (gateResult.isGate3)
+                    {
+                        finalResult.arrN[i] &= gateResult.arrN[i] & finalResult.arrValid[i];
+                        finalResult.arrM[i] &= gateResult.arrM[i] & finalResult.arrValid[i];
+                        finalResult.arrL[i] &= gateResult.arrL[i] & finalResult.arrValid[i];
+                        finalResult.arrValid[i] &= (gateResult.arrN[i] | gateResult.arrM[i] | gateResult.arrL[i]);
+                    }
+                }
+            }
+            DrawGateResult(finalResult, FSC1_H, SSC_H);
+            
+            strMsg = String.Format("Total data length = {0} \n3-Diff Gated data length = {1} \nOut side gates data length = {2} \n", nTotalCnt, finalResult.nValidCnt, finalResult.nInvalidCnt);
+            if (finalResult.isGate3)
+            {
+                NML = new int[3] { finalResult.nNCnt * 100 / nTotalCnt, finalResult.nMCnt * 100 / nTotalCnt, finalResult.nLCnt * 100 / nTotalCnt };
+                strMsg += String.Format(" Neutrophils = {0} ( {1}% )\n Monocytes = {2} ( {3}% ) \n Lymphocytes = {4} ( {5}% )",
+                                    finalResult.nNCnt, NML[0], finalResult.nMCnt, NML[1], finalResult.nLCnt, NML[2]);
+                finalResult.arrN.CopyTo(NeutrophilsTF);
+            }
+
+            MessageBox.Show(strMsg, "Gate - Final Results");
+            var tuple = new Tuple<int[], bool[]>(NML, NeutrophilsTF);
+            return tuple;
+        }
+
+        private void DrawGateResult(GateResult gateResult, string axisX, string axisY)
+        {
+            int nTotalCnt = gateResult.arrData.Count, i;
+            string threeDiffGated = "threeDiffGated";
+            string outsideFixedGates = "OutsideGates";
+            string neutrophils = "Neutrophils";
+            string monocytes = "Monocytes";
+            string lymphocytes = "Lymphocytes";
+            double x, y;
+
+            chartData.ChartAreas[0].AxisX.Title = axisX;
+            chartData.ChartAreas[0].AxisY.Title = axisY;
+            chartData.Series.Clear();
+            if (gateResult.isGate3)
+            {
+                addChartSeries(neutrophils, gateResult.arrColor[0]);
+                addChartSeries(monocytes,   gateResult.arrColor[1]);
+                addChartSeries(lymphocytes, gateResult.arrColor[2]);
+            }
+            else
+            {
+                addChartSeries(threeDiffGated, Color.Blue);
+            }
+            addChartSeries(outsideFixedGates, Color.Red);
+            // Add Chart Points
+            for (i = 0; i < nTotalCnt; i++)   // for (int j = 0; j < Gate1Max_Length; j++)
+            {
+                x = gateResult.arrData[i][0];
+                y = gateResult.arrData[i][1];
+
+                if (gateResult.arrValid[i])
+                {
+                    if (gateResult.isGate3)
+                    {
+                        if (gateResult.arrN[i])
+                        {
+                            chartData.Series[neutrophils].Points.AddXY(x, y);
+                            continue;
+                        }
+                        if (gateResult.arrM[i])
+                        {
+                            chartData.Series[monocytes].Points.AddXY(x, y);
+                            continue;
+                        }
+                        if (gateResult.arrL[i])
+                            chartData.Series[lymphocytes].Points.AddXY(x, y);
+                    }
+                    else
+                    {
+                        chartData.Series[threeDiffGated].Points.AddXY(x, y);
+                    }
+                }
+                else
+                {
+                    chartData.Series[outsideFixedGates].Points.AddXY(x, y);
+                }
+            }
+
+            // Draw chart
+            chartData.Refresh();
+        }
+
+        private void addChartSeries(string strSeries, Color color)
+        {
+            chartData.Series.Add(strSeries);
+            chartData.Series[strSeries].ChartType = SeriesChartType.Point;
+            chartData.Series[strSeries].MarkerSize = 4; ;
+            chartData.Series[strSeries].MarkerStyle = MarkerStyle.Circle;
+            chartData.Series[strSeries].MarkerColor = color;
+        }
+
         public Tuple<int[], bool[]> gate_3diff(FCMeasurement sample) //static 
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
@@ -2235,32 +2403,6 @@ namespace WindowsFormsApplication1
             WBC_file_type = "BASO";
         }
 
-        private void FileNameBox_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-        private void checkBoxGate1_CheckedChanged(object sender, EventArgs e)
-        {
-
-        }
-
-
-        private void checkBox_FixedGating_CheckedChanged(object sender, EventArgs e)
-        {
-            Gating_Type = "FixedGating";
-        }
-
-        private void checkBox_DynamicGating_CheckedChanged(object sender, EventArgs e)
-        {
-            Gating_Type = "DynamicGating";
-            MessageBox.Show("Dynamic Gating currently not enabled");
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-
-        }
-
         public string Set_FixedGatingFolder()
         {
 
@@ -2444,7 +2586,17 @@ namespace WindowsFormsApplication1
 
         }
 
-            private bool checkCultureCorrect()
+        private void btnDynamic_CheckedChanged(object sender, EventArgs e)
+        {
+            isDynamicGating = true;
+        }
+
+        private void btnFixed_CheckedChanged(object sender, EventArgs e)
+        {
+            isDynamicGating = false;
+        }
+
+        private bool checkCultureCorrect()
         {
             if (sample == null)
                 return false;
