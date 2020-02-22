@@ -658,7 +658,7 @@ namespace WindowsFormsApplication1
                 Console.WriteLine(String.Format("EOS (max): {0} \nInside EOS gate: {1}", count_EOS_Max, count_GateEOS));
 */            
 
-                int[] WBC_counts = FCMeasurement.processEOS(Loaded_TotalFileName, filePath_gates, channelNomenclature); 
+                int[] WBC_counts = FCMeasurement.processEOS(Loaded_TotalFileName, filePath_gates, channelNomenclature, isDynamicGating, false); 
                 int totalWBC = WBC_counts[0] + WBC_counts[1] + WBC_counts[2] + WBC_counts[3];
 
                 double pctNeutrophils = 100 * WBC_counts[0] / totalWBC; // percent Neutrophils
@@ -959,11 +959,11 @@ namespace WindowsFormsApplication1
             string FSC1_A = FCMeasurement.GetChannelName("FCS1area", channelNomenclature);
 
             string gate1File = Path.Combine(filePath_gates, "gating Cells.csv");
-            string gate2File = Path.Combine(filePath_gates, "gating Singlets.csv");
             string gate3File = Path.Combine(filePath_gates, "gating Cell Types.csv");
 
             int nTotalCnt = sample.Counts, i;
             int[] NML = new int[3];
+            int[] NML_COUNTS = new int[3];
             bool[] NeutrophilsTF = new bool[nTotalCnt];
             string strMsg;
 
@@ -982,7 +982,7 @@ namespace WindowsFormsApplication1
 
             if (checkBoxGate2.Checked)
             {
-                GateResult gate2Result = FCMeasurement.Gate_2(gate2File, sample, channelNomenclature);
+                GateResult gate2Result = FCMeasurement.Gate_2(sample, channelNomenclature);
                 DrawGateResult(gate2Result, FSC1_A, FSC1_H);
 
                 strMsg = String.Format("Slope = {0}, Y-intercept = {1}, Standard Error = {2}",
@@ -1039,13 +1039,14 @@ namespace WindowsFormsApplication1
             if (finalResult.isGate3)
             {
                 NML = new int[3] { finalResult.nNCnt * 100 / nTotalCnt, finalResult.nMCnt * 100 / nTotalCnt, finalResult.nLCnt * 100 / nTotalCnt };
+                NML_COUNTS = new int[3] { finalResult.nNCnt, finalResult.nMCnt, finalResult.nLCnt };
                 strMsg += String.Format(" Neutrophils = {0} ( {1}% )\n Monocytes = {2} ( {3}% ) \n Lymphocytes = {4} ( {5}% )",
                                     finalResult.nNCnt, NML[0], finalResult.nMCnt, NML[1], finalResult.nLCnt, NML[2]);
                 finalResult.arrN.CopyTo(NeutrophilsTF);
             }
 
             MessageBox.Show(strMsg, "Gate - Final Results");
-            var tuple = new Tuple<int[], bool[]>(NML, NeutrophilsTF);
+            var tuple = new Tuple<int[], bool[]>(NML_COUNTS, NeutrophilsTF);
             return tuple;
         }
 
@@ -2580,7 +2581,7 @@ namespace WindowsFormsApplication1
             dlg.Title = "Choose Excel file to process.";
             if (dlg.ShowDialog() == DialogResult.OK)
             {
-                ProcessListForm processListForm = new ProcessListForm(dlg.FileName, filePath_gates, channelNomenclature);
+                ProcessListForm processListForm = new ProcessListForm(dlg.FileName, filePath_gates, channelNomenclature, isDynamicGating);
                 processListForm.ShowDialog();
             }
 

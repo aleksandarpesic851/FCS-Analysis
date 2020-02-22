@@ -570,8 +570,97 @@ namespace FlowCytometry
             }
             return hs;
         }
-        
-        public static Tuple<int[], bool[]> diff3_Gating(string fcsFileName, string filePath_gates, string channelNomenclature) //analyzeType
+        public static Tuple<int[], bool[]> new_diff3_Gating(string fcsFileName, string filePath_gates, string channelNomenclature, bool isDynamic, bool isConsole, int nTotalFileCnt = 1, int nCurr = 0, BackgroundWorker worker = null, DoWorkEventArgs e = null) //analyzeType
+        {
+            string FSC1_H = FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
+            string SSC_H = FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
+            string FSC1_A = FCMeasurement.GetChannelName("FCS1area", channelNomenclature);
+
+            string gate1File = Path.Combine(filePath_gates, "gating Cells.csv");
+            string gate3File = Path.Combine(filePath_gates, "gating Cell Types.csv");
+
+            FCMeasurement sample = new FCMeasurement(fcsFileName);
+            int i, percentage, nTotalCnt = sample.Counts;
+            int[] NML = new int[3];
+            int[] NML_COUNTS = new int[3];
+            bool[] NeutrophilsTF = new bool[nTotalCnt];
+            string strMsg;
+
+            List<GateResult> arrGateResults = new List<GateResult>();
+
+            // Do always gate1, even though it's not checked so that it can draw at least gate1.
+            GateResult gate1Result = Gate_1(gate1File, sample, channelNomenclature);
+            strMsg = String.Format("Gate - 1 Results : Total data length = {0} \n    Inside gate - 1 = {1}", nTotalCnt, gate1Result.nValidCnt);
+            percentage = (int)((nCurr - 0.8) * 100 / nTotalFileCnt);
+            ReportMsg(isConsole, strMsg, percentage, nTotalFileCnt, nCurr, worker, e);
+            
+            arrGateResults.Add(gate1Result);
+            
+            
+            GateResult gate2Result = FCMeasurement.Gate_2(sample, channelNomenclature);
+            strMsg = String.Format("Gate - 2 Results : Slope = {0}, Y-intercept = {1}, Standard Error = {2}",
+                            Math.Round(gate2Result.SingletsFit[0], 5), Math.Round(gate2Result.SingletsFit[1], 1), Math.Round(gate2Result.SingletsFit[2], 1));
+            strMsg += String.Format("\n    Total data length = {0} \n    Inside Singlets gate = {1}", nTotalCnt, gate2Result.nValidCnt);
+            percentage = (int)((nCurr - 0.6) * 100 / nTotalFileCnt);
+            ReportMsg(isConsole, strMsg, percentage, nTotalFileCnt, nCurr, worker, e);
+
+            arrGateResults.Add(gate2Result);
+            
+            GateResult gate3Result = FCMeasurement.Gate_3(gate3File, sample, channelNomenclature, isDynamic);
+            NML = new int[3] { gate3Result.nNCnt * 100 / nTotalCnt, gate3Result.nMCnt * 100 / nTotalCnt, gate3Result.nLCnt * 100 / nTotalCnt };
+            strMsg = String.Format("Gate - 3 Results : Total data length = {0} \n    Neutrophils = {1} ( {2}% )\n    Monocytes = {3} ( {4}% ) \n    Lymphocytes = {5} ( {6}% )",
+                            nTotalCnt, gate3Result.nNCnt, NML[0], gate3Result.nMCnt, NML[1], gate3Result.nLCnt, NML[2]);
+            percentage = (int)((nCurr - 0.3) * 100 / nTotalFileCnt);
+            ReportMsg(isConsole, strMsg, percentage, nTotalFileCnt, nCurr, worker, e);
+
+            arrGateResults.Add(gate3Result);
+            
+            GateResult finalResult = new GateResult(gate1Result.arrData);
+            finalResult.initAllAsTrue();
+
+            foreach (GateResult gateResult in arrGateResults)
+            {
+                if (gateResult.isGate3)
+                {
+                    finalResult.isGate3 = true;
+                    foreach (Color color in gateResult.arrColor)
+                    {
+                        finalResult.arrColor.Add(color);
+                    }
+                }
+
+                for (i = 0; i < nTotalCnt; i++)
+                {
+                    finalResult.arrValid[i] &= gateResult.arrValid[i];
+                    finalResult.arrValid_Max[i] &= gateResult.arrValid_Max[i];
+                    if (gateResult.isGate3)
+                    {
+                        finalResult.arrN[i] &= gateResult.arrN[i] & finalResult.arrValid[i];
+                        finalResult.arrM[i] &= gateResult.arrM[i] & finalResult.arrValid[i];
+                        finalResult.arrL[i] &= gateResult.arrL[i] & finalResult.arrValid[i];
+                        finalResult.arrValid[i] &= (gateResult.arrN[i] | gateResult.arrM[i] | gateResult.arrL[i]);
+                    }
+                }
+            }
+
+            strMsg = String.Format("Gate - Final Results : Total data length = {0} \n    3-Diff Gated data length = {1} \n    Out side gates data length = {2} \n", nTotalCnt, finalResult.nValidCnt, finalResult.nInvalidCnt);
+            if (finalResult.isGate3)
+            {
+                NML = new int[3] { finalResult.nNCnt * 100 / nTotalCnt, finalResult.nMCnt * 100 / nTotalCnt, finalResult.nLCnt * 100 / nTotalCnt };
+                NML_COUNTS = new int[3] { finalResult.nNCnt, finalResult.nMCnt, finalResult.nLCnt };
+                strMsg += String.Format("    Neutrophils = {0} ( {1}% )\n    Monocytes = {2} ( {3}% ) \n    Lymphocytes = {4} ( {5}% )",
+                                    finalResult.nNCnt, NML[0], finalResult.nMCnt, NML[1], finalResult.nLCnt, NML[2]);
+                finalResult.arrN.CopyTo(NeutrophilsTF);
+            }
+
+            percentage = (int)((nCurr - 0.2) * 100 / nTotalFileCnt);
+            ReportMsg(isConsole, strMsg, percentage, nTotalFileCnt, nCurr, worker, e);
+
+            var tuple = new Tuple<int[], bool[]>(NML_COUNTS, NeutrophilsTF);
+            return tuple;
+        }
+
+        public static Tuple<int[], bool[]> diff3_Gating(string fcsFileName, string filePath_gates, string channelNomenclature, bool isDynamic) //analyzeType
         {
             // Tuple<int, bool[]> int[]
             //resultCsvFile //   channelNomenclature = "new_names";//"old_names";
@@ -783,7 +872,7 @@ namespace FlowCytometry
             return tuple;
         }
 
-        public static int[] processEOS(string fcsFileName, string filePath_gates, string channelNomenclature)
+        public static int[] processEOS(string fcsFileName, string filePath_gates, string channelNomenclature, bool isDynamic, bool isConsole, int nTotalCnt = 1, int nCurr = 0, BackgroundWorker worker = null, DoWorkEventArgs e = null)
         {
             FCMeasurement sample = new FlowCytometry.FCMeasurement(fcsFileName);
             int TotalDataLength = sample.Counts;
@@ -800,7 +889,7 @@ namespace FlowCytometry
 
             //   bool[] indexGateEOS = new bool[TotalDataLength];
 
-            var tuple = diff3_Gating(fcsFileName, filePath_gates, channelNomenclature);
+            var tuple = new_diff3_Gating(fcsFileName, filePath_gates, channelNomenclature, isDynamic, isConsole, nTotalCnt, nCurr, worker, e);
 
             int[] EOSreport = new int[4];
             EOSreport[0] = tuple.Item1[0];
@@ -1251,7 +1340,20 @@ namespace FlowCytometry
 
             return diffSec;
         }
-        public static void FG_folder_analysis(string Total_ExcelFileName, string filePath_gates, string channelNomenclature, bool isCosole = true, BackgroundWorker worker = null, DoWorkEventArgs e = null)
+
+        public static void ReportMsg(bool isConsole, string strMsg, int percentage = 0, int nTotalCnt = 0, int nCurr = 0, BackgroundWorker worker = null, DoWorkEventArgs e = null)
+        {
+            if (isConsole)
+            {
+                Console.WriteLine(strMsg);
+            }
+            else if(worker != null)
+            {
+                worker.ReportProgress(percentage, new ProcessState() { nTotalCnt = nTotalCnt, nCurr = nCurr, strMsg = strMsg });
+            }
+        }
+
+        public static void FG_folder_analysis(string Total_ExcelFileName, string filePath_gates, string channelNomenclature, bool isDynamic = false, bool isCosole = true, BackgroundWorker worker = null, DoWorkEventArgs e = null)
         {
             #region Read Excel file Generate list FileName_FlowRate
              
@@ -1299,54 +1401,31 @@ namespace FlowCytometry
                 arguments[0] = listItem[0]; // full FCS filename with path an extension
                 arguments[3] = listItem[1]; // type of analysis: "3-diff", "EOS", "BASO"
                 FlowRateString = listItem[2];
-                
-                if (isCosole)
-                {
-                    Console.Write(String.Format("\n Processing file #{0} : {1} \n", FileNumber, listItem[0]));
-                    Console.Write(String.Format("Sample Volume associated with file = {0}mL", FlowRateString));
-                }
-                else
-                {
-                    strMsg = String.Format("\n Processing file #{0} : {1} \n", FileNumber, listItem[0]);
-                    strMsg += String.Format("Sample Volume associated with file = {0}mL", FlowRateString);
 
-                    percentage = ( FileNumber - 1 ) * 100 / nTotalCnt;
-                    worker.ReportProgress(percentage, new ProcessState() { nTotalCnt = nTotalCnt, nCurr = FileNumber, strMsg = strMsg });
-                }
+                strMsg = String.Format("\n Processing file #{0} : {1} \n", FileNumber, listItem[0]);
+                strMsg += String.Format("Sample Volume associated with file = {0}mL", FlowRateString);
+                percentage = (FileNumber - 1) * 100 / nTotalCnt;
+                ReportMsg(isCosole, strMsg, percentage, nTotalCnt, FileNumber, worker, e);
 
                 FileName_WO_Ext = Path.GetFileNameWithoutExtension(arguments[0]);
 
                 FlowRate = Convert.ToDouble(FlowRateString);
-                NMLE = WBC_analysis(arguments, ouputExcel);
+                NMLE = WBC_analysis(arguments, ouputExcel, isDynamic, isCosole, nTotalCnt, FileNumber, worker, e);
 
-                percentage = (int)((FileNumber - 0.5) * 100 / nTotalCnt);
+                percentage = (int)((FileNumber - 0.15) * 100 / nTotalCnt);
                 for (int i = 0; i < NMLE.Length; i++)
                 {
                     NMLE_1k_Per_mL[i] = Math.Round(NMLE[i] / FlowRate, 2);
                     NMLE_report[i] = Math.Round(NMLE_1k_Per_mL[i]/1000,2).ToString();
-                    if (isCosole)
-                    {
-                        Console.Write(String.Format("NMLE{0} TC : {1}\n", i, NMLE[i])); //NMLE_report
-                    }
-                    else
-                    {
-                        percentage++;
-                        strMsg = String.Format("NMLE{0} TC : {1}", i, NMLE[i]); //NMLE_report
-                        worker.ReportProgress(percentage, new ProcessState() { nTotalCnt = nTotalCnt, nCurr = FileNumber, strMsg = strMsg });
-                    }
                     
+                    strMsg = String.Format("NMLE{0} TC : {1}", i, NMLE[i]); //NMLE_report
+                    ReportMsg(isCosole, strMsg, percentage, nTotalCnt, FileNumber, worker, e);
                 }
 
-                if (isCosole)
-                {
-                    Console.Write(String.Format("NMLE_Report: {0}, {1}, {2}, {3}\n", NMLE_report));
-                }
-                else
-                {
-                    percentage = (int)((FileNumber - 0.2) * 100 / nTotalCnt);
-                    strMsg = String.Format("NMLE_Report: {0}, {1}, {2}, {3}", NMLE_report);
-                    worker.ReportProgress(percentage, new ProcessState() { nTotalCnt = nTotalCnt, nCurr = FileNumber, strMsg = strMsg });
-                }
+                percentage = (int)((FileNumber - 0.1) * 100 / nTotalCnt);
+                strMsg = String.Format("NMLE_Report: {0}, {1}, {2}, {3}", NMLE_report);
+                ReportMsg(isCosole, strMsg, percentage, nTotalCnt, FileNumber, worker, e);
+
                 sb.AppendLine(string.Join(",", FileName_WO_Ext, arguments[3], FlowRateString, NMLE[0], NMLE[1], NMLE[2], NMLE[3],
                     NMLE_report[0], NMLE_report[1], NMLE_report[2], NMLE_report[3]));
             }
@@ -1453,7 +1532,7 @@ namespace FlowCytometry
             return FN_AT_FR_List;
         }
 
-        public static int[] WBC_analysis(string[] args, bool ouputExcel) //void Main(string[] args)
+        public static int[] WBC_analysis(string[] args, bool ouputExcel, bool isDynamic, bool isConsole, int nTotalCnt = 1, int nCurr = 0, BackgroundWorker worker = null, DoWorkEventArgs e = null)
         {
             int[] counts = new int[4]; // does not work for EOS, which is 4-diff (EOS + 3-diff)
             if (args.Length >= 3) //>= 3)
@@ -1492,7 +1571,7 @@ namespace FlowCytometry
                 }
                 else if (sampleType == "EOS")
                 {
-                    counts = processEOS(fcsFileName, filePath_gates, channelNomenclature); //tuple.Item2, 
+                    counts = processEOS(fcsFileName, filePath_gates, channelNomenclature, isDynamic, isConsole, nTotalCnt, nCurr, worker, e); //tuple.Item2, 
                     totalWBC = counts[0] + counts[1] + counts[2] + counts[3];
 
                     pctNeutrophils = 100 * counts[0] / totalWBC; // percent Neutrophils
@@ -1504,18 +1583,20 @@ namespace FlowCytometry
                     pctLympocytes = Math.Round(pctLympocytes, 1);
                     pctMonocytes = Math.Round(pctMonocytes, 1);
                     pctEosinophils = Math.Round(pctEosinophils, 1);
-
-                    Console.WriteLine(String.Format("4-diff analysis for {0}: \n" +
+                    if (isConsole)
+                    {
+                        Console.WriteLine(String.Format("4-diff analysis for {0}: \n" +
                                    "Total WBC: {1}\n" +
                                    "Neutrophils: {2}, {3}%\n" +
                                    "Monocytes: {4}, {5}%\n" +
                                    "Lymphocytes: {6}, {7}%\n" +
                                    "Eosinophils: {8}, {9}%\n", fcsFileName, totalWBC, counts[0], pctNeutrophils,
                                     counts[1], pctLympocytes, counts[2], pctMonocytes, counts[3], pctEosinophils));
+                    }
                 }
                 else if (sampleType == "3-diff")
                 {
-                    tuple = diff3_Gating(fcsFileName, filePath_gates, channelNomenclature);
+                    tuple = new_diff3_Gating(fcsFileName, filePath_gates, channelNomenclature, isDynamic, isConsole, nTotalCnt, nCurr, worker, e);
                     totalWBC = tuple.Item1[0] + tuple.Item1[1] + tuple.Item1[2];
                     pctNeutrophils = 100 * tuple.Item1[0] / totalWBC; // percent Neutrophils
                     pctLympocytes = 100 * tuple.Item1[1] / totalWBC; // percent Lymphocytes
@@ -1528,12 +1609,16 @@ namespace FlowCytometry
                     pctNeutrophils = Math.Round(pctNeutrophils, 1);
                     pctLympocytes = Math.Round(pctLympocytes, 1);
                     pctMonocytes = Math.Round(pctMonocytes, 1);
-                    Console.WriteLine(String.Format("3-diff analysis for {0}: \n" +
+                    if (isConsole)
+                    {
+                        Console.WriteLine(String.Format("3-diff analysis for {0}: \n" +
                                    "Total WBC: {1}\n" +
                                    "Neutrophils: {2}, {3}%\n" +
                                    "Monocytes: {4}, {5}%\n" +
-                                   "Lymphocytes: {6}, {7}%\n", fcsFileName, totalWBC,
-                    tuple.Item1[0], pctNeutrophils, tuple.Item1[1], pctLympocytes, tuple.Item1[2], pctMonocytes));
+                                   "Lymphocytes: {6}, {7}%\n",
+                                   fcsFileName, totalWBC, tuple.Item1[0], pctNeutrophils, tuple.Item1[1], pctLympocytes, tuple.Item1[2], pctMonocytes));
+                    }
+                    
                 }
 
                 // Console.WriteLine("Finished processing. Press a button ...");
@@ -1680,7 +1765,7 @@ namespace FlowCytometry
         }
 
         // Gate 2
-        public static GateResult Gate_2(string gateFile, FCMeasurement fcsData, string channelNomenclature)
+        public static GateResult Gate_2(FCMeasurement fcsData, string channelNomenclature)
         {
             string channel1 = GetChannelName("FCS1area", channelNomenclature);
             string channel2 = GetChannelName("FCS1peak", channelNomenclature);

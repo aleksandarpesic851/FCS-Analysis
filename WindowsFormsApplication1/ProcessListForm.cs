@@ -16,12 +16,14 @@ namespace WindowsFormsApplication1
         private string fileName;
         private string gatePath;
         private string culture;
+        private bool isDynamic;
             
-        public ProcessListForm(string fileName, string gatePath, string channelCuture)
+        public ProcessListForm(string fileName, string gatePath, string channelCuture, bool isDynamic)
         {
             this.fileName = fileName;
             this.gatePath = gatePath;
             this.culture = channelCuture;
+            this.isDynamic = isDynamic;
 
             InitializeComponent();
             backgroundWorker1.WorkerReportsProgress = true;
@@ -44,7 +46,7 @@ namespace WindowsFormsApplication1
                 MessageBox.Show("Incorrect Parameters!");
                 return;
             }
-            FCMeasurement.FG_folder_analysis(fileName, gatePath, culture, false, sender as BackgroundWorker, e);
+            FCMeasurement.FG_folder_analysis(fileName, gatePath, culture, isDynamic, false, sender as BackgroundWorker, e);
         }
 
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
