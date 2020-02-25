@@ -1,4 +1,4 @@
-﻿namespace WindowsFormsApplication1
+﻿namespace Windows_FCS_Analysis
 {
     partial class ChartForm
     {

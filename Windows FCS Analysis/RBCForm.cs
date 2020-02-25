@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 
-namespace WindowsFormsApplication1
+namespace Windows_FCS_Analysis
 {
     public partial class RBCForm : Form
     {

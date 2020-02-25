@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace WindowsFormsApplication1
+namespace Windows_FCS_Analysis
 {
     public partial class MieScatterForm : Form
     {

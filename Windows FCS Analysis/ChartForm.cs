@@ -16,7 +16,7 @@ using System.Windows.Forms.DataVisualization.Charting;
 using ClusterAPI;
 using FlowCytometry;
 
-namespace WindowsFormsApplication1
+namespace Windows_FCS_Analysis
 {
     public partial class ChartForm : Form //partial
     {
@@ -121,31 +121,6 @@ namespace WindowsFormsApplication1
          
         private void ChartForm_Load(object sender, EventArgs e) //private
         {
-            // Create a new Mean-Shift algorithm for 3 dimensional samples
-/*
-            string filePath_Test = "C:/Users/begem/OneDrive/Desktop/General Fluidics/Csharp/Build4/WindowsFormsApplication1/bin/Debug/";
-            string fileName_Test = "HL60_007.fcs";
-            string fileTest = Path.Combine(filePath_Test, Path.GetFileName(fileName_Test));
-
-            string filePath_RBC = "C:/Users/begem/OneDrive/Desktop/General Fluidics/Data/MGH/RBC/141203_RBC/";
-            string fileName_RBC = "t94491_01.fcs";
-            string fileRBC = Path.Combine(filePath_RBC, Path.GetFileName(fileName_RBC));
-
-            string filePath_WBC = "F:\\VisualStudio\\C#\\Clustering\\TestData\\FCS";
-            string fileName_WBC = "WBC_sample.fcs";
-
-            string fileWBC = Path.Combine(filePath_WBC, Path.GetFileName(fileName_WBC));
-
-            sample = new FCMeasurement(fileWBC); //fileWBC
-            comboBox1.Items.Clear();
-            comboBox2.Items.Clear();
-
-            foreach (String name in sample.ChannelsNames)
-            {
-                comboBox1.Items.Add(name);
-                comboBox2.Items.Add(name);
-            }*/
-            
         }
 
 
@@ -437,23 +412,6 @@ namespace WindowsFormsApplication1
 
             WriteWBC_Counts(writeFileName, fileTot, countWBC); //
 
-            #region some junk
-            /*
-            // LINQ =>                //meanValue = Math.Max(arrayLymph)
-            //double[,] arrayLymph2 = Lymphocytes.ToArray();
-            //            SharpCluster.Partitional.KMeans kmeans = new SharpCluster.Partitional.KMeans(_dataSet, hasClass);
-            //     SharpCluster.Cluster[] clusters = kmeans.ExecuteClustering(number, centers);
-            string writeFileName = string.Join("_", "WBC_counts",FileNameSplit,".csv");
-            string writeFileName = string.Join("", FileNameSplit, "_WBC_counts.csv");
-            var csv = new StringBuilder();
-            string first = reader[0].ToString();
-            string second = image.ToString();
-            var newLine = string.Format("{0},{1}{2}", first, second, Environment.NewLine);
-            csv.Append(newLine);
-            WriteFilePath = "C:/Users/begem/OneDrive/Desktop/General Fluidics/Csharp/Build9/WindowsFormsApplication1/bin/Debug/";
-            File.WriteAllText(WriteFilePath, csv.ToString());
-            */
-            #endregion
             return cellsLMG;
         }
 
@@ -1231,10 +1189,6 @@ namespace WindowsFormsApplication1
             // GATE 2: Singlets
 
             #region get Singlets gate file location
-            /*string filePath_gate2 = filePath_gates; // "C:/Users/begem/OneDrive/Desktop/General Fluidics/Csharp/Build9/WindowsFormsApplication1/bin/Debug";
-            string fileName_gatedSinglets = "gating Singlets.csv";
-            string Gate2_file = Path.Combine(filePath_gate2, Path.GetFileName(fileName_gatedSinglets));
-*/
 
             string FSC1_A = FCMeasurement.GetChannelName("FCS1area", channelNomenclature);
             Gate2_hs = GenerateDataSet(FSC1_A, FSC1_H);
@@ -1445,80 +1399,7 @@ namespace WindowsFormsApplication1
                 }
             }
             #endregion
-
-            #region origin dynamic gates
-            /*
-            // GATE 4: Neutrophils,Lymphocytes, Monocytes
-            // Channels for Gate 3 are the same as Gate 1 (FCS1 vs SSC)
-
-            #region read Final Gate 
-            //  string filePath_gates = "C:/Users/begem/OneDrive/Desktop/General Fluidics/Csharp/Build9/WindowsFormsApplication1/bin/Debug";
-            string fileName_GateFinal = "gating Cell Types.csv"; // gating2.csv"; //4
-            string GateFinal_file = Path.Combine(filePath_gates, Path.GetFileName(fileName_GateFinal));
-            #endregion
-
-            polygons = loadPolygon(GateFinal_file);
-
-            #region analyze GateFinal for positive selection by Cell size or Granularity (FSC vs SSC)
-
-            int FSC1_H_max = sample.Channels[FSC1_H].Range;
-            int SSC_H_max = sample.Channels[SSC_H].Range;
-
-            bool[] NeutrophilsTF = new bool[TotalDataLength];
-            bool testCombinedGate = false;
-            if (testCombinedGate)
-            {
-                indexGateFinal = FCMeasurement.GateArray(Gate1_array, Gate1_file, FSC1_H_max, SSC_H_max);
-                // only works for one gate
-
-            }
-            else
-            {
-                HashSet<double[]>[] cytes = new HashSet<double[]>[polygons.Count];
-                //
-                for (int j = 0; j < polygons.Count; j++)
-                {
-                    cytes[j] = new HashSet<double[]>();
-                }
-                indexGate3_Max = FCMeasurement.findMaxValues(sample, Gate1_array, FSC1_A, FSC1_H);
-
-                for (int j = 0; j < TotalDataLength; j++)//Gate2Max_Length 
-                {
-                    x = Gate1_array[j][0]; //Gate1_array = GateFinal_array, so using already created Gate1_array
-                    y = Gate1_array[j][1];
-                    indexGateFinal[j, 1] = false;
-                    if (polygons != null)
-                    {
-                        for (int k = 0; k < polygons.Count; k++)
-                        {
-                            if (polygons[k].IsInsidePoly(x, y))                   //  (Polygon.IsInsidePoly(x, y))
-                            {
-                                cytes[k].Add(new double[2] { x, y }); //[x][y]
-                                                                      // chartData.Series[threeDiffGated].Points.AddXY(x, y);
-                                indexGateFinal[j, 1] = true;
-                                indexGate3[j] = true;
-                                if (k == 0)
-                                {
-                                    NeutrophilsTF[j] = true;
-                                }
-                            }
-                            else
-                            {
-                                indexGate3[j] = false;
-                                //  chartData.Series[outsideFixedGates].Points.AddXY(x, y);
-                                //indexGateFinal[j] = false;
-                            }
-                        }
-                    }
-                }
-            }
-
-            #endregion
-
             
-*/
-            #endregion
-
             #region putting the gates together
             bool[] indexUnGated = new bool[TotalDataLength];
             bool[] indexGatesTotal = new bool[TotalDataLength];
