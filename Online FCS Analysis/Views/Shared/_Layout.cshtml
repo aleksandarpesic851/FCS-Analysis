@@ -1,0 +1,333 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FCS Analysis - @ViewData["Title"]</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="Online FCS Analysis" />
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.png">
+
+    <!-- CSS here -->
+    <link rel="stylesheet" href="~/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/css/owl.carousel.min.css">
+    <link rel="stylesheet" href="~/css/magnific-popup.css">
+    <link rel="stylesheet" href="~/css/font-awesome.min.css">
+    <link rel="stylesheet" href="~/css/themify-icons.css">
+    <link rel="stylesheet" href="~/css/nice-select.css">
+    <link rel="stylesheet" href="~/css/flaticon.css">
+    <link rel="stylesheet" href="~/css/gijgo.css">
+    <link rel="stylesheet" href="~/css/animate.css">
+    <link rel="stylesheet" href="~/css/slicknav.css">
+    <link rel="stylesheet" href="~/css/style.css">
+    <link rel="stylesheet" href="~/css/site.css">
+</head>
+<body>
+    <header>
+        <div class="header-area ">
+            <div id="sticky-header" class="main-header-area">
+                <div class="container-fluid p-0">
+                    <div class="row align-items-center no-gutters">
+                        <div class="col-xl-2 col-lg-2">
+                            <div class="logo-img">
+                                <a href="/">
+                                    <img src="img/logo.png" alt="">
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-xl-7 col-lg-7">
+                            <div class="main-menu  d-none d-lg-block">
+                                <nav>
+                                    <ul id="navigation">
+                                        <li><a class="active" href="/">home</a></li>
+                                        <li><a href="/">Courses</a></li>
+                                        <li>
+                                            <a href="#">pages <i class="ti-angle-down"></i></a>
+                                            <ul class="submenu">
+                                                <li><a href="course_details.html">course details</a></li>
+                                                <li><a href="elements.html">elements</a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="/">About</a></li>
+                                        <li><a href="/">Contact</a></li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-lg-3 d-none d-lg-block">
+                            <div class="log_chat_area d-flex align-items-center">
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    <a href="#" class="nav-link dropdown-toggle login" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <img src="~/uploads/avatars/admin.png" class="avatar-image" />
+                                    </a>
+                                    <div class="dropdown-menu p-2">
+                                        <div>
+                                            <img src="~/uploads/avatars/admin.png" class="avatar-image" />
+                                            <span>Administrator</span>
+                                        </div>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="#">My Profile</a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="/Users/Logout">Sign Out</a>
+                                        <div class="dropdown-divider"></div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <a href="#login-form" class="login popup-with-form">
+                                        <i class="flaticon-user"></i>
+                                        <span>Sign In</span>
+                                    </a>
+                                }
+                                <div class="live_chat_btn">
+                                    <a class="boxed_btn_orange" href="#">
+                                        <i class="fa fa-phone"></i>
+                                        <span>+10 378 467 3672</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="mobile_menu d-block d-lg-none"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- header-end -->
+    @RenderBody()
+    <!-- footer -->
+    <footer class="footer footer_bg_1">
+        <div class="footer_top">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xl-4 col-md-6 col-lg-4">
+                        <div class="footer_widget">
+                            <div class="footer_logo">
+                                <a href="#">
+                                    <img src="img/logo.png" alt="">
+                                </a>
+                            </div>
+                            <p>
+                                Firmament morning sixth subdue darkness creeping gathered divide our let god moving.
+                                Moving in fourth air night bring upon it beast let you dominion likeness open place day
+                                great.
+                            </p>
+                            <div class="socail_links">
+                                <ul>
+                                    <li>
+                                        <a href="#">
+                                            <i class="ti-facebook"></i>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <i class="ti-twitter-alt"></i>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <i class="fa fa-instagram"></i>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <i class="fa fa-youtube-play"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-xl-2 offset-xl-1 col-md-6 col-lg-3">
+                        <div class="footer_widget">
+                            <h3 class="footer_title">
+                                Courses
+                            </h3>
+                            <ul>
+                                <li><a href="#">Wordpress</a></li>
+                                <li><a href="#"> Photoshop</a></li>
+                                <li><a href="#">Illustrator</a></li>
+                                <li><a href="#">Adobe XD</a></li>
+                                <li><a href="#">UI/UX</a></li>
+                            </ul>
+
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-md-6 col-lg-2">
+                        <div class="footer_widget">
+                            <h3 class="footer_title">
+                                Resourches
+                            </h3>
+                            <ul>
+                                <li><a href="#">Free Adobe XD</a></li>
+                                <li><a href="#">Tutorials</a></li>
+                                <li><a href="#">About</a></li>
+                                <li><a href="#"> About</a></li>
+                                <li><a href="#"> Contact</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6 col-lg-3">
+                        <div class="footer_widget">
+                            <h3 class="footer_title">
+                                Address
+                            </h3>
+                            <p>
+                                200, D-block, Green lane USA <br>
+                                +10 367 467 8934 <br>
+                                edumark@contact.com
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="copy-right_text">
+            <div class="container">
+                <div class="footer_border"></div>
+                <div class="row">
+                    <div class="col-xl-12">
+                        <p class="copy_right text-center">
+                            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                            Copyright &copy;
+                            <script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+                            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- footer -->
+
+    @if (!User.Identity.IsAuthenticated)
+    {
+        <!-- login form start-->
+        <div id="login-form" class="white-popup-block mfp-hide">
+            <div class="popup_box ">
+                <div class="popup_inner">
+                    <div class="logo text-center">
+                        <a href="#">
+                            <img src="img/logo.png" alt="">
+                        </a>
+                    </div>
+                    <h3>Sign in</h3>
+                    <form action="/Users/Login" method="post">
+                        <div class="row">
+                            @if ((ViewData["Error"] as ErrorMsgModel).errorIn == Online_FCS_Analysis.Utilities.Constants.ERROR_IN_LOGIN)
+                            {
+                                <div class="col-12 text-danger text-left">
+                                    <span>@((ViewData["Error"] as ErrorMsgModel).errorMsg)</span>
+                                </div>
+                            }
+                            <div class="col-xl-12 col-md-12">
+                                <input type="email" placeholder="Enter email" name="user_email" required title="Insert your email address.">
+                            </div>
+                            <div class="col-xl-12 col-md-12">
+                                <input type="password" placeholder="Password" name="user_password" required title="Insert your password.">
+                            </div>
+                            <div class="col-xl-12">
+                                <button type="submit" class="boxed_btn_orange">Sign in</button>
+                            </div>
+                        </div>
+                    </form>
+                    <p class="doen_have_acc">
+                        Don’t have an account? <a class="dont-hav-acc" href="#register-form">Sign Up</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- login form end -->
+        <!-- register form start-->
+        <div id="register-form" class="white-popup-block mfp-hide">
+            <div class="popup_box ">
+                <div class="popup_inner">
+                    <div class="logo text-center">
+                        <a href="#">
+                            <img src="img/logo.png" alt="">
+                        </a>
+                    </div>
+                    <h3>Resistration</h3>
+                    <form action="/Users/Register" method="POST" enctype="multipart/form-data">
+                        <div class="row">
+                            @if ((ViewData["Error"] as ErrorMsgModel).errorIn == Online_FCS_Analysis.Utilities.Constants.ERROR_IN_REGISTER)
+                            {
+                                <div class="col-12 text-danger text-left">
+                                    <span>@((ViewData["Error"] as ErrorMsgModel).errorMsg)</span>
+                                </div>
+                            }
+                            <div class="col-xl-12 col-md-12">
+                                <input type="text" name="user_name" id="user_name" placeholder="Your Name" required />
+                            </div>
+                            <div class="col-xl-12 col-md-12">
+                                <input type="email" name="user_email" id="user_email" placeholder="Your Email" required />
+                            </div>
+                            <div class="col-xl-12 col-md-12">
+                                <input type="password" name="user_password" id="user_password" placeholder="Password" required pattern=".{5,}" title="5 characters minimum" />
+                            </div>
+                            <div class="col-xl-12 col-md-12">
+                                <input type="password" id="user_password_confirm" placeholder="Repeat your password" required />
+                            </div>
+                            <div class="col-xl-12 col-md-12">
+                                <input type="tel" name="user_phone" id="user_phone" placeholder="Your Phone : xxxx-xxx-xxxx" pattern="^\d{4}-\d{3}-\d{4}$" title="Please insert correct phone number. Format : xxxx-xxx-xxxx" />
+                            </div>
+                            <div class="col-xl-12 col-md-12">
+                                <input name="user_address" id="user_address" placeholder="Your Address" />
+                            </div>
+                            <div class="col-xl-12 col-md-12">
+                                <input type="file" name="user_avatar_image" id="user_avatar_image" placeholder="Your Avatar" accept="image/*" required />
+                            </div>
+                            <div class="col-xl-12">
+                                <button type="submit" class="boxed_btn_orange">Sign Up</button>
+                            </div>
+                        </div>
+                    </form>
+                    <p class="doen_have_acc">
+                        Already have an account? <a class="dont-hav-acc" href="#login-form">Sign In</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- register form end-->
+    }
+
+    <!-- JS here -->
+    <script>
+        var errorMsg = @Html.Raw(Json.Serialize(ViewData["Error"]))
+    </script>
+    <script src="~/js/vendor/modernizr-3.5.0.min.js"></script>
+    <script src="~/js/vendor/jquery-1.12.4.min.js"></script>
+    <script src="~/js/popper.min.js"></script>
+    <script src="~/js/bootstrap.min.js"></script>
+    <script src="~/js/owl.carousel.min.js"></script>
+    <script src="~/js/isotope.pkgd.min.js"></script>
+    <script src="~/js/ajax-form.js"></script>
+    <script src="~/js/waypoints.min.js"></script>
+    <script src="~/js/jquery.counterup.min.js"></script>
+    <script src="~/js/imagesloaded.pkgd.min.js"></script>
+    <script src="~/js/scrollIt.js"></script>
+    <script src="~/js/jquery.scrollUp.min.js"></script>
+    <script src="~/js/wow.min.js"></script>
+    <script src="~/js/nice-select.min.js"></script>
+    <script src="~/js/jquery.slicknav.min.js"></script>
+    <script src="~/js/jquery.magnific-popup.min.js"></script>
+    <script src="~/js/plugins.js"></script>
+    <script src="~/js/gijgo.min.js"></script>
+
+    <!--contact js-->
+    <script src="~/js/contact.js"></script>
+    <script src="~/js/jquery.ajaxchimp.min.js"></script>
+    <script src="~/js/jquery.form.js"></script>
+    <script src="~/js/jquery.validate.min.js"></script>
+    <script src="~/js/mail-script.js"></script>
+
+    <script src="js/main.js"></script>
+    <script src="js/site.js"></script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

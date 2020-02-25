@@ -1,0 +1,188 @@
+﻿@model IEnumerable<UserModel>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Employee";
+}
+
+<div class="box">
+    <div class="box-header">
+        <h4 class="box-title">Create Category</h4>
+        <form asp-action="UpdateEmployee" method="post" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col-9">
+                    <div class="row">
+                        <div class="col-5">
+                            <label for="user_email">Email: </label>
+                            <input type="email" id="user_email" class="form-control" name="user_email" required />
+                        </div>
+                        <div class="col-5 offset-1">
+                            <label for="user_name">Name: </label>
+                            <input id="user_name" class="form-control" name="user_name" required />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-5">
+                            <label for="user_password">Password: </label>
+                            <input type="password" id="user_password" class="form-control" name="user_password" required />
+                        </div>
+                        <div class="col-5 offset-1">
+                            <label for="user_role">Role: </label>
+                            <select id="user_role" class="form-control" name="user_role" required>
+                                <option value="Clerk">Clerk</option>
+                                <option value="Delivery Body">Delivery Body</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-2 offset-1 mt-auto">
+                    <button type="submit" class="btn-outline-primary">Create</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="box-body">
+        <h4 class="box-title">Category List</h4>
+        <table class="table table-bordered table-striped" id="category-table">
+            <thead>
+                <tr>
+                    <th width="20%">Name</th>
+                    <th width="20%">Email</th>
+                    <th width="20%">Password</th>
+                    <th width="20%">Role</th>
+                    <th width="20%">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.user_name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.user_email)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.user_password)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.user_role)
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-primary" onclick="showUpdateDlg(@item.user_id, '@item.user_name', '@item.user_email', '@item.user_password', '@item.user_role')">Edit</button> &nbsp;&nbsp;
+                            <button type="button" class="btn btn-danger" onclick="Delete(@item.user_id)">Delete</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="update-modal">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Update Category</span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="UpdateEmployee" method="post" style="padding: 20px">
+                    <input id="update_user_id" name="user_id" type="hidden" />
+                    <div class="row">
+                        <div class="col-9">
+                            <div class="row">
+                                <div class="col-5">
+                                    <label for="update_user_email">Email: </label>
+                                    <input type="email" id="update_user_email" class="form-control" name="user_email" required />
+                                </div>
+                                <div class="col-5 offset-1">
+                                    <label for="update_user_name">Name: </label>
+                                    <input id="update_user_name" class="form-control" name="user_name" required />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-5">
+                                    <label for="update_user_password">Password: </label>
+                                    <input type="password" id="update_user_password" class="form-control" name="user_password" required />
+                                </div>
+                                <div class="col-5 offset-1">
+                                    <label for="update_user_role">Role: </label>
+                                    <select id="update_user_role" class="form-control" name="user_role" required>
+                                        <option value="Clerk">Clerk</option>
+                                        <option value="Delivery Body">Delivery Body</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-2 offset-1 mt-auto">
+                            <button type="submit" class="btn-outline-primary">Save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- DataTables -->
+@section Links {
+    <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" />
+}
+@section Scripts {
+    <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+
+    <script>
+        $(function () {
+            $('#category-table').DataTable();
+            const message = "@ViewData["message"]";
+            if (message) {
+                $.bootstrapGrowl(message,{
+                    type: 'info',
+                    delay: 2000,
+                });
+            }
+        });
+        function Delete(id){
+            var r = confirm("Are you sure you want to Delete?");
+            if (r == true) {
+
+                $.ajax(
+                {
+                    type: "POST",
+                    url: '@Url.Action("Delete")',
+                    data: {
+                        id: id
+                    },
+                    error: function (result) {
+                        alert("error");
+                    },
+                    success: function (result) {
+                        if (result == true) {
+                            document.location.href = "/Account/Employee";
+                        }
+                        else {
+                            alert("There is a problem, Try Later!");
+                        }
+                    }
+                });
+            }
+        }
+
+        function showUpdateDlg(id, name, email, pwd, role) {
+            $("#update_user_id").val(id);
+            $("#update_user_name").val(name);
+            $("#update_user_email").val(email);
+            $("#update_user_password").val(pwd);
+            $("#update_user_role").val(role);
+
+            $("#update-modal").modal();
+        }
+    </script>
+}
