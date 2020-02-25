@@ -28,8 +28,8 @@ namespace Online_FCS_Analysis.Models
             {
                 entity.ToTable("users");
 
-                entity.Property(e => e.user_id)
-                    .HasColumnName("user_id")
+                entity.Property(e => e.id)
+                    .HasColumnName("id")
                     .HasColumnType("int")
                     .ValueGeneratedOnAdd();
                 entity.Property(e => e.user_email)
@@ -70,7 +70,7 @@ namespace Online_FCS_Analysis.Models
         {
             modelBuilder.Entity<UserModel>().HasData(new UserModel
             {
-                user_id = 1,
+                id = 1,
                 user_name = "Admin",
                 user_email = "admin@gmail.com",
                 user_password = "secret",

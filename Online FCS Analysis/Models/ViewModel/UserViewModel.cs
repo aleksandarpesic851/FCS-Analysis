@@ -11,7 +11,7 @@ namespace Online_FCS_Analysis.Models.ViewModel
 {
     public class UserViewModel
     {
-        public int user_id { get; set; }
+        public int id { get; set; }
         [EmailAddress]
         [Required]
         public string user_email { get; set; }
@@ -34,7 +34,7 @@ namespace Online_FCS_Analysis.Models.ViewModel
         {
             return new UserViewModel
             {
-                user_id = user.user_id,
+                id = user.id,
                 user_email = user.user_email,
                 user_password = user.user_password,
                 user_name = user.user_name,
@@ -50,7 +50,7 @@ namespace Online_FCS_Analysis.Models.ViewModel
         {
             return new UserModel
             {
-                user_id = user.user_id,
+                id = user.id,
                 user_email = user.user_email,
                 user_password = user.user_password,
                 user_name = user.user_name,

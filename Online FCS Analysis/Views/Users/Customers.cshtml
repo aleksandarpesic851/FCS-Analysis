@@ -71,8 +71,8 @@
                             @Html.DisplayFor(modelItem => item.user_role)
                         </td>
                         <td>
-                            <button type="button" class="btn btn-primary" onclick="showUpdateDlg(@item.user_id, '@item.user_name', '@item.user_email', '@item.user_password', '@item.user_role')">Edit</button> &nbsp;&nbsp;
-                            <button type="button" class="btn btn-danger" onclick="Delete(@item.user_id)">Delete</button>
+                            <button type="button" class="btn btn-primary" onclick="showUpdateDlg(@item.id, '@item.user_name', '@item.user_email', '@item.user_password', '@item.user_role')">Edit</button> &nbsp;&nbsp;
+                            <button type="button" class="btn btn-danger" onclick="Delete(@item.id)">Delete</button>
                         </td>
                     </tr>
                 }

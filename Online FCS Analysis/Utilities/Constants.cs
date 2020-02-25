@@ -15,7 +15,7 @@ namespace Online_FCS_Analysis.Utilities
         public const string ERROR_IN_REGISTER = "register";
 
         public const string CLAIM_TYPE_USER_NAME = "user_name";
-        public const string CLAIM_TYPE_USER_ID = "user_id";
+        public const string CLAIM_TYPE_USER_ID = "id";
         public const string CLAIM_TYPE_USER_AVATAR = "user_avatar";
 
     }

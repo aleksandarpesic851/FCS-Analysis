@@ -38,7 +38,7 @@ namespace Online_FCS_Analysis.Controllers
             {
                 new Claim(ClaimTypes.Role, loginUser.user_role),
                 new Claim(Constants.CLAIM_TYPE_USER_NAME, loginUser.user_name == null ? "" : loginUser.user_name),
-                new Claim(Constants.CLAIM_TYPE_USER_ID, "" + loginUser.user_id),
+                new Claim(Constants.CLAIM_TYPE_USER_ID, "" + loginUser.id),
                 new Claim(Constants.CLAIM_TYPE_USER_AVATAR, loginUser.user_avatar)
             };
 
@@ -92,7 +92,7 @@ namespace Online_FCS_Analysis.Controllers
             {
                 new Claim(ClaimTypes.Role, model.user_role),
                 new Claim("user_name", model.user_name == null ? "" : model.user_name),
-                new Claim("user_id", "" + model.user_id),
+                new Claim("id", "" + model.id),
             };
 
             var userIdentity = new ClaimsIdentity(claims, "user");
@@ -118,7 +118,7 @@ namespace Online_FCS_Analysis.Controllers
         [Authorize]
         public IActionResult MyAccount()
         {
-            UserModel currentUser = _dbContext.Users.Find(Convert.ToInt32(User.FindFirstValue("user_id")));
+            UserModel currentUser = _dbContext.Users.Find(Convert.ToInt32(User.FindFirstValue("id")));
             return View(currentUser);
         }
 
@@ -136,7 +136,7 @@ namespace Online_FCS_Analysis.Controllers
         {
             string message = "";
             int nCnt = _dbContext.Users.Where(user => user.user_email == model.user_email).Count();
-            if (nCnt > 0 && model.user_id == 0)
+            if (nCnt > 0 && model.id == 0)
             {
                 message = "There exists an user with this email. please try with other one.";
                 return RedirectToAction("Customers", message);
@@ -145,7 +145,7 @@ namespace Online_FCS_Analysis.Controllers
             _dbContext.Users.Update(model);
             _dbContext.SaveChanges();
 
-            if (model.user_id == 0)
+            if (model.id == 0)
             {
                 message = "Created new user successfully.";
             }
