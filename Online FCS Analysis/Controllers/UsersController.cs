@@ -37,8 +37,9 @@ namespace Online_FCS_Analysis.Controllers
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Role, loginUser.user_role),
-                new Claim("user_name", loginUser.user_name == null ? "" : loginUser.user_name),
-                new Claim("user_id", "" + loginUser.user_id)
+                new Claim(Constants.CLAIM_TYPE_USER_NAME, loginUser.user_name == null ? "" : loginUser.user_name),
+                new Claim(Constants.CLAIM_TYPE_USER_ID, "" + loginUser.user_id),
+                new Claim(Constants.CLAIM_TYPE_USER_AVATAR, loginUser.user_avatar)
             };
 
             var userIdentity = new ClaimsIdentity(claims, "user");

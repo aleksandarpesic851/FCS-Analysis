@@ -807,13 +807,20 @@ h3 {
 
 /* line 1, C:/Users/SPN Graphics/Desktop/CL September/Edu mark/207 Education/HTML/scss/_header.scss */
 .header-area {
-  position: absolute;
-  left: 0;
-  right: 0;
-  width: 100%;
-  top: 0;
-  z-index: 99;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#a64eee+0,3c35ce+100 */
+    background: #a64eee;
+    /* Old browsers */
+    background: -moz-linear-gradient(left, #a64eee 0%, #3c35ce 100%);
+    /* FF3.6-15 */
+    background: -webkit-linear-gradient(left, #a64eee 0%, #3c35ce 100%);
+    /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to right, #a64eee 0%, #3c35ce 100%);
+    /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a64eee', endColorstr='#3c35ce',GradientType=1 );
+    /* IE6-9 */
+    width: 100%;
+    z-index: 99;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 @media (max-width: 767px) {
@@ -1232,61 +1239,61 @@ h3 {
 }
 
 /* line 5, C:/Users/SPN Graphics/Desktop/CL September/Edu mark/207 Education/HTML/scss/_slider.scss */
-.slider_area .single_slider {
-  height: 100vh;
+.body_first_area .single_slider {
+  height: calc(100vh - 102px);
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
 }
 
 /* line 10, C:/Users/SPN Graphics/Desktop/CL September/Edu mark/207 Education/HTML/scss/_slider.scss */
-.slider_area .single_slider .illastrator_png {
+.body_first_area .single_slider .illastrator_png {
   position: relative;
   right: 63px;
 }
 
 @media (min-width: 1200px) and (max-width: 1500px) {
   /* line 10, C:/Users/SPN Graphics/Desktop/CL September/Edu mark/207 Education/HTML/scss/_slider.scss */
-  .slider_area .single_slider .illastrator_png {
+  .body_first_area .single_slider .illastrator_png {
     right: 0;
   }
 }
 
 @media (min-width: 992px) and (max-width: 1200px) {
   /* line 10, C:/Users/SPN Graphics/Desktop/CL September/Edu mark/207 Education/HTML/scss/_slider.scss */
-  .slider_area .single_slider .illastrator_png {
+  .body_first_area .single_slider .illastrator_png {
     right: 0;
   }
 }
 
 @media (min-width: 768px) and (max-width: 991px) {
   /* line 10, C:/Users/SPN Graphics/Desktop/CL September/Edu mark/207 Education/HTML/scss/_slider.scss */
-  .slider_area .single_slider .illastrator_png {
+  .body_first_area .single_slider .illastrator_png {
     right: 0;
   }
 }
 
 @media (max-width: 767px) {
   /* line 10, C:/Users/SPN Graphics/Desktop/CL September/Edu mark/207 Education/HTML/scss/_slider.scss */
-  .slider_area .single_slider .illastrator_png {
+  .body_first_area .single_slider .illastrator_png {
     right: 0;
   }
 }
 
 /* line 25, C:/Users/SPN Graphics/Desktop/CL September/Edu mark/207 Education/HTML/scss/_slider.scss */
-.slider_area .single_slider .illastrator_png img {
+.body_first_area .single_slider .illastrator_png img {
   width: 100%;
 }
 
 @media (max-width: 767px) {
   /* line 29, C:/Users/SPN Graphics/Desktop/CL September/Edu mark/207 Education/HTML/scss/_slider.scss */
-  .slider_area .single_slider .slider_info {
+  .body_first_area .single_slider .slider_info {
     text-align: center;
   }
 }
 
 /* line 33, C:/Users/SPN Graphics/Desktop/CL September/Edu mark/207 Education/HTML/scss/_slider.scss */
-.slider_area .single_slider .slider_info h3 {
+.body_first_area .single_slider .slider_info h3 {
   color: #ffffff;
   font-size: 60px;
   text-transform: capitalize;
@@ -1298,7 +1305,7 @@ h3 {
 
 @media (max-width: 767px) {
   /* line 33, C:/Users/SPN Graphics/Desktop/CL September/Edu mark/207 Education/HTML/scss/_slider.scss */
-  .slider_area .single_slider .slider_info h3 {
+  .body_first_area .single_slider .slider_info h3 {
     font-size: 24px;
     letter-spacing: 0px;
     line-height: 35px;
@@ -1309,7 +1316,7 @@ h3 {
 
 @media (min-width: 768px) and (max-width: 991px) {
   /* line 33, C:/Users/SPN Graphics/Desktop/CL September/Edu mark/207 Education/HTML/scss/_slider.scss */
-  .slider_area .single_slider .slider_info h3 {
+  .body_first_area .single_slider .slider_info h3 {
     font-size: 30px;
     line-height: 46px;
   }
@@ -1317,7 +1324,7 @@ h3 {
 
 @media (min-width: 992px) and (max-width: 1200px) {
   /* line 33, C:/Users/SPN Graphics/Desktop/CL September/Edu mark/207 Education/HTML/scss/_slider.scss */
-  .slider_area .single_slider .slider_info h3 {
+  .body_first_area .single_slider .slider_info h3 {
     font-size: 35px;
     line-height: 45px;
   }

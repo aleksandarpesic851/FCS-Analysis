@@ -1,0 +1,89 @@
+﻿
+<!-- login form start-->
+<div id="login-form" class="white-popup-block mfp-hide">
+    <div class="popup_box ">
+        <div class="popup_inner">
+            <div class="logo text-center">
+                <a href="#">
+                    <img src="img/logo.png" alt="">
+                </a>
+            </div>
+            <h3>Sign in</h3>
+            <form action="/Users/Login" method="post">
+                <div class="row">
+                    @if (ViewData["Error"] is ErrorMsgModel errorMsgModel && errorMsgModel.errorIn == Online_FCS_Analysis.Utilities.Constants.ERROR_IN_LOGIN)
+                    {
+                        <div class="col-12 text-danger text-left">
+                            <span>@(errorMsgModel.errorMsg)</span>
+                        </div>
+                    }
+                    <div class="col-xl-12 col-md-12">
+                        <input type="email" placeholder="Enter email" name="user_email" required title="Insert your email address.">
+                    </div>
+                    <div class="col-xl-12 col-md-12">
+                        <input type="password" placeholder="Password" name="user_password" required title="Insert your password.">
+                    </div>
+                    <div class="col-xl-12">
+                        <button type="submit" class="boxed_btn_orange">Sign in</button>
+                    </div>
+                </div>
+            </form>
+            <p class="doen_have_acc">
+                Don’t have an account? <a class="dont-hav-acc" href="#register-form">Sign Up</a>
+            </p>
+        </div>
+    </div>
+</div>
+<!-- login form end -->
+<!-- register form start-->
+<div id="register-form" class="white-popup-block mfp-hide">
+    <div class="popup_box ">
+        <div class="popup_inner">
+            <div class="logo text-center">
+                <a href="#">
+                    <img src="img/logo.png" alt="">
+                </a>
+            </div>
+            <h3>Resistration</h3>
+            <form action="/Users/Register" method="POST" enctype="multipart/form-data">
+                <div class="row">
+                    @if (ViewData["Error"] is ErrorMsgModel errorMsg && errorMsg.errorIn == Online_FCS_Analysis.Utilities.Constants.ERROR_IN_REGISTER)
+                    {
+                        <div class="col-12 text-danger text-left">
+                            <span>@errorMsg.errorMsg)</span>
+                        </div>
+                    }
+                    <div class="col-xl-12 col-md-12">
+                        <input type="text" name="user_name" id="user_name" placeholder="Your Name" required />
+                    </div>
+                    <div class="col-xl-12 col-md-12">
+                        <input type="email" name="user_email" id="user_email" placeholder="Your Email" required />
+                    </div>
+                    <div class="col-xl-12 col-md-12">
+                        <input type="password" name="user_password" id="user_password" placeholder="Password" required pattern=".{5,}" title="5 characters minimum" />
+                    </div>
+                    <div class="col-xl-12 col-md-12">
+                        <input type="password" id="user_password_confirm" placeholder="Repeat your password" required />
+                    </div>
+                    <div class="col-xl-12 col-md-12">
+                        <input type="tel" name="user_phone" id="user_phone" placeholder="Your Phone : xxxx-xxx-xxxx" pattern="^\d{4}-\d{3}-\d{4}$" title="Please insert correct phone number. Format : xxxx-xxx-xxxx" />
+                    </div>
+                    <div class="col-xl-12 col-md-12">
+                        <input name="user_address" id="user_address" placeholder="Your Address" />
+                    </div>
+                    <div class="custom-file mb-3">
+                        <input type="file" class="custom-file-input" id="user_avatar_image" name="user_avatar_image" placeholder="Your Avatar" accept="image/*" required >
+                        <label class="custom-file-label" for="customFile">Choose file</label>
+                    </div>
+                    <div class="col-xl-12">
+                        <button type="submit" class="boxed_btn_orange">Sign Up</button>
+                    </div>
+                </div>
+            </form>
+            <p class="doen_have_acc">
+                Already have an account? <a class="dont-hav-acc" href="#login-form">Sign In</a>
+            </p>
+        </div>
+    </div>
+</div>
+<!-- register form end-->

@@ -9,9 +9,14 @@ namespace Online_FCS_Analysis.Utilities
     {
         public const string ROLE_ADMIN = "Admin";
         public const string ROLE_CUSTOMER = "Customer";
+        public const string ROLE_PREMIUM_CUSTOMER = "Premium Customer";
 
         public const string ERROR_IN_LOGIN = "login";
         public const string ERROR_IN_REGISTER = "register";
+
+        public const string CLAIM_TYPE_USER_NAME = "user_name";
+        public const string CLAIM_TYPE_USER_ID = "user_id";
+        public const string CLAIM_TYPE_USER_AVATAR = "user_avatar";
 
     }
 }
