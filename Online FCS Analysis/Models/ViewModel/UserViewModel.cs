@@ -28,7 +28,7 @@ namespace Online_FCS_Analysis.Models.ViewModel
         [Phone]
         public string user_phone { get; set; }
         public string user_address { get; set; }
-        public bool user_activated { get; set; } = true;
+        public bool enabled { get; set; } = true;
 
         public static implicit operator UserViewModel(UserModel user)
         {
@@ -42,7 +42,7 @@ namespace Online_FCS_Analysis.Models.ViewModel
                 user_role = user.user_role,
                 user_phone = user.user_phone,
                 user_address = user.user_address,
-                user_activated = user.user_activated,
+                enabled = user.enabled,
             };
         }
 
@@ -58,7 +58,7 @@ namespace Online_FCS_Analysis.Models.ViewModel
                 user_role = user.user_role,
                 user_phone = user.user_phone,
                 user_address = user.user_address,
-                user_activated = user.user_activated,
+                enabled = user.enabled,
             };
         }
     }

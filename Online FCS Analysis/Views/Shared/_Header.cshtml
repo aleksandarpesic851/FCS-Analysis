@@ -6,7 +6,7 @@
                     <div class="col-xl-2 col-lg-2">
                         <div class="logo-img">
                             <a href="/">
-                                <img src="img/logo.png" alt="">
+                                <img src="~/img/logo.png" alt="">
                             </a>
                         </div>
                     </div>
@@ -14,15 +14,18 @@
                         <div class="main-menu  d-none d-lg-block">
                             <nav>
                                 <ul id="navigation">
-                                    <li><a class="active" href="/">home</a></li>
-                                    <li><a href="/FCS">FCS Analysis</a></li>
-                                    <li>
-                                        <a href="#">pages <i class="ti-angle-down"></i></a>
-                                        <ul class="submenu">
-                                            <li><a href="course_details.html">course details</a></li>
-                                            <li><a href="elements.html">elements</a></li>
-                                        </ul>
-                                    </li>
+                                    <li><a class="@Html.IsSelected(actions: "Index", controllers: "Home", cssClass: "active")" href="/">home</a></li>
+                                    <li><a class="@Html.IsSelected(actions: "Wbc", controllers: "FCS", cssClass: "active")" href="/FCS/Wbc">WBC Analysis</a></li>
+                                    <li><a class="@Html.IsSelected(actions: "Rbc", controllers: "FCS", cssClass: "active")" href="/FCS/Rbc">RBC Analysis</a></li>
+    <!--
+    <li>
+        <a href="#">pages <i class="ti-angle-down"></i></a>
+        <ul class="submenu">
+            <li><a href="course_details.html">course details</a></li>
+            <li><a href="elements.html">elements</a></li>
+        </ul>
+    </li>
+        -->
                                     <li><a href="/">About</a></li>
                                     <li><a href="/">Contact</a></li>
                                 </ul>

@@ -19,7 +19,7 @@
 }
 
 .chart-area {
-    margin: 100px 0;
+    margin: 100px 20px;
 }
 
 @media (orientation: landscape) {

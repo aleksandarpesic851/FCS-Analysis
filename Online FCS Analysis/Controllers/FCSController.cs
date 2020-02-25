@@ -8,7 +8,12 @@ namespace Online_FCS_Analysis.Controllers
 {
     public class FCSController : Controller
     {
-        public IActionResult Index()
+        public IActionResult Wbc()
+        {
+            return View();
+        }
+
+        public IActionResult Rbc()
         {
             return View();
         }

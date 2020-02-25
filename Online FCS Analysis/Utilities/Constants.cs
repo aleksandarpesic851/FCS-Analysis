@@ -18,5 +18,8 @@ namespace Online_FCS_Analysis.Utilities
         public const string CLAIM_TYPE_USER_ID = "id";
         public const string CLAIM_TYPE_USER_AVATAR = "user_avatar";
 
+        public const string FCS_TYPE_WBC = "wbc";
+        public const string FCS_TYPE_RBC = "rbc";
+
     }
 }

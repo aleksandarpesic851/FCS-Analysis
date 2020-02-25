@@ -68,7 +68,7 @@ namespace Online_FCS_Analysis.Controllers
                 return RedirectToAction("", "Home", new ErrorMsgModel { errorMsg = "There exists an user with this email. please try with other one.", errorIn = Constants.ERROR_IN_REGISTER });
             }
 
-            string filePath = "/uploads/avatars/";
+            string filePath = "/uploads/avatars/default.png";
             if (model.user_avatar_image != null && model.user_avatar_image.Length > 0)
             {
                 string fileName = model.user_avatar_image.FileName;
@@ -91,8 +91,9 @@ namespace Online_FCS_Analysis.Controllers
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Role, model.user_role),
-                new Claim("user_name", model.user_name == null ? "" : model.user_name),
-                new Claim("id", "" + model.id),
+                new Claim(Constants.CLAIM_TYPE_USER_NAME, model.user_name == null ? "" : model.user_name),
+                new Claim(Constants.CLAIM_TYPE_USER_ID, "" + model.id),
+                new Claim(Constants.CLAIM_TYPE_USER_AVATAR, model.user_avatar),
             };
 
             var userIdentity = new ClaimsIdentity(claims, "user");

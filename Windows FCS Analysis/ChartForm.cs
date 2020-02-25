@@ -517,7 +517,7 @@ namespace Windows_FCS_Analysis
 
             if (!checkCultureCorrect())
             {
-                MessageBox.Show("Please check culture is set correctly", "Incorrect Culture");
+                MessageBox.Show("Please check nomenclature is set correctly", "Incorrect nomenclature!");
                 return;
             }
 
@@ -1880,7 +1880,7 @@ namespace Windows_FCS_Analysis
 
             if (!checkCultureCorrect())
             {
-                MessageBox.Show("Please check culture is set correctly", "Incorrect Culture");
+                MessageBox.Show("Please check nomenclature is set correctly", "Incorrect nomenclature!");
                 return;
             }
 
@@ -2039,7 +2039,7 @@ namespace Windows_FCS_Analysis
 
             if (!checkCultureCorrect())
             {
-                MessageBox.Show("Please check culture is set correctly", "Incorrect Culture");
+                MessageBox.Show("Please check nomenclature is set correctly", "Incorrect nomenclature!");
                 return;
             }
 
@@ -2344,7 +2344,7 @@ namespace Windows_FCS_Analysis
 
             if (!checkCultureCorrect())
             {
-                MessageBox.Show("Please check culture is set correctly", "Incorrect Culture");
+                MessageBox.Show("Please check nomenclature is set correctly", "Incorrect nomenclature!");
                 return;
             }
 

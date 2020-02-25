@@ -24,6 +24,5 @@ namespace Online_FCS_Analysis.Models.Entities
         [Phone]
         public string user_phone { get; set; }
         public string user_address { get; set; }
-        public bool user_activated { get; set; } = true;
     }
 }
