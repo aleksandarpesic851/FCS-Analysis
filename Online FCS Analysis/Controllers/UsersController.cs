@@ -68,16 +68,16 @@ namespace Online_FCS_Analysis.Controllers
                 return RedirectToAction("", "Home", new ErrorMsgModel { errorMsg = "There exists an user with this email. please try with other one.", errorIn = Constants.ERROR_IN_REGISTER });
             }
 
-            string filePath = "/uploads/avatars/default.png";
+            string filePath = Constants.avatar_path + "default.png";
             if (model.user_avatar_image != null && model.user_avatar_image.Length > 0)
             {
                 string fileName = model.user_avatar_image.FileName;
                 int nIdx = fileName.LastIndexOf('\\');
                 nIdx = nIdx > 0 ? nIdx + 1 : 0;
-                fileName = fileName.Substring(nIdx);
+                fileName = Path.GetRandomFileName() + "_" + fileName.Substring(nIdx);
 
-                filePath = "/uploads/avatars/" + Path.GetRandomFileName() + "_" + fileName;
-                string fullPath = Path.GetFullPath("./wwwroot") + filePath;
+                filePath = Constants.avatar_path + fileName;
+                string fullPath = Constants.avatar_full_path+ fileName;
 
                 using (var stream = System.IO.File.Create(fullPath))
                 {

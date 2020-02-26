@@ -17,22 +17,12 @@ namespace Online_FCS_Analysis.Models.Entities
         [Required]
         public int user_id { get; set; }
         [Required]
-        public bool is_shared { get; set; } = false;
-        [NotMapped]
-        public WBC3Cell wBC3Cell
-        {
-            get
-            {
-                return Global.FromByteArray<WBC3Cell>(wbc_3_cells);
-            }
-            set
-            {
-                wbc_3_cells = Global.ToByteArray<WBC3Cell>(wBC3Cell);
-            }
-        }
-        [Required]
         public string fcs_type { get; set; } = Constants.FCS_TYPE_WBC;
         [Required]
-        public Byte[] wbc_3_cells { get; set; }
+        public string wbc_3cells { get; set; }
+        [Required] 
+        public string wbc_heatmap { get; set; }
+        [Required]
+        public int nomenclature { get; set; } = 0;
     }
 }
