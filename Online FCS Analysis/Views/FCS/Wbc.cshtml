@@ -2,20 +2,29 @@
     ViewData["Title"] = "";
 }
 
-    <div class="body_first_area chart-area">
-        <div class="row">
-            <div class="col-12 col-lg-4 col-xl-3" style="background: blue">
-                Tools
-            </div>
-            <!-- Chart Graph -->
-            <div class="col-12 col-lg-8 col-xl-9 enable-scroll">
-                <div class="chart-container">
-                    <canvas id="fcs-chart"></canvas>
-                </div>
+<div class="body_first_area chart-area">
+    <div class="row">
+        <div class="col-12 col-lg-4 col-xl-3" style="background: blue">
+            @if (User.Identity.IsAuthenticated)
+            {
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#file-upload-dialog" data-backdrop="static" data-keyboard="false">
+                    Upload FCS Files
+                </button>
+            }
+        </div>
+        <!-- Chart Graph -->
+        <div class="col-12 col-lg-8 col-xl-9 enable-scroll">
+            <div class="chart-container">
+                <canvas id="fcs-chart"></canvas>
             </div>
         </div>
-
     </div>
+
+</div>
+@if (User.Identity.IsAuthenticated)
+{
+    @await Html.PartialAsync("~/Views/FileManager/Index.cshtml", "/FileManager/Upload")
+}
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>

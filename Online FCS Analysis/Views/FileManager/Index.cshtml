@@ -1,71 +1,90 @@
-﻿<div id="file-upload">
-    <div id="actions" class="row">
+﻿@model string
 
-        <div class="col-12">
-            <!-- The fileinput-button span is used to style the file input field as button -->
-            <span class="btn btn-success fileinput-button dz-clickable">
-                <i class="glyphicon glyphicon-plus"></i>
-                <span>Add files...</span>
-            </span>
-            <button type="submit" class="btn btn-primary start">
-                <i class="glyphicon glyphicon-upload"></i>
-                <span>Start upload</span>
-            </button>
-            <button type="reset" class="btn btn-warning cancel">
-                <i class="glyphicon glyphicon-ban-circle"></i>
-                <span>Cancel upload</span>
-            </button>
-        </div>
+<div class="modal" id="file-upload-dialog">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
 
-        <div class="col-12 mt-5">
-            <!-- The global file processing state -->
-            <span class="fileupload-process">
-                <div id="total-progress" class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                    <div class="progress-bar progress-bar-success" style="width: 100%;" data-dz-uploadprogress=""></div>
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Upload FCS Files</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <div id="actions" class="row">
+                    <div class="col-12">
+                        <!-- The fileinput-button span is used to style the file input field as button -->
+                        <span class="btn btn-success fileinput-button dz-clickable">
+                            <i class="glyphicon glyphicon-plus"></i>
+                            <span>Add files...</span>
+                        </span>
+                        <button type="submit" class="btn btn-primary start">
+                            <i class="glyphicon glyphicon-upload"></i>
+                            <span>Start upload</span>
+                        </button>
+                    </div>
+
+                    <div class="col-12 mt-5">
+                        <!-- The global file processing state -->
+                        <span class="fileupload-process">
+                            <div id="total-progress" class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                                <div class="progress-bar progress-bar-success" style="width: 100%;" data-dz-uploadprogress=""></div>
+                            </div>
+                        </span>
+                    </div>
+
                 </div>
-            </span>
-        </div>
+                <div class="table table-striped files" id="previews">
+                    <div id="template" class="file-row">
+                        <!-- This is used as the file preview template -->
 
-    </div>
+                        <div>
+                            <p class="name" data-dz-name></p>
+                            <strong class="error text-danger" data-dz-errormessage></strong>
+                        </div>
+                        <div>
+                            <p class="size" data-dz-size></p>
+                            <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                                <div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress></div>
+                            </div>
+                        </div>
+                        <div>
+                            <button class="btn btn-primary start">
+                                <i class="glyphicon glyphicon-upload"></i>
+                                <span>Start</span>
+                            </button>
+                            <button data-dz-remove class="btn btn-warning cancel">
+                                <i class="glyphicon glyphicon-ban-circle"></i>
+                                <span>Cancel</span>
+                            </button>
+                            <button data-dz-remove class="btn btn-danger delete">
+                                <i class="glyphicon glyphicon-trash"></i>
+                                <span>Delete</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
-    <div class="table table-striped files" id="previews">
-        <div id="template" class="file-row">
-            <!-- This is used as the file preview template -->
-            
-            <div>
-                <p class="name" data-dz-name></p>
-                <strong class="error text-danger" data-dz-errormessage></strong>
-            </div>
-            <div>
-                <p class="size" data-dz-size></p>
-                <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                    <div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress></div>
+                <input type="file" multiple="multiple" class="dz-hidden-input" style="visibility: hidden; position: absolute; top: 0px; left: 0px; height: 0px; width: 0px;">
+
+                <div class="file-upload-wait">
+                    <span>File Uploaded Successfully. Now doing initial analyze for new files. This will take some times.</span>
                 </div>
             </div>
-            <div>
-                <button class="btn btn-primary start">
-                    <i class="glyphicon glyphicon-upload"></i>
-                    <span>Start</span>
-                </button>
-                <button data-dz-remove class="btn btn-warning cancel">
-                    <i class="glyphicon glyphicon-ban-circle"></i>
-                    <span>Cancel</span>
-                </button>
-                <button data-dz-remove class="btn btn-danger delete">
-                    <i class="glyphicon glyphicon-trash"></i>
-                    <span>Delete</span>
-                </button>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
             </div>
+
         </div>
     </div>
-
-    <input type="file" multiple="multiple" class="dz-hidden-input" style="visibility: hidden; position: absolute; top: 0px; left: 0px; height: 0px; width: 0px;">
-
 </div>
 
-@section Scripts {
-    <script src="https://www.dropzonejs.com/js/dropzone.js?v=6"></script>
-    <script>
+<script src="https://www.dropzonejs.com/js/dropzone.js?v=6"></script>
+<script>
+    $(document).ready(function () {
         // Get the template HTML and remove it from the doumenthe template HTML and remove it from the doument
         var previewNode = document.querySelector("#template");
         previewNode.id = "";
@@ -73,7 +92,7 @@
         previewNode.parentNode.removeChild(previewNode);
 
         var myDropzone = new Dropzone(document.body, { // Make the whole body a dropzone
-            url: "/FileManager/Upload", // Set the url
+            url: "@Model", // Set the url
             thumbnailWidth: 80,
             thumbnailHeight: 80,
             parallelUploads: 20,
@@ -91,6 +110,9 @@
         // Update the total progress bar
         myDropzone.on("totaluploadprogress", function (progress) {
             document.querySelector("#total-progress .progress-bar").style.width = progress + "%";
+            if (progress > 99) {
+                $(".file-upload-wait").show();
+            }
         });
 
         myDropzone.on("sending", function (file) {
@@ -103,6 +125,7 @@
         // Hide the total progress bar when nothing's uploading anymore
         myDropzone.on("queuecomplete", function (progress) {
             document.querySelector("#total-progress").style.opacity = "0";
+            $("#file-upload-dialog").modal("hide");
         });
 
         // Setup the buttons for all transfers
@@ -111,8 +134,11 @@
         document.querySelector("#actions .start").onclick = function () {
             myDropzone.enqueueFiles(myDropzone.getFilesWithStatus(Dropzone.ADDED));
         };
-        document.querySelector("#actions .cancel").onclick = function () {
+        $("#file-upload-dialog").on('hidden.bs.modal', function(){
             myDropzone.removeAllFiles(true);
-        };
-    </script>
-}
+            $(".file-upload-wait").hide();
+        });
+        $(".file-upload-wait").hide();
+    });
+
+</script>

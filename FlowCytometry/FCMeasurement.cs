@@ -1939,7 +1939,7 @@ namespace FlowCytometry
             List<CustomCluster.Cluster> clusters;
 
             calculateDynamicGates(polygons, arrData.ToArray(), out clusters);
-            return clusters;
+            
             foreach (CustomCluster.Cluster cluster in clusters)
             {
                 if (string.IsNullOrEmpty(cluster.clusterName))
