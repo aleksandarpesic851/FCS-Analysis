@@ -40,7 +40,7 @@ namespace Online_FCS_Analysis.Controllers
                 {
                     string orgFileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
                     string fileName = Path.GetRandomFileName() + "_" + orgFileName;
-                    string fullPath = Constants.wbc_fcs_full_path + fileName;
+                    string fullPath = Path.Combine(Constants.wbc_fcs_full_path, fileName);
                     using (var stream = System.IO.File.Create(fullPath))
                     {
                         await file.CopyToAsync(stream);
@@ -87,14 +87,15 @@ namespace Online_FCS_Analysis.Controllers
                 nomenclature = nomenclature
             };
             _dbContext.FCSs.Add(newWbc);
+            _dbContext.SaveChangesAsync();
         }
 
         private void StoreDynamicGateResultsOnDisk(FCMeasurement fcsMeasurement, string fileName, int nomenclature)
         {
             #region initialize Objects
-            string gateFile = Constants.wwwroot_abs_path + _appSettings.Value.defaultGateSetting.path + fileName;
-            string cellsFile = Constants.wbc_3cell_full_path + fileName + ".obj";
-            string heatmapFile = Constants.wbc_heatmap_full_path + fileName + ".png";
+            string gateFile = Path.Combine(Constants.wwwroot_abs_path, _appSettings.Value.defaultGateSetting.path, _appSettings.Value.defaultGateSetting.gate3);
+            string cellsFile = Path.Combine(Constants.wbc_3cell_full_path, fileName + ".obj");
+            string heatmapFile = Path.Combine(Constants.wbc_heatmap_full_path, fileName + ".png");
             string channelNomenclature = Constants.WBC_NOMENCLATURES[nomenclature];
 
             string channel1 = FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
@@ -128,7 +129,7 @@ namespace Online_FCS_Analysis.Controllers
             {
                 for (x = 0; x < nGridCnt; x ++)
                 {
-                    bmp.SetPixel(x, y, Global.GetHeatColor(meanshift.kde[x, y], meanshift.maxKde));
+                    bmp.SetPixel(x, nGridCnt - y - 1, Global.GetHeatColor(meanshift.kde[x, y], meanshift.maxKde));
                 }
             }
             bmp.Save(heatmapFile);

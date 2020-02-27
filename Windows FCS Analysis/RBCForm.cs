@@ -87,6 +87,8 @@ namespace Windows_FCS_Analysis
         private Custom_Meanshift meanshift;
         List<Cluster> clusters = null;
 
+        public static MarkerStyle[] CELL_MARKER = new MarkerStyle[] { MarkerStyle.Diamond, MarkerStyle.Cross, MarkerStyle.Triangle };
+
         #region
         public RBCForm()
         {
@@ -689,7 +691,7 @@ namespace Windows_FCS_Analysis
                     chartWBC.Series.Add(cluster.clusterName);
                     int idx = Array.IndexOf(Global.CELL_NAME, cluster.clusterName);
                     chartWBC.Series[i].MarkerColor = arrGate3Polygon[idx].color;
-                    chartWBC.Series[i].MarkerStyle = Global.CELL_MARKER[idx];
+                    chartWBC.Series[i].MarkerStyle = CELL_MARKER[idx];
                     chartWBC.Series[i].MarkerSize = 3;
                 }
 

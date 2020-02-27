@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace Online_FCS_Analysis.Utilities
 {
+    [Serializable()]
     public class WBC3Cell
     {
         public List<int> wbc_n;
