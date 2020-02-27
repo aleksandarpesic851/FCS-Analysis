@@ -7,8 +7,15 @@ namespace Online_FCS_Analysis.Utilities
 {
     public class WBC3Cell
     {
-        public int[] wbc_n;
-        public int[] wbc_m;
-        public int[] wbc_l;
+        public List<int> wbc_n;
+        public List<int> wbc_m;
+        public List<int> wbc_l;
+
+        public WBC3Cell()
+        {
+            wbc_n = new List<int>();
+            wbc_m = new List<int>();
+            wbc_l = new List<int>();
+        }
     }
 }

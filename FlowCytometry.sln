@@ -10,6 +10,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestConsoleApplication", "TestConsoleApplication\TestConsoleApplication.csproj", "{0B584ADD-1DCB-4FFB-8D0D-DE41FBE30507}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Online FCS Analysis", "Online FCS Analysis\Online FCS Analysis.csproj", "{C424545A-6F30-4F34-A774-F67737B5772C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CBD6AF93-CDC1-402C-B2AF-CEF3832ACA35} = {CBD6AF93-CDC1-402C-B2AF-CEF3832ACA35}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,8 +34,8 @@ Global
 		{0B584ADD-1DCB-4FFB-8D0D-DE41FBE30507}.Release|Any CPU.Build.0 = Debug|Any CPU
 		{C424545A-6F30-4F34-A774-F67737B5772C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C424545A-6F30-4F34-A774-F67737B5772C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C424545A-6F30-4F34-A774-F67737B5772C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C424545A-6F30-4F34-A774-F67737B5772C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C424545A-6F30-4F34-A774-F67737B5772C}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{C424545A-6F30-4F34-A774-F67737B5772C}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

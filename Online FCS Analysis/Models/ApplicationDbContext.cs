@@ -99,14 +99,20 @@ namespace Online_FCS_Analysis.Models
                     .IsRequired()
                     .HasColumnName("user_id")
                     .HasColumnType("int");
-                entity.Property(e => e.wbc_3_cells)
+                entity.Property(e => e.fcs_type)
                     .IsRequired()
-                    .HasColumnName("wbc_3_cells")
+                    .HasColumnName("fcs_type")
                     .HasColumnType("blob");
-                entity.Property(e => e.is_shared)
-                    .HasColumnName("is_shared")
-                    .HasDefaultValue(false)
-                    .HasColumnType("bit");
+                entity.Property(e => e.wbc_3cells)
+                    .HasColumnName("wbc_3cells")
+                    .HasMaxLength(255);
+                entity.Property(e => e.wbc_heatmap)
+                    .HasColumnName("wbc_heatmap")
+                    .HasMaxLength(255);
+                entity.Property(e => e.nomenclature)
+                    .IsRequired()
+                    .HasColumnName("nomenclature")
+                    .HasColumnType("int");
                 entity.Property(e => e.enabled)
                     .HasColumnName("enabled")
                     .HasDefaultValue(true)

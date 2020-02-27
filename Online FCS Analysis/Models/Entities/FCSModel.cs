@@ -18,9 +18,7 @@ namespace Online_FCS_Analysis.Models.Entities
         public int user_id { get; set; }
         [Required]
         public string fcs_type { get; set; } = Constants.FCS_TYPE_WBC;
-        [Required]
         public string wbc_3cells { get; set; }
-        [Required] 
         public string wbc_heatmap { get; set; }
         [Required]
         public int nomenclature { get; set; } = 0;

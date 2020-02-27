@@ -572,10 +572,6 @@ namespace FlowCytometry
         }
         public static Tuple<int[], bool[]> new_diff3_Gating(string fcsFileName, string filePath_gates, string channelNomenclature, bool isDynamic, bool isConsole, int nTotalFileCnt = 1, int nCurr = 0, BackgroundWorker worker = null, DoWorkEventArgs e = null) //analyzeType
         {
-            string FSC1_H = FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
-            string SSC_H = FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
-            string FSC1_A = FCMeasurement.GetChannelName("FCS1area", channelNomenclature);
-
             string gate1File = Path.Combine(filePath_gates, "gating Cells.csv");
             string gate3File = Path.Combine(filePath_gates, "gating Cell Types.csv");
 
@@ -1927,6 +1923,50 @@ namespace FlowCytometry
             return result;
         }
 
+        // Calculate Heatmap and 3-cells using dynamic gate, and write it on hardisk
+        public List<CustomCluster.Cluster> StoreDynamicGateResultsOnDisk(string gateFile, string cellsFile, string heatmapFile, string channelNomenclature)
+        {
+            string channel1 = GetChannelName("FCS1peak", channelNomenclature);
+            string channel2 = GetChannelName("SSCpeak", channelNomenclature);
+            List<double[]> arrData = GetChannelData(this, channel1, channel2);
+            GateResult result = new GateResult(arrData);
+            List<Polygon> polygons = loadPolygon(gateFile);
+            foreach (Polygon polygon in polygons)
+            {
+                result.arrColor.Add(polygon.color);
+            }
+
+            List<CustomCluster.Cluster> clusters;
+
+            calculateDynamicGates(polygons, arrData.ToArray(), out clusters);
+            return clusters;
+            foreach (CustomCluster.Cluster cluster in clusters)
+            {
+                if (string.IsNullOrEmpty(cluster.clusterName))
+                    continue;
+                int idx = Array.IndexOf(CustomCluster.Global.CELL_NAME, cluster.clusterName);
+
+                foreach (int point in cluster.points)
+                {
+                    if (!result.arrValid_Max[point])
+                        continue;
+                    switch (idx)
+                    {
+                        case 0:
+                            result.arrN[point] = true;
+                            break;
+                        case 1:
+                            result.arrM[point] = true;
+                            break;
+                        case 2:
+                            result.arrL[point] = true;
+                            break;
+                    }
+                    result.arrValid[point] = true;
+                }
+            }
+        }
+
         public static List<double[]> GetChannelData(FCMeasurement fcsData, string channel1, string channel2)
         {
             List<double[]> arrData = new List<double[]>();
@@ -1936,6 +1976,20 @@ namespace FlowCytometry
             }
             return arrData;
         }
+
+        // Get Nomenclature. 0 : old_name, 1 : middleaged_names, 2 : new_name
+        public int GetNomenclature()
+        {
+            if (ChannelsNames.Contains("FSC1LG,Area"))
+                return 0;
+            if (ChannelsNames.Contains("BS1CH2; ssclg-H"))
+                return 1;
+            if (ChannelsNames.Contains("BS1CH4; ssclg-H"))
+                return 2;
+
+            return -1;
+        }
+
         #endregion
     }
 
