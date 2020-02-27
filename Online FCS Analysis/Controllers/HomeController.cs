@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Online_FCS_Analysis.Models.ViewModel;
+using Online_FCS_Analysis.Utilities;
 
 namespace Online_FCS_Analysis.Controllers
 {
@@ -19,10 +20,16 @@ namespace Online_FCS_Analysis.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index(ErrorMsgModel error)
+        public IActionResult Index(ShowMsgModel error)
         {
             ViewData["Error"] = error;
             return View();
+        }
+
+        public IActionResult Login()
+        {
+            ViewData["Error"] = new ShowMsgModel { showDlg = Constants.SHOW_LOGIN };
+            return View("Index");
         }
 
         public IActionResult Privacy()

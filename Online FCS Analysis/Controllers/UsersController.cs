@@ -31,7 +31,7 @@ namespace Online_FCS_Analysis.Controllers
             
             if (loginUser == null)
             {
-                return RedirectToAction("", "Home", new ErrorMsgModel { errorMsg = "Your credential is incorrect.", errorIn = Constants.ERROR_IN_LOGIN });
+                return RedirectToAction("", "Home", new ShowMsgModel { errorMsg = "Your credential is incorrect.", showDlg = Constants.SHOW_LOGIN });
             }
                 
             List<Claim> claims = new List<Claim>
@@ -58,14 +58,14 @@ namespace Online_FCS_Analysis.Controllers
 
             if (!ModelState.IsValid)
             {
-                return RedirectToAction("", "Home", new ErrorMsgModel { errorMsg = "Your credential is incorrect.", errorIn = Constants.ERROR_IN_REGISTER });
+                return RedirectToAction("", "Home", new ShowMsgModel { errorMsg = "Your credential is incorrect.", showDlg = Constants.SHOW_REGISTER });
             }
 
             // check there is same user email with this model.
             int nCnt = _dbContext.Users.Where(user => user.user_email == model.user_email).Count();
             if (nCnt > 0)
             {
-                return RedirectToAction("", "Home", new ErrorMsgModel { errorMsg = "There exists an user with this email. please try with other one.", errorIn = Constants.ERROR_IN_REGISTER });
+                return RedirectToAction("", "Home", new ShowMsgModel { errorMsg = "There exists an user with this email. please try with other one.", showDlg = Constants.SHOW_REGISTER });
             }
 
             string filePath = Constants.avatar_path + "default.png";

@@ -11,7 +11,7 @@
             <h3>Sign in</h3>
             <form action="/Users/Login" method="post">
                 <div class="row">
-                    @if (ViewData["Error"] is ErrorMsgModel errorMsgModel && errorMsgModel.errorIn == Online_FCS_Analysis.Utilities.Constants.ERROR_IN_LOGIN)
+                    @if (ViewData["Error"] is ShowMsgModel errorMsgModel && errorMsgModel.showDlg == Online_FCS_Analysis.Utilities.Constants.SHOW_LOGIN)
                     {
                         <div class="col-12 text-danger text-left">
                             <span>@(errorMsgModel.errorMsg)</span>
@@ -47,7 +47,7 @@
             <h3>Resistration</h3>
             <form action="/Users/Register" method="POST" enctype="multipart/form-data">
                 <div class="row">
-                    @if (ViewData["Error"] is ErrorMsgModel errorMsg && errorMsg.errorIn == Online_FCS_Analysis.Utilities.Constants.ERROR_IN_REGISTER)
+                    @if (ViewData["Error"] is ShowMsgModel errorMsg && errorMsg.showDlg == Online_FCS_Analysis.Utilities.Constants.SHOW_REGISTER)
                     {
                         <div class="col-12 text-danger text-left">
                             <span>@errorMsg.errorMsg)</span>

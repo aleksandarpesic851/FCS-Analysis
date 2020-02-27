@@ -11,6 +11,7 @@ using Microsoft.Extensions.Hosting;
 using Online_FCS_Analysis.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Online_FCS_Analysis.Utilities;
 
 namespace Online_FCS_Analysis
 {
@@ -26,7 +27,10 @@ namespace Online_FCS_Analysis
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddControllersWithViews().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
+            });
             // Register App Settings
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
 
@@ -35,7 +39,7 @@ namespace Online_FCS_Analysis
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options => {
-                    options.LoginPath = "/Users/Login/";
+                    options.LoginPath = "/Home/Login";
                     options.AccessDeniedPath = "/Users/AccessDenied";
                 });
         }

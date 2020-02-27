@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using FlowCytometry;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
@@ -16,6 +17,7 @@ using Online_FCS_Analysis.Utilities;
 
 namespace Online_FCS_Analysis.Controllers
 {
+    [Authorize]
     public class FileManagerController : Controller
     {
         private readonly ApplicationDbContext _dbContext;
@@ -31,6 +33,7 @@ namespace Online_FCS_Analysis.Controllers
             return View();
         }
 
+        #region Upload FCS Files
         public async Task<IActionResult> UploadAsync()
         {
             var files = HttpContext.Request.Form.Files;
@@ -161,6 +164,21 @@ namespace Online_FCS_Analysis.Controllers
             #endregion
         }
 
-        
+        #endregion Upload FCS Files
+
+        #region Delete FCS Files
+        public IActionResult Delete(int id)
+        {
+            int user_id = Convert.ToInt32(User.FindFirst(Constants.CLAIM_TYPE_USER_ID).Value);
+
+            FCSModel fcs = _dbContext.FCSs.Where(e => e.id == id && e.user_id == user_id).FirstOrDefault();
+            if (fcs != null)
+            {
+                fcs.enabled = false;
+                _dbContext.SaveChanges();
+            }
+            return Ok("sucess");
+        }
+        #endregion
     }
 }
