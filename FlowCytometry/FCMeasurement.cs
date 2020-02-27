@@ -1923,50 +1923,6 @@ namespace FlowCytometry
             return result;
         }
 
-        // Calculate Heatmap and 3-cells using dynamic gate, and write it on hardisk
-        public List<CustomCluster.Cluster> StoreDynamicGateResultsOnDisk(string gateFile, string cellsFile, string heatmapFile, string channelNomenclature)
-        {
-            string channel1 = GetChannelName("FCS1peak", channelNomenclature);
-            string channel2 = GetChannelName("SSCpeak", channelNomenclature);
-            List<double[]> arrData = GetChannelData(this, channel1, channel2);
-            GateResult result = new GateResult(arrData);
-            List<Polygon> polygons = loadPolygon(gateFile);
-            foreach (Polygon polygon in polygons)
-            {
-                result.arrColor.Add(polygon.color);
-            }
-
-            List<CustomCluster.Cluster> clusters;
-
-            calculateDynamicGates(polygons, arrData.ToArray(), out clusters);
-            
-            foreach (CustomCluster.Cluster cluster in clusters)
-            {
-                if (string.IsNullOrEmpty(cluster.clusterName))
-                    continue;
-                int idx = Array.IndexOf(CustomCluster.Global.CELL_NAME, cluster.clusterName);
-
-                foreach (int point in cluster.points)
-                {
-                    if (!result.arrValid_Max[point])
-                        continue;
-                    switch (idx)
-                    {
-                        case 0:
-                            result.arrN[point] = true;
-                            break;
-                        case 1:
-                            result.arrM[point] = true;
-                            break;
-                        case 2:
-                            result.arrL[point] = true;
-                            break;
-                    }
-                    result.arrValid[point] = true;
-                }
-            }
-        }
-
         public static List<double[]> GetChannelData(FCMeasurement fcsData, string channel1, string channel2)
         {
             List<double[]> arrData = new List<double[]>();
