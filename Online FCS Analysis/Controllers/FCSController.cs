@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using FlowCytometry;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Online_FCS_Analysis.Models;
@@ -28,8 +30,9 @@ namespace Online_FCS_Analysis.Controllers
         {
             return View();
         }
+        
         [HttpPost]
-        public IActionResult LoadWbc()
+        public IActionResult LoadWbcs()
         {
             try
             {
@@ -77,13 +80,33 @@ namespace Online_FCS_Analysis.Controllers
                 recordsTotal = data.Count;
 
                 //Returning Json Data  
-                return Json(new { draw = draw, recordsFiltered = recordsTotal, recordsTotal = recordsTotal, data = data });
+                return Json(new { draw, recordsFiltered = recordsTotal, recordsTotal, data });
 
             }
             catch (Exception)
             {
                 throw;
             }
+        }
+    
+        [HttpPost]
+        public IActionResult LoadWbcData(string wbcFilename)
+        {
+            string cellsFile = Path.Combine(Constants.wbc_3cell_full_path, wbcFilename + ".obj");
+            string heatmapFile = Path.Combine(Constants.wbc_heatmap_full_path, wbcFilename + ".png");
+            string fcsFile = Path.Combine(Constants.wbc_fcs_full_path, wbcFilename);
+            FCMeasurement fcsMeasurement = new FCMeasurement(fcsFile);
+            WBC3Cell wbc3Cell = Global.ReadFromBinaryFile<WBC3Cell>(cellsFile);
+
+            return Json( 
+                new { 
+                    wbcData = fcsMeasurement.Channels, 
+                    wbc3Cell  = new {
+                        wbc3Cell.wbc_n,
+                        wbc3Cell.wbc_m,
+                        wbc3Cell.wbc_l,
+                    }, 
+                    heatmapFile} );
         }
     }
 }

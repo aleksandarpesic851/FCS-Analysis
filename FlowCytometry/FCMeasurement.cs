@@ -103,7 +103,8 @@ namespace FlowCytometry
                 if (hasGain)
                     return gain;
                 else
-                    throw new NotSupportedException("Parameter Gain is not available");
+                    //throw new NotSupportedException("Parameter Gain is not available");
+                    return 0;
             }
             internal set
             {

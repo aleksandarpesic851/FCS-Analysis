@@ -11,7 +11,7 @@
                 </button>
             </div>
             <br />
-            <table id="wbc-table" class="table table-striped table-bordered dt-responsive nowrap">
+            <table id="fcs-table" class="table table-striped table-bordered dt-responsive nowrap" width="100%">
                 <thead>
                     <tr>
                         <th>id</th>
@@ -40,6 +40,7 @@
 @section Stylesheet {
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/select/1.3.1/css/select.bootstrap4.min.css">
 }
 
 @section Scripts {
@@ -47,67 +48,5 @@
     <script src="~/js/fcs-chart.js"></script>
     <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
-
-    <script>
-        $(document).ready(function () {
-            $('#wbc-table').dataTable({
-                processing: true, // for show progress bar
-                serverSide: true, // for process server side
-                filter: true, // this is for disable filter (search box)
-                orderMulti: false, // for disable multiple column at once
-                scrollX: true,
-                scrollY: true,
-                ajax: {
-                    url: "/FCS/LoadWbc",
-                    type: "POST",
-                    datatype: "json"
-                },
-                columnDefs:
-                    [{
-                        targets: [0],
-                        visible: false,
-                        searchable: false
-                    },
-                    {
-                        targets: [-1],
-                        sortable: false
-                    }],
-                columns: [
-                    { "data": "id", "name": "id", "autoWidth": true },
-                    { "data": "fcs_name", "name": "fcs_name", "autoWidth": true },
-                    { "data": "createdAt", "name": "createdAt", "autoWidth": true },
-                    { "data": "updatedAt", "name": "updatedAt", "autoWidth": true },
-                    {
-                        data: null, render: function (data, type, row) {
-                            return "<a href='#' class='btn btn-danger' onclick=DeleteData('" + row.id + "'); >Delete</a>";
-                        }
-                    },
-                ]
-            });
-        });
-
-        function DeleteData(WbcId) {
-            if (confirm("Are you sure you want to delete this wbc data?")) {
-                Delete(WbcId);
-            }
-            else {
-                return false;
-            }
-        }
-
-
-        function Delete(WbcId) {
-            const url = "/FileManager/Delete";
-
-            $.post(url, { id: WbcId }, function (data) {
-                if (data) {
-                    oTable = $('#wbc-table').DataTable();
-                    oTable.draw();
-                }
-                else {
-                    alert("Something Went Wrong!");
-                }
-            });
-        }
-    </script>
+    <script src="~/js/wbc.js"></script>
 }

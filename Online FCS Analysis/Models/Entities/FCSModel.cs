@@ -13,6 +13,8 @@ namespace Online_FCS_Analysis.Models.Entities
         [Required]
         public string fcs_name { get; set; }
         [Required]
+        public string fcs_file_name { get; set; }
+        [Required]
         public string fcs_path { get; set; }
         [Required]
         public int user_id { get; set; }

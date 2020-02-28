@@ -116,3 +116,7 @@ div.table .file-row:nth-child(odd) {
     display: table-cell;
     vertical-align: middle;
 }
+
+#fcs-table tr {
+    pointer: cursor;
+}

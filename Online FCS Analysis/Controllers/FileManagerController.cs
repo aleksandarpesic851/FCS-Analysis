@@ -82,6 +82,7 @@ namespace Online_FCS_Analysis.Controllers
             FCSModel newWbc = new FCSModel
             {
                 fcs_name = orgFileName,
+                fcs_file_name = fileName,
                 fcs_path = Constants.wbc_fcs_path+ fileName,
                 user_id = Convert.ToInt32(User.FindFirst(Constants.CLAIM_TYPE_USER_ID).Value),
                 fcs_type = Constants.FCS_TYPE_WBC,

@@ -87,6 +87,10 @@ namespace Online_FCS_Analysis.Models
                     .IsRequired()
                     .HasColumnName("fcs_name")
                     .HasMaxLength(255);
+                entity.Property(e => e.fcs_file_name)
+                    .IsRequired()
+                    .HasColumnName("fcs_file_name")
+                    .HasMaxLength(255);
                 entity.Property(e => e.fcs_path)
                     .IsRequired()
                     .HasColumnName("fcs_path")
