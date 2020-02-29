@@ -118,5 +118,13 @@ div.table .file-row:nth-child(odd) {
 }
 
 #fcs-table tr {
-    pointer: cursor;
+    cursor: pointer;
+}
+
+.gate-tab {
+    width: 100%;
+    cursor: pointer;
+    color: #007bff;
+    font-size: 20px;
+
 }

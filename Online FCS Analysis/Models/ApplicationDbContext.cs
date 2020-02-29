@@ -110,6 +110,9 @@ namespace Online_FCS_Analysis.Models
                 entity.Property(e => e.wbc_3cells)
                     .HasColumnName("wbc_3cells")
                     .HasMaxLength(255);
+                entity.Property(e => e.wbc_gate2)
+                    .HasColumnName("wbc_gate2")
+                    .HasMaxLength(255);
                 entity.Property(e => e.wbc_heatmap)
                     .HasColumnName("wbc_heatmap")
                     .HasMaxLength(255);

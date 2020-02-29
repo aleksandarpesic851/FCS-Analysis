@@ -153,7 +153,7 @@ namespace FlowCytometry
             }
         }
     }
-
+    [Serializable]
     public class Polygon
     {
         public PointF[] poly;
@@ -1791,37 +1791,12 @@ namespace FlowCytometry
                     continue;
 
                 result.arrValid_Max[i] = true;
-                /*
-                                // Gate by Polygon
-                                if (polygons != null)
-                                {
-                                    foreach (Polygon polygon in polygons)
-                                    {
-                                        if (polygon.IsInsidePoly(xy[0], xy[1]))
-                                        {
-                                            result.arrValid[i] = true;
-                                            break;
-                                        }
-                                    }
-                                }*/
-
-                // Gate by Linear Regression
-                // if (result.arrValid[i])
-                // {
-                /*                expect1 = slope * (1 + delta_slope * 2) * xy[0] + intercept * (1 + delta_intercept);
-                                expect2 = slope * (1 - delta_slope) * xy[0] + intercept * (1 - delta_intercept);
-
-                                if (xy[1] > expect2 && xy[1] < expect1)
-                                    result.arrValid[i] = true;
-                */
                 exp_delta = Math.Max(minDelta, slope * xy[1] * delta_slope);
                 expect1 = slope * xy[1] + intercept * (1 + delta_intercept) + exp_delta;
                 expect2 = slope * xy[1] + intercept * (1 - delta_intercept) - exp_delta;
 
                 if (xy[0] > expect2 && xy[0] < expect1)
                     result.arrValid[i] = true;
-
-                // }
             }
 
             return result;

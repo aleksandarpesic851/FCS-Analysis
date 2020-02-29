@@ -87,6 +87,7 @@ namespace Online_FCS_Analysis.Controllers
                 user_id = Convert.ToInt32(User.FindFirst(Constants.CLAIM_TYPE_USER_ID).Value),
                 fcs_type = Constants.FCS_TYPE_WBC,
                 wbc_3cells = Constants.wbc_3cell_path + fileName + ".obj",
+                wbc_gate2 = Constants.wbc_gate2_path + fileName + ".obj",
                 wbc_heatmap = Constants.wbc_heatmap_path + fileName + ".png",
                 nomenclature = nomenclature
             };
@@ -97,15 +98,17 @@ namespace Online_FCS_Analysis.Controllers
         private void StoreDynamicGateResultsOnDisk(FCMeasurement fcsMeasurement, string fileName, int nomenclature)
         {
             #region initialize Objects
-            string gateFile = Path.Combine(Constants.wwwroot_abs_path, _appSettings.Value.defaultGateSetting.path, _appSettings.Value.defaultGateSetting.gate3);
+            string gate3File = Path.Combine(Constants.wwwroot_abs_path, _appSettings.Value.defaultGateSetting.path, _appSettings.Value.defaultGateSetting.gate3);
             string cellsFile = Path.Combine(Constants.wbc_3cell_full_path, fileName + ".obj");
+            string gate2File = Path.Combine(Constants.wbc_gate2_full_path, fileName + ".obj");
             string heatmapFile = Path.Combine(Constants.wbc_heatmap_full_path, fileName + ".png");
             string channelNomenclature = Constants.WBC_NOMENCLATURES[nomenclature];
 
             string channel1 = FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
             string channel2 = FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
+            string channel3 = FCMeasurement.GetChannelName("FCS1area", channelNomenclature);
             List<double[]> arrData = FCMeasurement.GetChannelData(fcsMeasurement, channel1, channel2);
-            List<Polygon> polygons = FCMeasurement.loadPolygon(gateFile);
+            List<Polygon> polygons = FCMeasurement.loadPolygon(gate3File);
             
             if (polygons.Count < 3)
             {
@@ -123,7 +126,31 @@ namespace Online_FCS_Analysis.Controllers
             FlowCytometry.CustomCluster.Global.T_Y_2 = (int)polygons[0].poly[0].Y;
 
             FlowCytometry.CustomCluster.Custom_Meanshift meanshift = new FlowCytometry.CustomCluster.Custom_Meanshift(arrData);
-            #endregion
+            #endregion initialize Objects
+
+            #region Calculate gate2 and save on disk
+            double[] singletsFit = FCMeasurement.NewLinearRegression(arrData.ToArray());
+            double slope = singletsFit[0];
+            double intercept = singletsFit[1];
+            double delta_slope = 0.2;
+            double delta_intercept = 0.5;
+            double minDelta = 7000 * slope * delta_slope;
+            int yMax = fcsMeasurement.Channels[channel1].Range;
+            int xMax = fcsMeasurement.Channels[channel3].Range;
+            
+            List<PointF> gate2Points = new List<PointF>();
+            gate2Points.Add(new PointF((float)(intercept * (1 + delta_intercept) + minDelta), 0));
+            gate2Points.Add(new PointF((float)(slope * 7000 + intercept * (1 + delta_intercept) + minDelta), 7000));
+            gate2Points.Add(new PointF((float)(slope * yMax + intercept * (1 + delta_intercept) + minDelta), yMax));
+            gate2Points.Add(new PointF((float)(slope * yMax + intercept * (1 - delta_intercept) - minDelta), yMax));
+            gate2Points.Add(new PointF((float)(slope * 7000 + intercept * (1 - delta_intercept) - minDelta), 7000));
+            gate2Points.Add(new PointF((float)(intercept * (1 - delta_intercept) - minDelta), 0));
+
+            List<Polygon> gate2Polygon = new List<Polygon>();
+            gate2Polygon.Add(new Polygon(gate2Points.ToArray(), Color.OrangeRed));
+
+            Global.WriteToBinaryFile(gate2File, gate2Polygon);
+            #endregion Calculate gate2 and save on disk
 
             #region Generate Heatmap Image and save on disk
             meanshift.CalculateKDE();
@@ -138,7 +165,7 @@ namespace Online_FCS_Analysis.Controllers
             }
             bmp.Save(heatmapFile);
 
-            #endregion
+            #endregion Generate Heatmap Image and save on disk
 
             #region Calculate clusters and save on disk
             List<FlowCytometry.CustomCluster.Cluster> clusters = meanshift.CalculateCluster();
@@ -162,7 +189,7 @@ namespace Online_FCS_Analysis.Controllers
                 }
             }
             Global.WriteToBinaryFile(cellsFile, wbc3Cell);
-            #endregion
+            #endregion Calculate clusters and save on disk
         }
 
         #endregion Upload FCS Files

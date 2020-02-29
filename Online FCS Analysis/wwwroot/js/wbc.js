@@ -1,4 +1,26 @@
-﻿$(document).ready(function () {
+﻿var wbcTotalData;
+var wbcChannels;
+var wbcNomenclature;
+
+var defaultChannel1;
+var defaultChannel2;
+var defaultChannel3;
+
+var defaultGate1;
+var defaultGate2;
+var defaultGate3;
+
+var defaultGatePolygons;
+var customGatePolygons;
+var currGatePolygon;
+var currGateName;
+
+var isDefaultGate = false;
+var isDynamicGate = false;
+
+$(document).ready(function () {
+    defaultGatePolygons = [];
+
     let wbc_table = $('#fcs-table').dataTable({
         processing: true, // for show progress bar
         serverSide: true, // for process server side
@@ -33,6 +55,7 @@
             },
         ],
     });
+
     $('#fcs-table tbody').on("click", "tr", function () {
         const tr = $(this);
         const isSelected = tr.hasClass("selected");
@@ -40,9 +63,11 @@
             $("#fcs-table tbody tr").removeClass("selected");
             tr.addClass("selected");
             const data = wbc_table.fnGetData(tr);
-            LoadWbcData(data.fcs_file_name);
+            LoadWbcData(data.id);
         }
     });
+
+    $(".wbc-items").prop("disabled", true);
 });
 
 function DeleteData(wbcId) {
@@ -68,14 +93,216 @@ function Delete(wbcId) {
     });
 }
 
-function LoadWbcData(wbcFilename) {
+function LoadWbcData(wbcId) {
     let url = "/FCS/LoadWbcData";
-    $.post(url, { wbcFilename: wbcFilename }, function (data) {
+    $.post(url, { wbcId: wbcId }, function (data) {
         if (data) {
-            console.log(data);
+            wbcTotalData = data;
+            initWbc();
         }
         else {
             alert("Something Went Wrong!");
         }
     });
+}
+
+function DefaultGate() {
+
+}
+
+function DrawHeatmap() {
+
+    if ($("#draw-heatmap").prop("checked")) {
+        $("#fcs-chart").css("background", 'url("' + wbcTotalData.heatmapFile + '") 30px 0px / calc(100% - 30px) calc(100% - 30px) no-repeat white');
+    } else {
+        $("#fcs-chart").css("background", '');
+    }
+}
+
+function initWbc() {
+    if (!wbcTotalData) {
+        return;
+    }
+    $(".wbc-items").prop("disabled", false);
+    wbcNomenclature = wbcTotalData.nomenclature;
+    wbcChannels = [];
+    $(".wbc-channels").empty();
+    for (let key in wbcTotalData.wbcData) {
+        wbcChannels.push(key);
+        $(".wbc-channels").append("<option>" + key + "</option>");
+    }
+
+    defaultChannel1 = GetChannelName("FCS1peak", wbcNomenclature);
+    defaultChannel2 = GetChannelName("SSCpeak", wbcNomenclature);
+    defaultChannel3 = GetChannelName("FCS1area", wbcNomenclature);
+
+    defaultGatePolygons["defaultGate1"] = {
+        channel1: defaultChannel1,
+        channel2: defaultChannel2,
+        polys: wbcTotalData.gate1Polygon
+    };
+    defaultGatePolygons["defaultGate2"] = {
+        channel1: defaultChannel1,
+        channel2: defaultChannel3,
+        polys: wbcTotalData.gate2Polygon
+    };
+    defaultGatePolygons["defaultGate3"] = {
+        channel1: defaultChannel1,
+        channel2: defaultChannel2,
+        polys: wbcTotalData.gate3Polygon
+    };
+
+    $("#channel-1").val(defaultChannel1);
+    $("#channel-2").val(defaultChannel2);
+
+    ChangeChannel();
+}
+
+function ChangeChannel() {
+    let channel1 = $("#channel-1").val();
+    let channel2 = $("#channel-2").val();
+    if (channel1 == channel2) {
+        $(".channel-items").prop("disabled", true);
+        alert("Please choose different channels!.");
+        return;
+    }
+    $(".channel-items").prop("disabled", false);
+
+    if (channel1 == defaultChannel1 && channel2 == defaultChannel2) {
+        $("#draw-heatmap").prop("disabled", false);
+    } else {
+        $("#draw-heatmap").prop("disabled", true);
+        $("#draw-heatmap").prop("checked", false);
+    }
+    UpdateChart();
+}
+
+function UpdateChart() {
+    let channel1 = currGatePolygon.channel1;
+    let channel2 = currGatePolygon.channel2;
+
+    $("#channel-1").val(channel1);
+    $("#channel-2").val(channel2);
+
+    chartData = [];
+    if (!$("#draw-heatmap").prop("checked")) {
+        chartData[0] = {
+            label: 'Inside Gate' + currGateName,
+            backgroundColor: 'rgb(132, 99, 255)',
+            borderColor: 'rgb(132, 99, 255)',
+            data: FilterGateData(true),
+            order: 1
+        };
+        chartData[1] = {
+            label: 'Outside Gate' + currGateName,
+            backgroundColor: 'rgb(255, 99, 132)',
+            borderColor: 'rgb(255, 99, 132)',
+            data: FilterGateData(false),
+            order: 2
+        };
+/*        chartData[1] = {
+            label: 'Original Data Points',
+            borderColor: 'rgb(132, 99, 255)',
+            fill: false,
+            data: [
+                { x: 4300, y: 4000},
+                { x: 2200, y: 4000},
+                { x: 1500, y: 5500},
+                { x: 2000, y: 14000},
+                { x: 8000, y: 14000},
+                { x: 8000, y: 9000},
+                { x: 4300, y: 4000}
+            ],
+            pointHitRadius: 10,
+            dragable: true,
+            type: 'line',
+            pointRadius: 5,
+            lineTension: 0,
+            order: 2
+        }
+*/    }
+    chartGraph.data.datasets = chartData;
+    chartGraph.update();
+    DrawHeatmap();
+}
+
+function DefaultGate() {
+    isDefaultGate = true;
+    $(".create-gate-div").hide();
+    $(".default-gate-div").show();
+    $(".wbc-channels").prop("disabled", true);
+
+    currGateName = "defaultGate1";
+    currGatePolygon = defaultGatePolygons[currGateName];
+    UpdateChart();
+}
+
+function CustomeGate() {
+    isDefaultGate = false;
+    $(".create-gate-div").show();
+    $(".default-gate-div").hide();
+    $(".wbc-channels").prop("disabled", false);
+}
+
+function ChangeDynamic(isDynamic) {
+    isDynamicGate = isDynamic;
+}
+
+function FilterGateData(isInside) {
+    if (!currGatePolygon) {
+        return [];
+    }
+
+    let channel1 = currGatePolygon.channel1;
+    let channel2 = currGatePolygon.channel2;
+
+    let xys = wbcTotalData.wbcData[channel1].data.map((v, i) => ({
+        x: wbcTotalData.wbcData[channel1].data[i],
+        y: wbcTotalData.wbcData[channel2].data[i]
+    }));
+    return xys.filter(xy => IsInsidePolygons(xy) == isInside);
+}
+
+function IsInsidePolygons(xy) {
+    let i = 0;
+    for (i = 0; i < currGatePolygon.polys.length; i++) {
+        if (!IsInsidePoly(currGatePolygon.polys[i], xy.x, xy.y)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function IsInsidePoly(poly, x, y)
+{
+    if (!poly)
+        return false;
+    let minX = poly[0].x;
+    let maxX = poly[0].x;
+    let minY = poly[0].y;
+    let maxY = poly[0].y;
+    let i = 1;
+
+    for (i = 1; i < poly.length; i++)
+    {
+        minX = Math.min(poly[i].x, minX);
+        maxX = Math.max(poly[i].x, maxX);
+        minY = Math.min(poly[i].y, minY);
+        maxY = Math.max(poly[i].y, maxY);
+    }
+
+    if (x < minX || x > maxX || y < minY || y > maxY) {
+        return false;
+    }
+
+    // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+    let inside = false;
+    for (i = 0, j = poly.length - 1; i < poly.length; j = i++)
+    {
+        if ((poly[i].y > y) != (poly[j].y > y) &&
+            x < (poly[j].x - poly[i].x) * (y - poly[i].y) / (poly[j].y - poly[i].y) + poly[i].x) {
+            inside = !inside;
+        }
+    }
+    return inside;
 }

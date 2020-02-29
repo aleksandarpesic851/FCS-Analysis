@@ -1,37 +1,21 @@
-﻿var data = [];
-var orgData = [
-	{
-		"category": "Immunooncology",
-		"company": "Kite Pharma",
-		"employees": 447,
-		"revenue": 32.1,
-		"rev_employee": 0.072
-	},
-	{
-		"category": "Immunooncology",
-		"company": "Inovio",
-		"employees": 239,
-		"revenue": 6.3,
-		"rev_employee": 0.026
-	},
-	{
-		"category": "Immunooncology",
-		"company": "Immune Design",
-		"employees": 50,
-		"revenue": 2.2,
-		"rev_employee": 0.044
-	},
-	{
-		"category": "Immunooncology",
-		"company": "Blue Bird Bio",
-		"employees": 764,
-		"revenue": 53.9,
-		"rev_employee": 0.071
-	}
-];
+﻿var chartData = [];
+var chartGraph;
 
 $(document).ready(function () {
-    initChart();
+	initChart();
+	function getMousePosition(canvas, event) {
+		let rect = canvas.getBoundingClientRect();
+		let x = event.clientX - rect.left;
+		let y = event.clientY - rect.top;
+		console.log("Coordinate x: " + x,
+			"Coordinate y: " + y);
+	}
+
+	let canvasElem = document.getElementById('fcs-chart');
+
+	canvasElem.addEventListener("mousedown", function (e) {
+		getMousePosition(canvasElem, e);
+	}); 
 });
 
 function initChart() {
@@ -63,7 +47,7 @@ function initChart() {
 
 		// `this` will be the overall tooltip
 		var position = this._chart.canvas.getBoundingClientRect();
-		tooltipEl.innerHTML = getTooltipContent(tooltipModel.dataPoints[0].index);
+		tooltipEl.innerHTML = getTooltipContent(tooltipModel.dataPoints[0].datasetIndex, tooltipModel.dataPoints[0].index);
 
 		// Display, position, and set styles for font
 		tooltipEl.style.opacity = 1;
@@ -77,21 +61,13 @@ function initChart() {
 
 	const ctx = document.getElementById('fcs-chart').getContext('2d');
 
-	updateDisplayData();
-
-	new Chart(ctx, {
+	chartGraph = new Chart(ctx, {
 		// The type of chart we want to create
 		type: 'bubble',
 
 		// The data for our dataset
 		data: {
-			labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-			datasets: [{
-				label: 'My First dataset',
-				backgroundColor: 'rgb(255, 99, 132)',
-				borderColor: 'rgb(255, 99, 132)',
-				data: data
-			}]
+			datasets: chartData
 		},
 
 		// Configuration options go here
@@ -103,26 +79,116 @@ function initChart() {
 			responsiveAnimationDuration: 200,
 			tooltips: {
 				enabled: false,
+			},
+			onClick: function (event, array) {
+				if (chartData.length > 1) {
+					let newXY = getCoordinate(event);
+					chartData[1].data.push(newXY);
+				}
+			},
+			dragData: true,
+			dragX: true,
+			onDragStart: function (e, target) {
+				if (!chartData[target._datasetIndex].dragable)
+					return false;
+				// do something
+				console.log('start', e);
+			},
+			onDrag: function (e, datasetIndex, index, value) {
+				// do something
+				console.log('drag', e, datasetIndex, index, value);
+			},
+			onDragEnd: function (e, datasetIndex, index, value) {
+				// do something
+				console.log('dragEnd', e, datasetIndex, index, value);
 			}
 		}
 	});
 }
 
-function updateDisplayData() {
-	data = [];
-	orgData.forEach(function (item, index) {
-		data.push(item);
-		data[index].x = item.employees;
-		data[index].y = item.revenue;
-		data[index].r = item.rev_employee * 100;
-	});
+function getCoordinate(event) {
+	var yTop = chartGraph.chartArea.top;
+	var yBottom = chartGraph.chartArea.bottom;
+
+	var yMin = chartGraph.scales['y-axis-0'].min;
+	var yMax = chartGraph.scales['y-axis-0'].max;
+	var newY = 0;
+
+	if (event.offsetY <= yBottom && event.offsetY >= yTop) {
+		newY = Math.abs((event.offsetY - yTop) / (yBottom - yTop));
+		newY = (newY - 1) * -1;
+		newY = newY * (Math.abs(yMax - yMin)) + yMin;
+	};
+
+	var xTop = chartGraph.chartArea.left;
+	var xBottom = chartGraph.chartArea.right;
+	var xMin = chartGraph.scales['x-axis-0'].min;
+	var xMax = chartGraph.scales['x-axis-0'].max;
+	var newX = 0;
+
+	if (event.offsetX <= xBottom && event.offsetX >= xTop) {
+		newX = Math.abs((event.offsetX - xTop) / (xBottom - xTop));
+		newX = newX * (Math.abs(xMax - xMin)) + xMin;
+	};
+
+	return { x: newX, y: newY };
 }
 
-function getTooltipContent(idx) {
+function getTooltipContent(datasetIdx, idx) {
 	var innerHtml = "";
-	innerHtml += "<b> Company: </b>" + orgData[idx].company + " <br> ";
-	innerHtml += "<b> Employees: </b>" + orgData[idx].employees + " <br> ";
-	innerHtml += "<b> Revenue: </b>" + orgData[idx].revenue + " <br> ";
-	innerHtml += "<b> Rev/Employee: </b>" + orgData[idx].rev_employee;
+	innerHtml += "<b> Category: </b>" + chartData[datasetIdx].label + " <br> ";
+	innerHtml += "<b> " + $("#channel-1").val() + ": </b>" + chartData[datasetIdx].data[idx].x + " <br> ";
+	innerHtml += "<b> " + $("#channel-2").val() + ": </b>" + chartData[datasetIdx].data[idx].y + " <br> ";
 	return innerHtml;
 }
+
+function GetChannelName(channelHandle, type)
+{
+	let channelName = "";
+	if (type == "old_names") {
+		if (channelHandle == "FCS1peak")
+			channelName = "FSC1LG,Peak"; //string FSC1peak = "FSC1LG,Peak"; 
+		else if (channelHandle == "SSCpeak")
+			channelName = "SSCLG,Peak"; //string SSCpeak = "SSCLG,Peak"; 
+		else if (channelHandle == "FCS1area")
+			channelName = "FSC1LG,Area"; //string FCS1area = "FSC1LG,Area"; 
+		else if (channelHandle == "SSCarea")
+			channelName = "SSCLG,Area"; //string SSCarea = "SSCLG,Area";
+		else if (channelHandle == "FSC2peak")
+			channelName = "FSC2HG,Peak";
+		else if (channelHandle == "FLpeak")
+			channelName = "FLLG,Peak"; //"FLLG,Peak"
+	}
+	else if (type == "middleaged_names") {
+		if (channelHandle == "FCS1peak")
+			channelName = "BS1CH1; fsc1lg-H";
+		else if (channelHandle == "SSCpeak")
+			channelName = "BS1CH2; ssclg-H";
+		else if (channelHandle == "FCS1area")
+			channelName = "BS1CH1; fsc1lg-A";
+		else if (channelHandle == "SSCarea")
+			channelName = "BS1CH4; ssclg-A";
+		else if (channelHandle == "FSC2peak")
+			channelName = "BS1CH2; fsc2lg-H";
+		else if (channelHandle == "FLpeak")
+			channelName = "BS1CH3;fllg-H";//BS1CH2; 
+	}
+	else if (type == "new_names")// NEW names
+	{
+		if (channelHandle == "FCS1peak")
+			channelName = "BS1CH1; fsc1lg-H"; //string FCS1peak = "BS1CH1; fsc1lg-H";
+		else if (channelHandle == "SSCpeak")
+			channelName = "BS1CH4; ssclg-H"; //string SSCpeak = "BS1CH4; ssclg-H";
+		else if (channelHandle == "FCS1area")
+			channelName = "BS1CH1; fsc1lg-A"; //string FCS1area = "BS1CH1; fsc1lg-A";
+		else if (channelHandle == "SSCarea")
+			channelName = "BS1CH4; ssclg-A"; //string SSCarea = "BS1CH4; ssclg-A";
+		else if (channelHandle == "FSC2peak")
+			channelName = "BS1CH2; fsc2lg-H";
+		else if (channelHandle == "FLpeak")
+			channelName = "BS1CH3;fllg-H";
+	}
+
+	return channelName;
+}
+

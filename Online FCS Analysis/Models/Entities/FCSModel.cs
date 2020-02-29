@@ -21,6 +21,7 @@ namespace Online_FCS_Analysis.Models.Entities
         [Required]
         public string fcs_type { get; set; } = Constants.FCS_TYPE_WBC;
         public string wbc_3cells { get; set; }
+        public string wbc_gate2 { get; set; }
         public string wbc_heatmap { get; set; }
         [Required]
         public int nomenclature { get; set; } = 0;

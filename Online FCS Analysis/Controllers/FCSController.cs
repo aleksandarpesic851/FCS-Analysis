@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using FlowCytometry;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Online_FCS_Analysis.Models;
 using Online_FCS_Analysis.Models.Entities;
 using Online_FCS_Analysis.Utilities;
@@ -16,10 +17,12 @@ namespace Online_FCS_Analysis.Controllers
     public class FCSController : Controller
     {
         private readonly ApplicationDbContext _dbContext;
+        private readonly IOptions<AppSettings> _appSettings;
 
-        public FCSController(ApplicationDbContext dbContext)
+        public FCSController(ApplicationDbContext dbContext, IOptions<AppSettings> appSettings)
         {
             _dbContext = dbContext;
+            _appSettings = appSettings;
         }
 
         public IActionResult Wbc()
@@ -90,23 +93,38 @@ namespace Online_FCS_Analysis.Controllers
         }
     
         [HttpPost]
-        public IActionResult LoadWbcData(string wbcFilename)
+        public IActionResult LoadWbcData(int wbcId)
         {
-            string cellsFile = Path.Combine(Constants.wbc_3cell_full_path, wbcFilename + ".obj");
-            string heatmapFile = Path.Combine(Constants.wbc_heatmap_full_path, wbcFilename + ".png");
-            string fcsFile = Path.Combine(Constants.wbc_fcs_full_path, wbcFilename);
+            int userId = Convert.ToInt32(User.FindFirst(Constants.CLAIM_TYPE_USER_ID).Value);
+            FCSModel fcsData = _dbContext.FCSs.FirstOrDefault(e => e.id == wbcId && e.user_id == userId);
+            if (fcsData == null)
+                return Ok();
+
+            string cellsFile = Constants.wwwroot_abs_path + fcsData.wbc_3cells;
+            string gate2File = Constants.wwwroot_abs_path + fcsData.wbc_gate2;
+            string heatmapFile = fcsData.wbc_heatmap;
+            string fcsFile = Constants.wwwroot_abs_path + fcsData.fcs_path;
+            string gate1File = Path.Combine(Constants.wwwroot_abs_path, _appSettings.Value.defaultGateSetting.path, _appSettings.Value.defaultGateSetting.gate1);
+            string gate3File = Path.Combine(Constants.wwwroot_abs_path, _appSettings.Value.defaultGateSetting.path, _appSettings.Value.defaultGateSetting.gate3);
             FCMeasurement fcsMeasurement = new FCMeasurement(fcsFile);
             WBC3Cell wbc3Cell = Global.ReadFromBinaryFile<WBC3Cell>(cellsFile);
-
+            List<Polygon> gate1Polygon = FCMeasurement.loadPolygon(gate1File);
+            List<Polygon> gate2Polygon = Global.ReadFromBinaryFile<List<Polygon>>(gate2File);
+            List<Polygon> gate3Polygon = FCMeasurement.loadPolygon(gate1File);
             return Json( 
                 new { 
-                    wbcData = fcsMeasurement.Channels, 
+                    wbcData = fcsMeasurement.Channels,
                     wbc3Cell  = new {
                         wbc3Cell.wbc_n,
                         wbc3Cell.wbc_m,
                         wbc3Cell.wbc_l,
-                    }, 
-                    heatmapFile} );
+                    },
+                    gate1Polygon = gate1Polygon.Select(e=>e.poly),
+                    gate2Polygon = gate2Polygon.Select(e => e.poly),
+                    gate3Polygon = gate3Polygon.Select(e => e.poly),
+                    heatmapFile,
+                    nomenclature = Constants.WBC_NOMENCLATURES[fcsData.nomenclature]
+                } );
         }
     }
 }
