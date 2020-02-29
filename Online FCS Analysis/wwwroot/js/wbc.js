@@ -27,7 +27,8 @@ $(document).ready(function () {
         filter: true, // this is for disable filter (search box)
         orderMulti: false, // for disable multiple column at once
         scrollX: true,
-        scrollY: true,
+        scrollY: "30vh",
+        scrollCollapse: true,
         ajax: {
             url: "/FCS/LoadWbcs",
             type: "POST",
@@ -106,14 +107,15 @@ function LoadWbcData(wbcId) {
     });
 }
 
-function DefaultGate() {
-
-}
-
 function DrawHeatmap() {
 
     if ($("#draw-heatmap").prop("checked")) {
-        $("#fcs-chart").css("background", 'url("' + wbcTotalData.heatmapFile + '") 30px 0px / calc(100% - 30px) calc(100% - 30px) no-repeat white');
+        let left = chartGraph.chartArea.left;
+        let top = chartGraph.chartArea.top;
+        let width = chartGraph.chartArea.right - chartGraph.chartArea.left;
+        let height = chartGraph.chartArea.bottom - chartGraph.chartArea.top;
+
+        $("#fcs-chart").css("background", 'url("' + wbcTotalData.heatmapFile + '") ' + left + 'px ' + top + 'px / ' + width + 'px ' + height + 'px no-repeat white');
     } else {
         $("#fcs-chart").css("background", '');
     }
@@ -191,14 +193,16 @@ function UpdateChart() {
             backgroundColor: 'rgb(132, 99, 255)',
             borderColor: 'rgb(132, 99, 255)',
             data: FilterGateData(true),
-            order: 1
+            order: 1,
+            radius: 1
         };
         chartData[1] = {
             label: 'Outside Gate' + currGateName,
             backgroundColor: 'rgb(255, 99, 132)',
             borderColor: 'rgb(255, 99, 132)',
             data: FilterGateData(false),
-            order: 2
+            order: 2,
+            radius: 1
         };
 /*        chartData[1] = {
             label: 'Original Data Points',
@@ -221,6 +225,7 @@ function UpdateChart() {
             order: 2
         }
 */    }
+    chartData = chartData.concat(GetChartGateLineData());
     chartGraph.data.datasets = chartData;
     chartGraph.update();
     DrawHeatmap();
@@ -228,7 +233,9 @@ function UpdateChart() {
 
 function DefaultGate() {
     isDefaultGate = true;
-    $(".create-gate-div").hide();
+    $("#tab-custom").removeClass("show");
+    $("#tab-default").addClass("show")
+    $(".custom-gate-div").hide();
     $(".default-gate-div").show();
     $(".wbc-channels").prop("disabled", true);
 
@@ -239,7 +246,9 @@ function DefaultGate() {
 
 function CustomeGate() {
     isDefaultGate = false;
-    $(".create-gate-div").show();
+    $("#tab-custom").addClass("show");
+    $("#tab-default").removeClass("show")
+    $(".custom-gate-div").show();
     $(".default-gate-div").hide();
     $(".wbc-channels").prop("disabled", false);
 }
@@ -305,4 +314,26 @@ function IsInsidePoly(poly, x, y)
         }
     }
     return inside;
+}
+
+function GetChartGateLineData() {
+    if (currGateName == "finalGate") {
+        return [];
+    }
+
+    let order = chartData.length;
+
+    return currGatePolygon.polys.map((v, i) => ({
+        label: "Gate - " + currGateName,
+        borderColor: 'rgb(100, 200, 100)',
+        fill: false,
+        data: v,
+        pointHitRadius: 10,
+        dragable: !isDefaultGate,
+        type: 'line',
+        pointRadius: 5,
+        pointHoverRadius: 10,
+        lineTension: 0,
+        order: order + i
+    }));
 }
