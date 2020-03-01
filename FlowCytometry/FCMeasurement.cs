@@ -1779,7 +1779,7 @@ namespace FlowCytometry
             double slope = result.SingletsFit[0];
             double intercept = result.SingletsFit[1];
             double expect1, expect2;
-            double delta_slope = 0.2;
+            double delta_slope = 0.3;
             double delta_intercept = 0.5;
             double minDelta = 7000 * slope * delta_slope;
             double exp_delta;

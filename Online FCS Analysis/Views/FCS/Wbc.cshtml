@@ -65,26 +65,44 @@
             </div>
         </div>
         <div class="row ml-4 mr-1 mt-4 mb-4 default-gate-div text-center" id="default-gates" style="display: none">
-            <div class="alert btn-primary pointer-cursor ml-1 mr-1" onclick="console.log('gate-1 clicked')">
+            <div class="btn-gate" data-gate="defaultGate1">
+                <strong>Default Gate 1</strong>
+            </div>
+            <div class="btn-gate" data-gate="defaultGate2">
+                <strong>Default Gate 2</strong>
+            </div>
+            <div class="btn-gate" data-gate="defaultGate3">
+                <strong>Default Gate 3</strong>
+            </div>
+            <div class="btn-gate final" data-gate="finalGate">
+                <strong>Final Gate &nbsp; : &nbsp;&nbsp;</strong>
+
                 <input type="checkbox" id="defaultGate1" class="wbc-items" />
                 <label for="defaultGate1" class="text-white m-0">Default Gate 1</label>
-            </div>
-            <div class="alert btn-primary pointer-cursor ml-1 mr-1" onclick="console.log('gate-2 clicked')">
+
                 <input type="checkbox" id="defaultGate2" class="wbc-items" />
                 <label for="defaultGate2" class="text-white m-0">Default Gate 2</label>
-            </div>
-            <div class="alert btn-primary pointer-cursor ml-1 mr-1" onclick="console.log('gate-1 clicked')">
+
                 <input type="checkbox" id="defaultGate3" class="wbc-items" />
                 <label for="defaultGate3" class="text-white m-0">Default Gate 3</label>
             </div>
-            <div class="alert btn-success pointer-cursor ml-1 mr-1" onclick="console.log('final gate clicked')">
-                <strong>Final Gate</strong>
-            </div>
         </div>
         <div class="row ml-4 mr-1 mt-4 mb-4 custom-gate-div" id="custom-gates">
-            <div class="alert btn-success pointer-cursor alert-dismissible ml-1 mr-1 pr-5" onclick="console.log('final gate clicked')">
-                <strong>Custom Gate</strong>
+            <div class="alert alert-dismissible btn-gate pr-5" data-gate="customGate1">
+                <strong>Custom Gate1</strong>
                 <button type="button" class="close" data-dismiss="alert" onclick="RemoveGate('defaultGate1')">×</button>
+            </div>
+            <div class="btn-gate final" data-gate="finalGate">
+                <strong>Final Gate &nbsp; : &nbsp;&nbsp;</strong>
+
+                <input type="checkbox" id="defaultGate1" class="wbc-items" />
+                <label for="defaultGate1" class="text-white m-0">Default Gate 1</label>
+
+                <input type="checkbox" id="defaultGate2" class="wbc-items" />
+                <label for="defaultGate2" class="text-white m-0">Default Gate 2</label>
+
+                <input type="checkbox" id="defaultGate3" class="wbc-items" />
+                <label for="defaultGate3" class="text-white m-0">Default Gate 3</label>
             </div>
         </div>
         <div class="col-12 col-lg-10 chart-container">

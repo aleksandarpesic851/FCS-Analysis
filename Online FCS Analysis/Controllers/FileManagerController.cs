@@ -108,6 +108,7 @@ namespace Online_FCS_Analysis.Controllers
             string channel2 = FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
             string channel3 = FCMeasurement.GetChannelName("FCS1area", channelNomenclature);
             List<double[]> arrData = FCMeasurement.GetChannelData(fcsMeasurement, channel1, channel2);
+            List<double[]> arrGate2Data = FCMeasurement.GetChannelData(fcsMeasurement, channel3, channel1);
             List<Polygon> polygons = FCMeasurement.loadPolygon(gate3File);
             
             if (polygons.Count < 3)
@@ -129,22 +130,24 @@ namespace Online_FCS_Analysis.Controllers
             #endregion initialize Objects
 
             #region Calculate gate2 and save on disk
-            double[] singletsFit = FCMeasurement.NewLinearRegression(arrData.ToArray());
+            double[] singletsFit = FCMeasurement.NewLinearRegression(arrGate2Data.ToArray());
             double slope = singletsFit[0];
             double intercept = singletsFit[1];
-            double delta_slope = 0.2;
+            double delta_slope = 0.3;
             double delta_intercept = 0.5;
             double minDelta = 7000 * slope * delta_slope;
             int yMax = fcsMeasurement.Channels[channel1].Range;
             int xMax = fcsMeasurement.Channels[channel3].Range;
             
             List<PointF> gate2Points = new List<PointF>();
+            gate2Points.Add(new PointF(0, 0));
             gate2Points.Add(new PointF((float)(intercept * (1 + delta_intercept) + minDelta), 0));
             gate2Points.Add(new PointF((float)(slope * 7000 + intercept * (1 + delta_intercept) + minDelta), 7000));
-            gate2Points.Add(new PointF((float)(slope * yMax + intercept * (1 + delta_intercept) + minDelta), yMax));
-            gate2Points.Add(new PointF((float)(slope * yMax + intercept * (1 - delta_intercept) - minDelta), yMax));
+            gate2Points.Add(new PointF((float)((1 + delta_slope) * slope * yMax + intercept * (1 + delta_intercept)), yMax));
+            gate2Points.Add(new PointF((float)((1 - delta_slope) * slope * yMax + intercept * (1 - delta_intercept)), yMax));
             gate2Points.Add(new PointF((float)(slope * 7000 + intercept * (1 - delta_intercept) - minDelta), 7000));
-            gate2Points.Add(new PointF((float)(intercept * (1 - delta_intercept) - minDelta), 0));
+            gate2Points.Add(new PointF(0, (float)((minDelta - intercept * (1 - delta_intercept)) / slope)));
+            gate2Points.Add(new PointF(0, 0));
 
             List<Polygon> gate2Polygon = new List<Polygon>();
             gate2Polygon.Add(new Polygon(gate2Points.ToArray(), Color.OrangeRed));
@@ -155,15 +158,18 @@ namespace Online_FCS_Analysis.Controllers
             #region Generate Heatmap Image and save on disk
             meanshift.CalculateKDE();
             int nGridCnt = meanshift.nGridCnt;
-            Bitmap bmp = new Bitmap(nGridCnt, nGridCnt);
-            for (y = 0; y < nGridCnt; y ++)
+            using (Bitmap bmp = new Bitmap(nGridCnt, nGridCnt))
             {
-                for (x = 0; x < nGridCnt; x ++)
+                for (y = 0; y < nGridCnt; y++)
                 {
-                    bmp.SetPixel(x, nGridCnt - y - 1, Global.GetHeatColor(meanshift.kde[x, y], meanshift.maxKde));
+                    for (x = 0; x < nGridCnt; x++)
+                    {
+                        bmp.SetPixel(x, nGridCnt - y - 1, Global.GetHeatColor(meanshift.kde[x, y], meanshift.maxKde));
+                    }
                 }
+                bmp.Save(heatmapFile);
             }
-            bmp.Save(heatmapFile);
+                
 
             #endregion Generate Heatmap Image and save on disk
 
@@ -189,6 +195,7 @@ namespace Online_FCS_Analysis.Controllers
                 }
             }
             Global.WriteToBinaryFile(cellsFile, wbc3Cell);
+
             #endregion Calculate clusters and save on disk
         }
 

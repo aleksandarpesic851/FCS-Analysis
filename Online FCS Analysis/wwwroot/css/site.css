@@ -37,7 +37,6 @@
     }
 }
 
-
 /*----------------- File Upload CSS */
 
 /* Mimic table appearance */
@@ -121,4 +120,27 @@ div.table .file-row:nth-child(odd) {
 
 .pointer-cursor {
     cursor: pointer;
+}
+
+.btn-gate {
+    color: white;
+    background-color: #007bff;
+    cursor: pointer;
+    margin: 0 .25rem;
+    padding: .75rem 1.25rem;
+    position: relative;
+    border: 1px solid transparent;
+    border-radius: .25rem;
+}
+
+.btn-gate:hover, .btn-gate.active {
+    background-color: #0069d9;
+}
+
+.btn-gate.final {
+    background-color: #28a745;
+}
+
+.btn-gate.final:hover, .btn-gate.final.active {
+    background-color: #218838;
 }

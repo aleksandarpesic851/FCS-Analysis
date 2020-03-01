@@ -67,8 +67,23 @@ $(document).ready(function () {
             LoadWbcData(data.id);
         }
     });
-
+    $('#fcs-table tbody td:last-child').click(function (event) {
+        event.preventDefault();
+    });
+    
     $(".wbc-items").prop("disabled", true);
+
+    $(".btn-gate").on("click", function () {
+        let gateDiv = $("#custom-gates");
+        if (isDefaultGate) {
+            gateDiv = $("#default-gates");
+        }
+        gateDiv.find(".active").removeClass("active");
+        $(this).addClass("active");
+
+        currGateName = $(this).data("gate");
+        UpdateChart();
+    });
 });
 
 function DeleteData(wbcId) {
@@ -144,8 +159,8 @@ function initWbc() {
         polys: wbcTotalData.gate1Polygon
     };
     defaultGatePolygons["defaultGate2"] = {
-        channel1: defaultChannel1,
-        channel2: defaultChannel3,
+        channel1: defaultChannel3,
+        channel2: defaultChannel1,
         polys: wbcTotalData.gate2Polygon
     };
     defaultGatePolygons["defaultGate3"] = {
@@ -180,6 +195,8 @@ function ChangeChannel() {
 }
 
 function UpdateChart() {
+    currGatePolygon = defaultGatePolygons[currGateName];
+
     let channel1 = currGatePolygon.channel1;
     let channel2 = currGatePolygon.channel2;
 
@@ -239,8 +256,6 @@ function DefaultGate() {
     $(".default-gate-div").show();
     $(".wbc-channels").prop("disabled", true);
 
-    currGateName = "defaultGate1";
-    currGatePolygon = defaultGatePolygons[currGateName];
     UpdateChart();
 }
 
