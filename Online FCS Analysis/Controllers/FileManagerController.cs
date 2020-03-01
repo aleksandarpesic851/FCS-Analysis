@@ -53,25 +53,25 @@ namespace Online_FCS_Analysis.Controllers
                     if (!System.IO.File.Exists(fullPath))
                         continue;
 
-                    FCMeasurement fcsMeasurement;
+                    
                     try
                     {
-                        fcsMeasurement = new FCMeasurement(fullPath);
+                        using (FCMeasurement fcsMeasurement = new FCMeasurement(fullPath))
+                        {
+                            int nomenclature = fcsMeasurement.GetNomenclature();
+                            if (nomenclature < 0)
+                            {
+                                System.IO.File.Delete(fullPath);
+                                continue;
+                            }
+                            await Task.Run(() => StoreDynamicGateResultsOnDisk(fcsMeasurement, fileName, nomenclature));
+                            await Task.Run(() => CreateNewWBC(orgFileName, fileName, nomenclature));
+                        }
                     }
                     catch
                     {
                         System.IO.File.Delete(fullPath);
-                        continue;
                     }
-
-                    int nomenclature = fcsMeasurement.GetNomenclature();
-                    if (nomenclature < 0)
-                    {
-                        System.IO.File.Delete(fullPath);
-                        continue;
-                    }
-                    await Task.Run(() => StoreDynamicGateResultsOnDisk(fcsMeasurement, fileName, nomenclature));
-                    await Task.Run(() => CreateNewWBC(orgFileName, fileName, nomenclature));
                 }
             }
             return Ok();
@@ -126,7 +126,6 @@ namespace Online_FCS_Analysis.Controllers
             FlowCytometry.CustomCluster.Global.T_Y_1 = (int)polygons[2].poly[0].Y;
             FlowCytometry.CustomCluster.Global.T_Y_2 = (int)polygons[0].poly[0].Y;
 
-            FlowCytometry.CustomCluster.Custom_Meanshift meanshift = new FlowCytometry.CustomCluster.Custom_Meanshift(arrData);
             #endregion initialize Objects
 
             #region Calculate gate2 and save on disk
@@ -155,46 +154,49 @@ namespace Online_FCS_Analysis.Controllers
             Global.WriteToBinaryFile(gate2File, gate2Polygon);
             #endregion Calculate gate2 and save on disk
 
-            #region Generate Heatmap Image and save on disk
-            meanshift.CalculateKDE();
-            int nGridCnt = meanshift.nGridCnt;
-            using (Bitmap bmp = new Bitmap(nGridCnt, nGridCnt))
+            //#region Generate Heatmap Image and save on disk
+            using (FlowCytometry.CustomCluster.Custom_Meanshift meanshift = new FlowCytometry.CustomCluster.Custom_Meanshift(arrData))
             {
-                for (y = 0; y < nGridCnt; y++)
+                meanshift.CalculateKDE();
+                int nGridCnt = meanshift.nGridCnt;
+                using (Bitmap bmp = new Bitmap(nGridCnt, nGridCnt))
                 {
-                    for (x = 0; x < nGridCnt; x++)
+                    for (y = 0; y < nGridCnt; y++)
                     {
-                        bmp.SetPixel(x, nGridCnt - y - 1, Global.GetHeatColor(meanshift.kde[x, y], meanshift.maxKde));
+                        for (x = 0; x < nGridCnt; x++)
+                        {
+                            bmp.SetPixel(x, nGridCnt - y - 1, Global.GetHeatColor(meanshift.kde[x, y], meanshift.maxKde));
+                        }
                     }
+                    bmp.Save(heatmapFile);
                 }
-                bmp.Save(heatmapFile);
-            }
                 
 
-            #endregion Generate Heatmap Image and save on disk
+                //#endregion Generate Heatmap Image and save on disk
 
-            #region Calculate clusters and save on disk
-            List<FlowCytometry.CustomCluster.Cluster> clusters = meanshift.CalculateCluster();
-            // Write WBC 3 Cells into the hard disk
-            WBC3Cell wbc3Cell = new WBC3Cell();
-            foreach(FlowCytometry.CustomCluster.Cluster cluster in clusters)
-            {
-                if (string.IsNullOrEmpty(cluster.clusterName))
-                    continue;
-                switch(cluster.clusterName)
+                #region Calculate clusters and save on disk
+                List<FlowCytometry.CustomCluster.Cluster> clusters = meanshift.CalculateCluster();
+                // Write WBC 3 Cells into the hard disk
+                WBC3Cell wbc3Cell = new WBC3Cell();
+                foreach(FlowCytometry.CustomCluster.Cluster cluster in clusters)
                 {
-                    case "Neutrophils":
-                        wbc3Cell.wbc_n.AddRange(cluster.points);
-                        break;
-                    case "Monocytes":
-                        wbc3Cell.wbc_m.AddRange(cluster.points);
-                        break;
-                    case "Lymphocytes":
-                        wbc3Cell.wbc_l.AddRange(cluster.points);
-                        break;
+                    if (string.IsNullOrEmpty(cluster.clusterName))
+                        continue;
+                    switch(cluster.clusterName)
+                    {
+                        case "Neutrophils":
+                            wbc3Cell.wbc_n.AddRange(cluster.points);
+                            break;
+                        case "Monocytes":
+                            wbc3Cell.wbc_m.AddRange(cluster.points);
+                            break;
+                        case "Lymphocytes":
+                            wbc3Cell.wbc_l.AddRange(cluster.points);
+                            break;
+                    }
                 }
+                Global.WriteToBinaryFile(cellsFile, wbc3Cell);
             }
-            Global.WriteToBinaryFile(cellsFile, wbc3Cell);
 
             #endregion Calculate clusters and save on disk
         }
