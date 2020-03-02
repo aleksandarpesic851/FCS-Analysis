@@ -1,31 +1,49 @@
-﻿var wbcTotalData;
-var wbcChannels;
-var wbcNomenclature;
+﻿// -------------------- WBC Global Variables ------------------//
 
-var defaultChannel1;
-var defaultChannel2;
-var defaultChannel3;
+var wbcTotalData;                   // total wbc data loaded from server
+var wbcChannels;                    // wbc channel names
+var wbcNomenclature;                // wbc nomenclature : new_names, old_names, mid..
 
-var defaultGate1;
-var defaultGate2;
-var defaultGate3;
+var defaultChannel1;                // default gate channel names
+var defaultChannel2;                // default gate channel names
+var defaultChannel3;                // default gate channel names
 
-var defaultGatePolygons;
-var customGatePolygons;
-var currGatePolygon;
-var currGateName;
+var defaultGate1 = "defaultGate1";  // default gate names
+var defaultGate2 = "defaultGate2";  // default gate names
+var defaultGate3 = "defaultGate3";  // default gate names
 
-var isDefaultGate = false;
-var isDynamicGate = false;
+var defaultGatePolygons = [];        // the array of default Gate Polygons
+var customGatePolygons = [];         // the array of custom Gate Polygons
+
+var currGatePolygon;            // current polygon gate. For final gate, it's empty.
+var currGateName;               // current gate name
+
+var isDefaultGate = false;      // Flag for dynamic or custom
+var isDynamicGate = false;      // Flag for dynamic gate of default gate3
 
 var Gate3Names = ["Neutrophils", "Monocytes", "Lymphocytes"];
 var Gate3Colors = ["rgb(255, 189, 189)", "rgb(173, 233, 255)", "rgb(194, 228, 156)"];
 
-let wbc_table;
+let wbc_table;      // wbc data table object
+
+// -------------------- WBC Global Variables ------------------//
+
+
+
+
+//------------- Initialize Controls when document ready ------------//
 
 $(document).ready(function () {
-    defaultGatePolygons = [];
 
+    InitWbcTable();
+
+    $(".wbc-items").prop("disabled", true);
+
+    InitGateEvent();
+
+});
+
+function InitWbcTable() {
     wbc_table = $('#fcs-table').dataTable({
         processing: true, // for show progress bar
         serverSide: true, // for process server side
@@ -72,12 +90,13 @@ $(document).ready(function () {
             LoadWbcData(data.id);
         }
     });
+
     $('#fcs-table tbody td:last-child').click(function (event) {
         event.preventDefault();
     });
-    
-    $(".wbc-items").prop("disabled", true);
+}
 
+function InitGateEvent() {
     $(".btn-gate").on("click", function () {
         let gateDiv = $("#custom-gates");
         if (isDefaultGate) {
@@ -88,7 +107,15 @@ $(document).ready(function () {
 
         UpdateChart();
     });
-});
+}
+
+//------------- Initialize Controls when document ready ------------//
+
+
+
+
+
+// -------------------- Delete WBC file ----------------------------//
 
 function DeleteData(wbcId) {
     if (confirm("Are you sure you want to delete this wbc data?")) {
@@ -113,6 +140,15 @@ function Delete(wbcId) {
     });
 }
 
+// ------------------------- Delete WBC file ---------------------- //
+
+
+
+
+
+
+// -------------------- Load WBC file, Initialize wbc objects ----------------------------//
+
 function LoadWbcData(wbcId) {
     let url = "/FCS/LoadWbcData";
     $.post(url, { wbcId: wbcId }, function (data) {
@@ -124,21 +160,6 @@ function LoadWbcData(wbcId) {
             alert("Something Went Wrong!");
         }
     });
-}
-
-// Draw or remove heatmap
-function DrawHeatmap() {
-    
-    if ($("#draw-heatmap").prop("checked")) {
-        let left = chartGraph.chartArea.left;
-        let top = chartGraph.chartArea.top;
-        let width = chartGraph.chartArea.right - chartGraph.chartArea.left;
-        let height = chartGraph.chartArea.bottom - chartGraph.chartArea.top;
-
-        $("#fcs-chart").css("background", 'url("' + wbcTotalData.heatmapFile + '") ' + left + 'px ' + top + 'px / ' + width + 'px ' + height + 'px no-repeat white');
-    } else {
-        $("#fcs-chart").css("background", '');
-    }
 }
 
 function initWbc() {
@@ -158,17 +179,17 @@ function initWbc() {
     defaultChannel2 = GetChannelName("SSCpeak", wbcNomenclature);
     defaultChannel3 = GetChannelName("FCS1area", wbcNomenclature);
 
-    defaultGatePolygons["defaultGate1"] = {
+    defaultGatePolygons[defaultGate1] = {
         channel1: defaultChannel1,
         channel2: defaultChannel2,
         polys: wbcTotalData.gate1Polygon
     };
-    defaultGatePolygons["defaultGate2"] = {
+    defaultGatePolygons[defaultGate2] = {
         channel1: defaultChannel3,
         channel2: defaultChannel1,
         polys: wbcTotalData.gate2Polygon
     };
-    defaultGatePolygons["defaultGate3"] = {
+    defaultGatePolygons[defaultGate3] = {
         channel1: defaultChannel1,
         channel2: defaultChannel2,
         polys: wbcTotalData.gate3Polygon
@@ -180,6 +201,16 @@ function initWbc() {
     ChangeChannel();
 }
 
+// -------------------- Load WBC file -------------- --------------//
+
+
+
+
+
+
+// -------------------- Events Control ----------------------------//
+
+// change channel name
 function ChangeChannel() {
     let channel1 = $("#channel-1").val();
     let channel2 = $("#channel-2").val();
@@ -190,15 +221,64 @@ function ChangeChannel() {
     }
     $(".channel-items").prop("disabled", false);
 
-    if (channel1 == defaultChannel1 && channel2 == defaultChannel2) {
-        $("#draw-heatmap").prop("disabled", false);
-    } else {
-        $("#draw-heatmap").prop("disabled", true);
-        $("#draw-heatmap").prop("checked", false);
-    }
     UpdateChart();
 }
 
+// change to default gate state
+function DefaultGate() {
+    isDefaultGate = true;
+    $("#tab-custom").removeClass("show");
+    $("#tab-default").addClass("show")
+    $(".custom-gate-div").hide();
+    $(".default-gate-div").show();
+
+    UpdateChart();
+}
+
+// change to custom gate state
+function CustomeGate() {
+    isDefaultGate = false;
+    $("#tab-custom").addClass("show");
+    $("#tab-default").removeClass("show")
+    $(".custom-gate-div").show();
+    $(".default-gate-div").hide();
+
+    UpdateChart();
+}
+
+// change dynamic states. this is affected only when default gate 3 and final gate for default gate.
+function ChangeDynamic(isDynamic) {
+    isDynamicGate = isDynamic;
+    if (currGateName == defaultGate3 || (isDefaultGate && currGateName == "finalGate" && $("#defaultGate3").is(":checked"))) {
+        UpdateChart();
+    }
+}
+
+// -------------------- Events Control ----------------------------//
+
+
+
+
+
+
+// --------------------  Draw WBC on Chart Graph -----------------//
+
+// Draw or remove heatmap
+function DrawHeatmap() {
+    
+    if ($("#draw-heatmap").prop("checked")) {
+        let left = chartGraph.chartArea.left;
+        let top = chartGraph.chartArea.top;
+        let width = chartGraph.chartArea.right - chartGraph.chartArea.left;
+        let height = chartGraph.chartArea.bottom - chartGraph.chartArea.top;
+
+        $("#fcs-chart").css("background", 'url("' + wbcTotalData.heatmapFile + '") ' + left + 'px ' + top + 'px / ' + width + 'px ' + height + 'px no-repeat white');
+    } else {
+        $("#fcs-chart").css("background", '');
+    }
+}
+
+// Draw Chart
 function UpdateChart() {
     // Draw or remove heatmap
     DrawHeatmap();
@@ -214,7 +294,6 @@ function UpdateChart() {
                 order: 1,
                 radius: 0
             }];
-
     } else {
         //---------Initialize Components-----//
         let gateDiv = $("#custom-gates");
@@ -224,9 +303,9 @@ function UpdateChart() {
         currGateName = gateDiv.find(".active").data("gate");
 
         if (currGateName == "finalGate") {
-            $("#channel-1").val(defaultChannel1);
-            $("#channel-2").val(defaultChannel2);
+            $(".wbc-channels").prop("disabled", false);
         } else {
+            $(".wbc-channels").prop("disabled", true);
             currGatePolygon = defaultGatePolygons[currGateName];
             $("#channel-1").val(currGatePolygon.channel1);
             $("#channel-2").val(currGatePolygon.channel2);
@@ -237,7 +316,7 @@ function UpdateChart() {
         //---------Update Chart-----//
 
         // Add Points for gates
-        if (currGateName == "defaultGate3") {
+        if (currGateName == defaultGate3) {
             chartData = GetDefaultGate3();
         } else if (currGateName == "finalGate") {
             chartData = GetFinalGateData();
@@ -246,7 +325,7 @@ function UpdateChart() {
         }
 
         // Add Gate Lines
-        if ((currGateName != "defaultGate3" || !isDynamicGate) && currGateName != "finalGate") {
+        if ((currGateName != defaultGate3 || !isDynamicGate) && currGateName != "finalGate") {
             chartData = chartData.concat(GetChartGateLineData());
         }
     }
@@ -256,7 +335,16 @@ function UpdateChart() {
     chartGraph.update();
 }
 
+// --------------------  Draw WBC on Chart Graph -----------------//
 
+
+
+
+
+
+// -------------------- Extract Chart Data from WBC Data --------//
+
+// Get Final Gate Data
 function GetFinalGateData() {
     let selectedGates = [];
     let gateDiv = "#custom-gates";
@@ -268,12 +356,13 @@ function GetFinalGateData() {
     });
 
     let gatePolygons = isDefaultGate ? defaultGatePolygons : currGatePolygon;
-    let nmlData = [];
     let isContainsGate3 = false;
 
+    let finalChannel1 = $("#channel-1").val();
+    let finalChannel2 = $("#channel-2").val();
     let finalRes = wbcTotalData.wbcData[defaultChannel1].data.map((v, i) => ({
-        x: wbcTotalData.wbcData[defaultChannel1].data[i],
-        y: wbcTotalData.wbcData[defaultChannel2].data[i],
+        x: wbcTotalData.wbcData[finalChannel1].data[i],
+        y: wbcTotalData.wbcData[finalChannel2].data[i],
         isInside: true
     }));
 
@@ -286,7 +375,7 @@ function GetFinalGateData() {
             y: wbcTotalData.wbcData[channel2].data[i]
         }));
         
-        if (gateName == "defaultGate3") {
+        if (gateName == defaultGate3) {
             isContainsGate3 = true;
 
             let isN, isM, isL;
@@ -384,7 +473,7 @@ function GetFinalGateData() {
     let detailHtml = "<h4>" + fcsName.fcs_name + "</h4>";
     selectedGates.forEach(function (v) {
         detailHtml += "<br><strong>Gate : </strong>" + v.gateName;
-        if (v.gateName == "defaultGate3") {
+        if (v.gateName == defaultGate3) {
             for (let i = 0; i < 3; i++) {
                 detailHtml += "<br><strong> &nbsp; &nbsp;" + Gate3Names[i] + " : </strong>" + v.c3[i];
             }
@@ -402,34 +491,7 @@ function GetFinalGateData() {
     return data;
 }
 
-function DefaultGate() {
-    isDefaultGate = true;
-    $("#tab-custom").removeClass("show");
-    $("#tab-default").addClass("show")
-    $(".custom-gate-div").hide();
-    $(".default-gate-div").show();
-    $(".wbc-channels").prop("disabled", true);
-
-    UpdateChart();
-}
-
-function CustomeGate() {
-    isDefaultGate = false;
-    $("#tab-custom").addClass("show");
-    $("#tab-default").removeClass("show")
-    $(".custom-gate-div").show();
-    $(".default-gate-div").hide();
-    $(".wbc-channels").prop("disabled", false);
-}
-
-function ChangeDynamic(isDynamic) {
-    isDynamicGate = isDynamic;
-    if ( currGateName == "defaultGate3" || (isDefaultGate && currGateName == "finalGate" && $("#defaultGate3").is(":checked")) ) {
-        UpdateChart();
-    }
-}
-
-// Get Ploygon gate data
+// Get Ploygon Gate Data : It's used in custom gate & default gate1,2
 function GetPolygonGateData() {
     let insideData = FilterGateData(currGatePolygon, true);
     let outsideData = FilterGateData(currGatePolygon, false);
@@ -460,7 +522,66 @@ function GetPolygonGateData() {
     return data;
 }
 
-// Get Gate3 data
+// Get Polygon gate data
+function FilterGateData(gatePolygon, isInside) {
+    if (!gatePolygon) {
+        return [];
+    }
+
+    let channel1 = gatePolygon.channel1;
+    let channel2 = gatePolygon.channel2;
+
+    let xys = wbcTotalData.wbcData[channel1].data.map((v, i) => ({
+        x: wbcTotalData.wbcData[channel1].data[i],
+        y: wbcTotalData.wbcData[channel2].data[i]
+    }));
+    return xys.filter(xy => IsInsidePolygons(gatePolygon, xy) == isInside);
+}
+
+// Check whether current point xy is inside polygons
+function IsInsidePolygons(gatePolygon, xy) {
+    let i = 0;
+    for (i = 0; i < gatePolygon.polys.length; i++) {
+        if (IsInsidePoly(gatePolygon.polys[i], xy.x, xy.y)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// check whether current point (x,y) is inside polygon
+function IsInsidePoly(poly, x, y) {
+    if (!poly)
+        return false;
+    let minX = poly[0].x;
+    let maxX = poly[0].x;
+    let minY = poly[0].y;
+    let maxY = poly[0].y;
+    let i = 1;
+
+    for (i = 1; i < poly.length; i++) {
+        minX = Math.min(poly[i].x, minX);
+        maxX = Math.max(poly[i].x, maxX);
+        minY = Math.min(poly[i].y, minY);
+        maxY = Math.max(poly[i].y, maxY);
+    }
+
+    if (x < minX || x > maxX || y < minY || y > maxY) {
+        return false;
+    }
+
+    // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+    let inside = false;
+    for (i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+        if ((poly[i].y > y) != (poly[j].y > y) &&
+            x < (poly[j].x - poly[i].x) * (y - poly[i].y) / (poly[j].y - poly[i].y) + poly[i].x) {
+            inside = !inside;
+        }
+    }
+    return inside;
+}
+
+// Get Default Gate3 data
 function GetDefaultGate3() {
     let data = [];
     let nmlData = [];
@@ -526,6 +647,7 @@ function GetDefaultGate3() {
     return data;
 }
 
+// Get Dynamic Gate Data for Gate 3
 function GetDynamicGateData(Idxs) {
     return Idxs.map((v, i) => ({
         x: wbcTotalData.wbcData[defaultChannel1].data[v],
@@ -533,6 +655,7 @@ function GetDynamicGateData(Idxs) {
     }));
 }
 
+// Get Data outside of Dynamic Gate
 function GetDynamicGateOutData() {
     let i = 0, nCnt = wbcTotalData.wbcData.Count.data.length;
     let data = [];
@@ -570,67 +693,7 @@ function FilterGate3Data(poygon, nIdx) {
     return xys.filter(xy => IsInsidePoly(poygon.polys[nIdx], xy.x, xy.y));
 }
 
-// Get Polygon gate data
-function FilterGateData(gatePolygon, isInside) {
-    if (!gatePolygon) {
-        return [];
-    }
-
-    let channel1 = gatePolygon.channel1;
-    let channel2 = gatePolygon.channel2;
-
-    let xys = wbcTotalData.wbcData[channel1].data.map((v, i) => ({
-        x: wbcTotalData.wbcData[channel1].data[i],
-        y: wbcTotalData.wbcData[channel2].data[i]
-    }));
-    return xys.filter(xy => IsInsidePolygons(gatePolygon, xy) == isInside);
-}
-
-// Check whether current point xy is inside polygons
-function IsInsidePolygons(gatePolygon, xy) {
-    let i = 0;
-    for (i = 0; i < gatePolygon.polys.length; i++) {
-        if (IsInsidePoly(gatePolygon.polys[i], xy.x, xy.y)) {
-            return true;
-        }
-    }
-    return false;
-}
-// check whether current point (x,y) is inside polygon
-function IsInsidePoly(poly, x, y)
-{
-    if (!poly)
-        return false;
-    let minX = poly[0].x;
-    let maxX = poly[0].x;
-    let minY = poly[0].y;
-    let maxY = poly[0].y;
-    let i = 1;
-
-    for (i = 1; i < poly.length; i++)
-    {
-        minX = Math.min(poly[i].x, minX);
-        maxX = Math.max(poly[i].x, maxX);
-        minY = Math.min(poly[i].y, minY);
-        maxY = Math.max(poly[i].y, maxY);
-    }
-
-    if (x < minX || x > maxX || y < minY || y > maxY) {
-        return false;
-    }
-
-    // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
-    let inside = false;
-    for (i = 0, j = poly.length - 1; i < poly.length; j = i++)
-    {
-        if ((poly[i].y > y) != (poly[j].y > y) &&
-            x < (poly[j].x - poly[i].x) * (y - poly[i].y) / (poly[j].y - poly[i].y) + poly[i].x) {
-            inside = !inside;
-        }
-    }
-    return inside;
-}
-
+// Gate Polygon Gate Line Data
 function GetChartGateLineData() {
     if (currGateName == "finalGate") {
         return [];
@@ -652,3 +715,5 @@ function GetChartGateLineData() {
         order: order + i
     }));
 }
+
+// -------------------- Extract Chart Data from WBC Data --------//
