@@ -144,3 +144,10 @@ div.table .file-row:nth-child(odd) {
 .btn-gate.final:hover, .btn-gate.final.active {
     background-color: #218838;
 }
+
+.btn-gate.final label {
+    padding: 20px 0;
+    margin: -20px 10px;
+    margin-left: 0px;
+    color: white;
+}

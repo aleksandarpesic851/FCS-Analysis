@@ -77,14 +77,14 @@
             <div class="btn-gate final" data-gate="finalGate">
                 <strong>Final Gate &nbsp; : &nbsp;&nbsp;</strong>
 
-                <input type="checkbox" data-gate="defaultGate1" class="wbc-items" checked/>
-                <label for="defaultGate1" class="text-white m-0">Default Gate 1</label>
+                <input type="checkbox" id="defaultGate1" data-gate="defaultGate1" class="wbc-items" checked/>
+                <label for="defaultGate1">Default Gate 1</label>
 
-                <input type="checkbox" data-gate="defaultGate2" class="wbc-items" checked/>
-                <label for="defaultGate2" class="text-white m-0">Default Gate 2</label>
+                <input type="checkbox" id="defaultGate2" data-gate="defaultGate2" class="wbc-items" checked/>
+                <label for="defaultGate2">Default Gate 2</label>
 
-                <input type="checkbox" data-gate="defaultGate3" class="wbc-items" checked/>
-                <label for="defaultGate3" class="text-white m-0">Default Gate 3</label>
+                <input type="checkbox" id="defaultGate3" data-gate="defaultGate3" class="wbc-items" checked/>
+                <label for="defaultGate3">Default Gate 3</label>
             </div>
         </div>
         <div class="row ml-4 mr-1 mt-4 mb-4 custom-gate-div" id="custom-gates">
@@ -94,21 +94,17 @@
             </div>
             <div class="btn-gate final" data-gate="finalGate">
                 <strong>Final Gate &nbsp; : &nbsp;&nbsp;</strong>
-
-                <input type="checkbox" id="defaultGate1" class="wbc-items" />
-                <label for="defaultGate1" class="text-white m-0">Default Gate 1</label>
-
-                <input type="checkbox" id="defaultGate2" class="wbc-items" />
-                <label for="defaultGate2" class="text-white m-0">Default Gate 2</label>
-
-                <input type="checkbox" id="defaultGate3" class="wbc-items" />
-                <label for="defaultGate3" class="text-white m-0">Default Gate 3</label>
             </div>
         </div>
-        <div class="col-12 col-lg-10 chart-container">
-            <canvas id="fcs-chart"></canvas>
-        </div>
+        <div class="row">
+            <div class="col-9 chart-container">
+                <canvas id="fcs-chart"></canvas>
+            </div>
+            <div class="col-2 ml-1" id="fcs-chart-details">
 
+            </div>
+        </div>
+        
     </div>
 @if (User.Identity.IsAuthenticated)
 {

@@ -21,10 +21,12 @@ var isDynamicGate = false;
 var Gate3Names = ["Neutrophils", "Monocytes", "Lymphocytes"];
 var Gate3Colors = ["rgb(255, 189, 189)", "rgb(173, 233, 255)", "rgb(194, 228, 156)"];
 
+let wbc_table;
+
 $(document).ready(function () {
     defaultGatePolygons = [];
 
-    let wbc_table = $('#fcs-table').dataTable({
+    wbc_table = $('#fcs-table').dataTable({
         processing: true, // for show progress bar
         serverSide: true, // for process server side
         filter: true, // this is for disable filter (search box)
@@ -289,14 +291,18 @@ function GetFinalGateData() {
             finalRes[idx].isInside &= xys[idx].isInside;
         });
         gateRes.push({ gateName: gateName, data: xys, polygon: gatePolygon });
+        selectedGates[idx] = { gateName: gateName, data: xys };
     });
 
     let data = [];
+    let insideData = finalRes.filter(xy => xy.isInside);
+    let outsideData = finalRes.filter(xy => !xy.isInside);
+
     data[0] = {
         label: 'Inside Gate' + currGateName,
         backgroundColor: 'rgb(132, 99, 255)',
         borderColor: 'rgb(132, 99, 255)',
-        data: finalRes.filter(xy => xy.isInside),
+        data: insideData,
         order: 1,
         radius: 1
     };
@@ -304,10 +310,24 @@ function GetFinalGateData() {
         label: 'Outside Gate' + currGateName,
         backgroundColor: 'rgb(255, 99, 132)',
         borderColor: 'rgb(255, 99, 132)',
-        data: finalRes.filter(xy => !xy.isInside),
+        data: outsideData,
         order: 2,
         radius: 1
     };
+
+    let fcsName = wbc_table.fnGetData($("#fcs-table tbody tr.selected"));
+    let detailHtml = "<h4>" + fcsName.fcs_name + "</h4>";
+    selectedGates.forEach(function (v) {
+        detailHtml += "<br><strong>Gate : </strong>" + v.gateName;
+        detailHtml += "<br><strong> &nbsp; &nbsp;Inside : </strong>" + v.data.filter(xy => xy.isInside).length;
+        detailHtml += "<br><strong> &nbsp; &nbsp;Outside : </strong>" + v.data.filter(xy => !xy.isInside).length;
+    });
+
+    detailHtml += "<br><hr class='mt-2 mb-2 mr-5'><strong>Gate : </strong>" + currGateName;
+    detailHtml += "<br><strong> &nbsp; &nbsp;Inside : </strong>" + insideData.length;
+    detailHtml += "<br><strong> &nbsp; &nbsp;Outside : </strong>" + outsideData.length;
+    $("#fcs-chart-details").html(detailHtml);
+
     return data;
 }
 
@@ -340,12 +360,14 @@ function ChangeDynamic(isDynamic) {
 
 // Get Ploygon gate data
 function GetPolygonGateData() {
+    let insideData = FilterGateData(currGatePolygon, true);
+    let outsideData = FilterGateData(currGatePolygon, false);
     let data = [];
     data[0] = {
         label: 'Inside Gate' + currGateName,
         backgroundColor: 'rgb(132, 99, 255)',
         borderColor: 'rgb(132, 99, 255)',
-        data: FilterGateData(currGatePolygon, true),
+        data: insideData,
         order: 1,
         radius: 1
     };
@@ -353,74 +375,83 @@ function GetPolygonGateData() {
         label: 'Outside Gate' + currGateName,
         backgroundColor: 'rgb(255, 99, 132)',
         borderColor: 'rgb(255, 99, 132)',
-        data: FilterGateData(currGatePolygon, false),
+        data: outsideData,
         order: 2,
         radius: 1
     };
+
+    let fcsName = wbc_table.fnGetData($("#fcs-table tbody tr.selected"));
+    let detailHtml = "<h4>" + fcsName.fcs_name + "</h4>";
+    detailHtml += "<br> <strong>Gate : </strong>" + currGateName;
+    detailHtml += "<br> <strong> &nbsp; &nbsp;Inside : </strong>" + insideData.length;
+    detailHtml += "<br> <strong> &nbsp; &nbsp;Outside : </strong>" + outsideData.length;
+    $("#fcs-chart-details").html(detailHtml);
     return data;
 }
 
 // Get Gate3 data
 function GetDefaultGate3() {
     let data = [];
+    let nmlData = [];
+    let outsideData = [];
 
     if (!isDefaultGate) {
         return data;
     }
     if (isDynamicGate) {
-        data[0] = {
-            label: Gate3Names[0],
-            backgroundColor: Gate3Colors[0],
-            borderColor: Gate3Colors[0],
-            data: GetDynamicGateData(wbcTotalData.wbc3Cell.wbc_n),
-            order: 1,
-            radius: 1
-        };
-        data[1] = {
-            label: Gate3Names[1],
-            backgroundColor: Gate3Colors[1],
-            borderColor: Gate3Colors[1],
-            data: GetDynamicGateData(wbcTotalData.wbc3Cell.wbc_m),
-            order: 2,
-            radius: 1
-        };
-        data[2] = {
-            label: Gate3Names[2],
-            backgroundColor: Gate3Colors[2],
-            borderColor: Gate3Colors[2],
-            data: GetDynamicGateData(wbcTotalData.wbc3Cell.wbc_l),
-            order: 3,
-            radius: 1
-        };
-        data[3] = {
-            label: 'Outside Default Gate3',
-            backgroundColor: 'rgb(255, 99, 132)',
-            borderColor: 'rgb(255, 99, 132)',
-            data: GetDynamicGateOutData(),
-            order: 4,
-            radius: 1
-        };
-    } else {
+        nmlData = [GetDynamicGateData(wbcTotalData.wbc3Cell.wbc_n), GetDynamicGateData(wbcTotalData.wbc3Cell.wbc_m), GetDynamicGateData(wbcTotalData.wbc3Cell.wbc_l)];
+        outsideData = GetDynamicGateOutData();
         for (let i = 0; i < 3; i++) {
             data[i] = {
                 label: Gate3Names[i],
                 backgroundColor: Gate3Colors[i],
                 borderColor: Gate3Colors[i],
-                data: FilterGate3Data(i),
+                data: nmlData[i],
                 order: i + 1,
                 radius: 1
             };
         }
+
         data[3] = {
             label: 'Outside Default Gate3',
             backgroundColor: 'rgb(255, 99, 132)',
             borderColor: 'rgb(255, 99, 132)',
-            data: FilterGateData(currGatePolygon, false),
+            data: outsideData,
+            order: 4,
+            radius: 1
+        };
+    } else {
+        for (let i = 0; i < 3; i++) {
+            nmlData[i] = FilterGate3Data(i);
+            data[i] = {
+                label: Gate3Names[i],
+                backgroundColor: Gate3Colors[i],
+                borderColor: Gate3Colors[i],
+                data: nmlData[i],
+                order: i + 1,
+                radius: 1
+            };
+        }
+        outsideData = FilterGateData(currGatePolygon, false);
+        data[3] = {
+            label: 'Outside Default Gate3',
+            backgroundColor: 'rgb(255, 99, 132)',
+            borderColor: 'rgb(255, 99, 132)',
+            data: outsideData,
             order: 4,
             radius: 1
         };
     }
-    
+
+    let fcsName = wbc_table.fnGetData($("#fcs-table tbody tr.selected"));
+    let detailHtml = "<h4>" + fcsName.fcs_name + "</h4>";
+    detailHtml += "<br><strong>Gate : </strong>" + currGateName;
+    for (let i = 0; i < 3; i++) {
+        detailHtml += "<br><strong> &nbsp; &nbsp;" + Gate3Names[i] + ": </strong>" + nmlData[i].length;
+    }
+    detailHtml += "<br><strong> &nbsp; &nbsp;Outside : </strong>" + outsideData.length;
+    $("#fcs-chart-details").html(detailHtml);
+
     return data;
 }
 
