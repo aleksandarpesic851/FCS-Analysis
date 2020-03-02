@@ -110,7 +110,7 @@ namespace Online_FCS_Analysis.Controllers
             WBC3Cell wbc3Cell = Global.ReadFromBinaryFile<WBC3Cell>(cellsFile);
             List<Polygon> gate1Polygon = FCMeasurement.loadPolygon(gate1File);
             List<Polygon> gate2Polygon = Global.ReadFromBinaryFile<List<Polygon>>(gate2File);
-            List<Polygon> gate3Polygon = FCMeasurement.loadPolygon(gate1File);
+            List<Polygon> gate3Polygon = FCMeasurement.loadPolygon(gate3File);
             return Json( 
                 new { 
                     wbcData = fcsMeasurement.Channels,

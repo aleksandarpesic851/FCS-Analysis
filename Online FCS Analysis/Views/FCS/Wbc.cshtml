@@ -50,7 +50,7 @@
             </div>
             <div class="col-2 mt-auto mb-auto text-center">
                 <input class="wbc-items channel-items" type="checkbox" id="draw-heatmap" name="draw-heatmap" onchange="UpdateChart()" />
-                <label for="draw-heatmap">Heatmap</label>
+                <label for="draw-heatmap" title="Draw heatmap only when ChannelX,Y are default channels">Heatmap</label>
             </div>
             <div class="col-2 mt-auto mb-auto text-center default-gate-div" style="display: none">
                 <input class="wbc-items" type="checkbox" id="dynamic-gate" name="dynamic-gate" onchange="ChangeDynamic(this.checked)" />
@@ -65,7 +65,7 @@
             </div>
         </div>
         <div class="row ml-4 mr-1 mt-4 mb-4 default-gate-div text-center" id="default-gates" style="display: none">
-            <div class="btn-gate" data-gate="defaultGate1">
+            <div class="btn-gate active" data-gate="defaultGate1">
                 <strong>Default Gate 1</strong>
             </div>
             <div class="btn-gate" data-gate="defaultGate2">
@@ -77,13 +77,13 @@
             <div class="btn-gate final" data-gate="finalGate">
                 <strong>Final Gate &nbsp; : &nbsp;&nbsp;</strong>
 
-                <input type="checkbox" id="defaultGate1" class="wbc-items" />
+                <input type="checkbox" data-gate="defaultGate1" class="wbc-items" checked/>
                 <label for="defaultGate1" class="text-white m-0">Default Gate 1</label>
 
-                <input type="checkbox" id="defaultGate2" class="wbc-items" />
+                <input type="checkbox" data-gate="defaultGate2" class="wbc-items" checked/>
                 <label for="defaultGate2" class="text-white m-0">Default Gate 2</label>
 
-                <input type="checkbox" id="defaultGate3" class="wbc-items" />
+                <input type="checkbox" data-gate="defaultGate3" class="wbc-items" checked/>
                 <label for="defaultGate3" class="text-white m-0">Default Gate 3</label>
             </div>
         </div>
