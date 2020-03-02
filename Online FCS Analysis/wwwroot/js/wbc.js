@@ -268,7 +268,7 @@ function GetFinalGateData() {
     });
 
     let gatePolygons = isDefaultGate ? defaultGatePolygons : currGatePolygon;
-    let gateRes = [];
+    let nmlData = [];
 
     let finalRes = wbcTotalData.wbcData[defaultChannel1].data.map((v, i) => ({
         x: wbcTotalData.wbcData[defaultChannel1].data[i],
@@ -280,18 +280,52 @@ function GetFinalGateData() {
         let gatePolygon = gatePolygons[gateName];
         let channel1 = gatePolygon.channel1;
         let channel2 = gatePolygon.channel2;
-
         let xys = wbcTotalData.wbcData[channel1].data.map((v, i) => ({
             x: wbcTotalData.wbcData[channel1].data[i],
             y: wbcTotalData.wbcData[channel2].data[i]
         }));
-
-        xys.forEach(function (xy, idx) {
-            xys[idx].isInside = IsInsidePolygons(gatePolygon, xy);
-            finalRes[idx].isInside &= xys[idx].isInside;
-        });
-        gateRes.push({ gateName: gateName, data: xys, polygon: gatePolygon });
-        selectedGates[idx] = { gateName: gateName, data: xys };
+        if (gateName == "defaultGate3") {
+            if (isDynamicGate) {
+                xys.forEach(function (xy, idx) {
+                    finalRes[idx].isInside &= (wbcTotalData.wbc3Cell.wbc_n.includes(idx) && wbcTotalData.wbc3Cell.wbc_m.includes(idx) && wbcTotalData.wbc3Cell.wbc_l.includes(idx));
+                });
+                selectedGates[idx] = {
+                    gateName: gateName,
+                    c3: [wbcTotalData.wbc3Cell.wbc_n.length, wbcTotalData.wbc3Cell.wbc_m.length, wbcTotalData.wbc3Cell.wbc_l.length]
+                };
+            } else {
+                let isN, isM, isL, nN = 0, nM = 0, nL = 0;
+                xys.forEach(function (xy, idx) {
+                    isN = IsInsidePoly(gatePolygon.polys[0], xy.x, xy.y);
+                    isM = IsInsidePoly(gatePolygon.polys[1], xy.x, xy.y);
+                    isL = IsInsidePoly(gatePolygon.polys[2], xy.x, xy.y);
+                    if (isN) {
+                        nN++;
+                    }
+                    if (isM) {
+                        nM++;
+                    }
+                    if (isL) {
+                        nL++;
+                    }
+                    finalRes[idx].isInside &= (isN || isM || isL);
+                });
+                selectedGates[idx] = {
+                    gateName: gateName,
+                    c3: [nN, nM, nL]
+                };
+            }
+        } else {
+            xys.forEach(function (xy, idx) {
+                xys[idx].isInside = IsInsidePolygons(gatePolygon, xy);
+                finalRes[idx].isInside &= xys[idx].isInside;
+            });
+            selectedGates[idx] = {
+                gateName: gateName,
+                inside: xys.filter(xy => xy.isInside).length,
+                outside: xys.filter(xy => !xy.isInside).length
+            };
+        }
     });
 
     let data = [];
@@ -319,8 +353,14 @@ function GetFinalGateData() {
     let detailHtml = "<h4>" + fcsName.fcs_name + "</h4>";
     selectedGates.forEach(function (v) {
         detailHtml += "<br><strong>Gate : </strong>" + v.gateName;
-        detailHtml += "<br><strong> &nbsp; &nbsp;Inside : </strong>" + v.data.filter(xy => xy.isInside).length;
-        detailHtml += "<br><strong> &nbsp; &nbsp;Outside : </strong>" + v.data.filter(xy => !xy.isInside).length;
+        if (v.gateName == "defaultGate3") {
+            for (let i = 0; i < 3; i++) {
+                detailHtml += "<br><strong> &nbsp; &nbsp;" + Gate3Names[i] + " : </strong>" + v.c3[i];
+            }
+        } else {
+            detailHtml += "<br><strong> &nbsp; &nbsp;Inside : </strong>" + v.inside;
+            detailHtml += "<br><strong> &nbsp; &nbsp;Outside : </strong>" + v.outside;
+        }
     });
 
     detailHtml += "<br><hr class='mt-2 mb-2 mr-5'><strong>Gate : </strong>" + currGateName;
@@ -422,7 +462,7 @@ function GetDefaultGate3() {
         };
     } else {
         for (let i = 0; i < 3; i++) {
-            nmlData[i] = FilterGate3Data(i);
+            nmlData[i] = FilterGate3Data(currGatePolygon, i);
             data[i] = {
                 label: Gate3Names[i],
                 backgroundColor: Gate3Colors[i],
@@ -484,19 +524,19 @@ function GetDynamicGateOutData() {
 }
 
 // Get Gate3 Fixed Polygon Data
-function FilterGate3Data(nIdx) {
-    if (!currGatePolygon) {
+function FilterGate3Data(poygon, nIdx) {
+    if (!poygon) {
         return [];
     }
 
-    let channel1 = currGatePolygon.channel1;
-    let channel2 = currGatePolygon.channel2;
+    let channel1 = poygon.channel1;
+    let channel2 = poygon.channel2;
 
     let xys = wbcTotalData.wbcData[channel1].data.map((v, i) => ({
         x: wbcTotalData.wbcData[channel1].data[i],
         y: wbcTotalData.wbcData[channel2].data[i]
     }));
-    return xys.filter(xy => IsInsidePoly(currGatePolygon.polys[nIdx], xy.x, xy.y));
+    return xys.filter(xy => IsInsidePoly(poygon.polys[nIdx], xy.x, xy.y));
 }
 
 // Get Polygon gate data
