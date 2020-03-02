@@ -269,6 +269,7 @@ function GetFinalGateData() {
 
     let gatePolygons = isDefaultGate ? defaultGatePolygons : currGatePolygon;
     let nmlData = [];
+    let isContainsGate3 = false;
 
     let finalRes = wbcTotalData.wbcData[defaultChannel1].data.map((v, i) => ({
         x: wbcTotalData.wbcData[defaultChannel1].data[i],
@@ -284,17 +285,25 @@ function GetFinalGateData() {
             x: wbcTotalData.wbcData[channel1].data[i],
             y: wbcTotalData.wbcData[channel2].data[i]
         }));
+        
         if (gateName == "defaultGate3") {
+            isContainsGate3 = true;
+
+            let isN, isM, isL;
             if (isDynamicGate) {
                 xys.forEach(function (xy, idx) {
-                    finalRes[idx].isInside &= (wbcTotalData.wbc3Cell.wbc_n.includes(idx) && wbcTotalData.wbc3Cell.wbc_m.includes(idx) && wbcTotalData.wbc3Cell.wbc_l.includes(idx));
+                    isN = wbcTotalData.wbc3Cell.wbc_n.includes(idx);
+                    isM = wbcTotalData.wbc3Cell.wbc_m.includes(idx);
+                    isL = wbcTotalData.wbc3Cell.wbc_l.includes(idx);
+                    finalRes[idx].isInside &= (isN || isM || isL);
+                    finalRes[idx].isNML = [isN, isM, isL];
                 });
                 selectedGates[idx] = {
                     gateName: gateName,
                     c3: [wbcTotalData.wbc3Cell.wbc_n.length, wbcTotalData.wbc3Cell.wbc_m.length, wbcTotalData.wbc3Cell.wbc_l.length]
                 };
             } else {
-                let isN, isM, isL, nN = 0, nM = 0, nL = 0;
+                let nN = 0, nM = 0, nL = 0;
                 xys.forEach(function (xy, idx) {
                     isN = IsInsidePoly(gatePolygon.polys[0], xy.x, xy.y);
                     isM = IsInsidePoly(gatePolygon.polys[1], xy.x, xy.y);
@@ -309,6 +318,7 @@ function GetFinalGateData() {
                         nL++;
                     }
                     finalRes[idx].isInside &= (isN || isM || isL);
+                    finalRes[idx].isNML = [isN, isM, isL];
                 });
                 selectedGates[idx] = {
                     gateName: gateName,
@@ -328,26 +338,47 @@ function GetFinalGateData() {
         }
     });
 
-    let data = [];
     let insideData = finalRes.filter(xy => xy.isInside);
     let outsideData = finalRes.filter(xy => !xy.isInside);
+    let data = [];
 
-    data[0] = {
-        label: 'Inside Gate' + currGateName,
-        backgroundColor: 'rgb(132, 99, 255)',
-        borderColor: 'rgb(132, 99, 255)',
-        data: insideData,
-        order: 1,
-        radius: 1
-    };
-    data[1] = {
-        label: 'Outside Gate' + currGateName,
-        backgroundColor: 'rgb(255, 99, 132)',
-        borderColor: 'rgb(255, 99, 132)',
-        data: outsideData,
-        order: 2,
-        radius: 1
-    };
+    if (isContainsGate3) {
+        for (let i = 0; i < 3; i++) {
+            data[i] = {
+                label: Gate3Names[i],
+                backgroundColor: Gate3Colors[i],
+                borderColor: Gate3Colors[i],
+                data: finalRes.filter(xy => xy.isInside && xy.isNML[i]),
+                order: i + 1,
+                radius: 1
+            };
+        }
+        data[3] = {
+            label: 'Outside Gate' + currGateName,
+            backgroundColor: 'rgb(255, 99, 132)',
+            borderColor: 'rgb(255, 99, 132)',
+            data: outsideData,
+            order: 4,
+            radius: 1
+        };
+    } else {
+        data[0] = {
+            label: 'Inside Gate' + currGateName,
+            backgroundColor: 'rgb(132, 99, 255)',
+            borderColor: 'rgb(132, 99, 255)',
+            data: insideData,
+            order: 1,
+            radius: 1
+        };
+        data[1] = {
+            label: 'Outside Gate' + currGateName,
+            backgroundColor: 'rgb(255, 99, 132)',
+            borderColor: 'rgb(255, 99, 132)',
+            data: outsideData,
+            order: 2,
+            radius: 1
+        };
+    }
 
     let fcsName = wbc_table.fnGetData($("#fcs-table tbody tr.selected"));
     let detailHtml = "<h4>" + fcsName.fcs_name + "</h4>";
@@ -393,7 +424,7 @@ function CustomeGate() {
 
 function ChangeDynamic(isDynamic) {
     isDynamicGate = isDynamic;
-    if (currGateName == "defaultGate3") {
+    if ( currGateName == "defaultGate3" || (isDefaultGate && currGateName == "finalGate" && $("#defaultGate3").is(":checked")) ) {
         UpdateChart();
     }
 }
