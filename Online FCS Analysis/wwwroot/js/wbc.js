@@ -207,6 +207,8 @@ function initWbc() {
 
     let customGates = wbcTotalData.customGate;
     $("#custom-btn-gate-div").empty();
+    $("#custom-gate-checks").empty();
+
     if (!customGates) {
         customGatePolygons = [];
         $("#custom-final-gate").removeClass("active").addClass("active");
@@ -461,15 +463,17 @@ function CompleteEditPoygon() {
 
     $(".wbc-channels").prop("disabled", false);
 
-    customGatePolygons[editingGateName].polys = [];
-    chartData = chartData.filter(data => data.type != "line" || data.data.length > 3);
-    chartData.forEach(function (v, idx) {
-        if (v.type == "line") {
-            customGatePolygons[editingGateName].polys.push(v.data);    
-        }
-    });
-    SaveCustomGate();
-    UpdateChart();
+    if (editingGateName) {
+        customGatePolygons[editingGateName].polys = [];
+        chartData = chartData.filter(data => data.type != "line" || data.data.length > 3);
+        chartData.forEach(function (v, idx) {
+            if (v.type == "line") {
+                customGatePolygons[editingGateName].polys.push(v.data);
+            }
+        });
+        SaveCustomGate();
+        UpdateChart();
+    }
 }
 
 function DeleteChoosenPolygon() {

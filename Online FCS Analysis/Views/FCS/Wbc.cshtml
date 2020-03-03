@@ -3,7 +3,7 @@
 }
 
     <div class="body_first_area chart-area">
-        <div class="row shadow rounded mb-5 p-4 fcs-file-container">
+        <div class="row shadow-sm rounded mb-5 p-4 fcs-file-container">
             <div class="col-12">
                 <div class="clearfix mb-3">
                     <h3 class="float-left">Choose WBC File</h3>
@@ -48,21 +48,17 @@
                 <select id="channel-2" name="channel-2" class="form-control wbc-items wbc-channels" onchange="ChangeChannel()">
                 </select>
             </div>
-            <div class="col-2 mt-auto mb-auto text-center">
+            <div class="col-3 mt-auto mb-auto text-center">
                 <input class="wbc-items channel-items" type="checkbox" id="draw-heatmap" name="draw-heatmap" onchange="UpdateChart()" />
                 <label for="draw-heatmap" title="Draw heatmap only when ChannelX,Y are default channels">Heatmap</label>
             </div>
-            <div class="col-2 mt-auto mb-auto text-center default-gate-div" style="display: none">
+            <div class="col-3 mt-auto mb-auto text-center default-gate-div" style="display: none">
                 <input class="wbc-items" type="checkbox" id="dynamic-gate" name="dynamic-gate" onchange="ChangeDynamic(this.checked)" />
                 <label for="dynamic-gate">Dynamic Gate</label>
             </div>
-            <div class="col-2 text-center channel-items custom-gate-div">
+            <div class="col-3 text-center channel-items custom-gate-div">
                 <button class="btn btn-primary mb-1 wbc-items channel-items" onclick="AddNewCustomGate()">New Gate</button>
                 <input class="form-control wbc-items" id="gate-name" placeholder="Gate Name" title="Insert your custom gate name" onchange="AddNewCustomGate()" />
-            </div>
-            <div class="col-2 text-center channel-items mt-auto mb-auto custom-gate-div">
-                <label for="save-custom-polygons" style="width: 100%">Save Your Custom Polygons on Server</label>
-                <button class="btn btn-primary wbc-items channel-items" id="save-custom-polygons">Save</button>
             </div>
         </div>
         <div class="row ml-4 mr-1 mt-4 mb-4 default-gate-div text-center" id="default-gates" style="display: none">
@@ -104,7 +100,7 @@
             <button class="btn btn-danger ml-5" onclick="DeleteChoosenPoint()">Delete Choosen Point</button>
             <button class="btn btn-info ml-5" onclick="CompleteEditPoygon()">Complete Edit Polygon</button>
         </div>
-        <div class="row">
+        <div class="row mt-5">
             <div class="col-9 chart-container">
                 <canvas id="fcs-chart"></canvas>
             </div>
