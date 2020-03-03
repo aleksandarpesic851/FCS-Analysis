@@ -106,11 +106,14 @@ namespace Online_FCS_Analysis.Controllers
             string fcsFile = Constants.wwwroot_abs_path + fcsData.fcs_path;
             string gate1File = Path.Combine(Constants.wwwroot_abs_path, _appSettings.Value.defaultGateSetting.path, _appSettings.Value.defaultGateSetting.gate1);
             string gate3File = Path.Combine(Constants.wwwroot_abs_path, _appSettings.Value.defaultGateSetting.path, _appSettings.Value.defaultGateSetting.gate3);
+            string customGatePath = Path.Combine(Constants.wbc_custom_full_gate, fcsData.fcs_file_name);
+            
             FCMeasurement fcsMeasurement = new FCMeasurement(fcsFile);
             WBC3Cell wbc3Cell = Global.ReadFromBinaryFile<WBC3Cell>(cellsFile);
             List<Polygon> gate1Polygon = FCMeasurement.loadPolygon(gate1File);
             List<Polygon> gate2Polygon = Global.ReadFromBinaryFile<List<Polygon>>(gate2File);
             List<Polygon> gate3Polygon = FCMeasurement.loadPolygon(gate3File);
+            List<GatePolygon> customGate = Global.ReadFromBinaryFile<List<GatePolygon>>(customGatePath);
             return Json( 
                 new { 
                     wbcData = fcsMeasurement.Channels,
@@ -122,9 +125,29 @@ namespace Online_FCS_Analysis.Controllers
                     gate1Polygon = gate1Polygon.Select(e=>e.poly),
                     gate2Polygon = gate2Polygon.Select(e => e.poly),
                     gate3Polygon = gate3Polygon.Select(e => e.poly),
+                    customGate,
                     heatmapFile,
                     nomenclature = Constants.WBC_NOMENCLATURES[fcsData.nomenclature]
                 } );
+        }
+
+        [HttpPost]
+        public IActionResult SaveCustomGate(int wbcId, List<GatePolygon> customGate)
+        {
+            int userId = Convert.ToInt32(User.FindFirst(Constants.CLAIM_TYPE_USER_ID).Value);
+            FCSModel fcsData = _dbContext.FCSs.FirstOrDefault(e => e.id == wbcId && e.user_id == userId);
+            if (fcsData == null)
+                return Ok();
+            string customGatePath = Path.Combine(Constants.wbc_custom_full_gate, fcsData.fcs_file_name);
+            if (customGate.Count > 0)
+            {
+                Global.WriteToBinaryFile(customGatePath, customGate);
+            } 
+            else
+            {
+                Global.DeleteFile(customGatePath);
+            }
+            return Ok();
         }
     }
 }

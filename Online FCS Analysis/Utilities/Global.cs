@@ -78,10 +78,22 @@ namespace Online_FCS_Analysis.Utilities
         /// <returns>Returns a new instance of the object read from the binary file.</returns>
         public static T ReadFromBinaryFile<T>(string filePath)
         {
+            if (!File.Exists(filePath))
+            {
+                return default;
+            }
             using (Stream stream = File.Open(filePath, FileMode.Open))
             {
                 var binaryFormatter = new BinaryFormatter();
                 return (T)binaryFormatter.Deserialize(stream);
+            }
+        }
+
+        public static void DeleteFile(string filePath)
+        {
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
             }
         }
 

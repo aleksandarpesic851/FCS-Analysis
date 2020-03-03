@@ -36,7 +36,7 @@ namespace Online_FCS_Analysis.Utilities
         public static string wbc_gate2_full_path = Path.Combine(wwwroot_abs_path, "uploads/fcs/wbc/gate2");
         public static string wbc_heatmap_path = "/uploads/fcs/wbc/heatmap/";
         public static string wbc_heatmap_full_path = Path.Combine(wwwroot_abs_path, "uploads/fcs/wbc/heatmap");
-
+        public static string wbc_custom_full_gate = Path.Combine(wwwroot_abs_path, "uploads/fcs/wbc/custom_gate");
         public static string rbc_fcs_path = "/uploads/fcs/rbc/fcs/";
         public static string rbc_fcs_full_path = Path.Combine(wwwroot_abs_path, "uploads/fcs/rbc/fcs");
 

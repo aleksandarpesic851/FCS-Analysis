@@ -1,6 +1,7 @@
 ﻿// -------------------- WBC Global Variables ------------------//
 
 var wbcTotalData;                   // total wbc data loaded from server
+var currWBCId;                      // Loaded wbc id
 var wbcChannels;                    // wbc channel names
 var wbcNomenclature;                // wbc nomenclature : new_names, old_names, mid..
 
@@ -43,7 +44,7 @@ $(document).ready(function () {
 
     $(".wbc-items").prop("disabled", true);
     
-    InitGateEvent();
+    AddGateChangeEvent();
 
 });
 
@@ -100,7 +101,7 @@ function InitWbcTable() {
     });
 }
 
-function InitGateEvent() {
+function AddGateChangeEvent() {
     $(".btn-gate").on("click", function () {
         let gateDiv = $("#custom-gates");
         if (isDefaultGate) {
@@ -154,10 +155,15 @@ function Delete(wbcId) {
 // -------------------- Load WBC file, Initialize wbc objects ----------------------------//
 
 function LoadWbcData(wbcId) {
+    if (isGateEditing) {
+        CompleteEditPoygon();
+    }
+
     let url = "/FCS/LoadWbcData";
     $.post(url, { wbcId: wbcId }, function (data) {
         if (data) {
             wbcTotalData = data;
+            currWBCId = wbcId;
             initWbc();
         }
         else {
@@ -199,25 +205,39 @@ function initWbc() {
         polys: wbcTotalData.gate3Polygon
     };
 
-    customGatePolygons = wbcTotalData.customGate;
+    let customGates = wbcTotalData.customGate;
     $("#custom-btn-gate-div").empty();
-    if (!customGatePolygons) {
+    if (!customGates) {
         customGatePolygons = [];
         $("#custom-final-gate").removeClass("active").addClass("active");
     } else {
         let newHtml, i = 0, active;
-        customGatePolygons.forEach(function (gate, idx) {
+        customGatePolygons = [];
+        customGates.forEach(function (gate, idx) {
+            let gateName = gate.gateName;
+
+            customGatePolygons[gateName] = {
+                channel1: gate.channel1,
+                channel2: gate.channel2,
+                polys: gate.polygons
+            };
+
             if (i == 0) {
                 actove = "active";
             } else {
                 active = "";
             }
-            newHtml = '<div class="alert alert-dismissible btn-gate pr-5 ' + active + '" data-gate="' + idx + '" id="custom-' + idx + '">';
-            newHtml += '<strong>' + idx + '</strong>';
-            newHtml += '<button type="button" class="close" data-dismiss="alert" onclick="RemoveGate(\'' + idx + '\')">×</button>';
+            newHtml = '<div class="alert alert-dismissible btn-gate pr-5 ' + active + '" data-gate="' + gateName + '" id="custom-' + gateName + '">';
+            newHtml += '<strong>' + gateName + '</strong>';
+            newHtml += '<button type="button" class="close" data-dismiss="alert" onclick="RemoveGate(\'' + gateName + '\')">×</button>';
             newHtml += '</div>';
 
             $("#custom-btn-gate-div").append(newHtml);
+
+            newHtml = '<input type="checkbox" id="final-custom-' + gateName + '" data-gate="' + gateName + '" class="wbc-items" checked/>';
+            newHtml += '<label for= "final-custom-' + gateName + '" > ' + gateName + '</label >';
+            $("#custom-gate-checks").append(newHtml);
+
             i++;
         });
     }
@@ -225,11 +245,36 @@ function initWbc() {
     $("#channel-1").val(defaultChannel1);
     $("#channel-2").val(defaultChannel2);
 
-    ChangeChannel();
+    $("#custom-gates").find(".active").removeClass("active");
+    $("#custom-gates .btn-gate").first().addClass("active");
+    
+    AddGateChangeEvent();
+    UpdateChart();
 }
 
-// -------------------- Load WBC file -------------- --------------//
+// -------------------- Load WBC file, Initialize wbc objects ----------------------------//
 
+
+
+
+
+// -------------------- Save Custom Gate on Server ----------------------------//
+function SaveCustomGate() {
+    let url = "/FCS/SaveCustomGate";
+    let arrGates = [];
+    for (let key in customGatePolygons) {
+        arrGates.push({
+            gateName: key,
+            channel1: customGatePolygons[key].channel1,
+            channel2: customGatePolygons[key].channel2,
+            polygons: customGatePolygons[key].polys
+        });
+    }
+    $.post(url, { wbcId: currWBCId, customGate: arrGates }, function (data) {
+        console.log("save custom gate data", data);
+    });
+}
+// -------------------- Save Custom Gate on Server----------------------------//
 
 
 
@@ -239,7 +284,7 @@ function initWbc() {
 
 // change channel name
 function ChangeChannel() {
-    if (isGateEditing) {
+    if (currGateName != "finalGate") {
         return;
     }
 
@@ -251,12 +296,15 @@ function ChangeChannel() {
         return;
     }
     $(".channel-items").prop("disabled", false);
-
     UpdateChart();
 }
 
 // change to default gate state
 function DefaultGate() {
+    if (isGateEditing) {
+        CompleteEditPoygon();
+    }
+
     isDefaultGate = true;
     $("#tab-custom").removeClass("show");
     $("#tab-default").addClass("show")
@@ -291,10 +339,14 @@ function RemoveGate(gateName) {
 
     if (gateName == currGateName) {
         $("#custom-gates").find(".active").removeClass("active");
-        $("#custom-gates .btn-gate:first-child").addClass("active");
+        $("#custom-gates .btn-gate").first().addClass("active");
     }
-    customGatePolygons.splice(customGatePolygons.indexOf(gateName), 1);
 
+    delete customGatePolygons[gateName];
+    SaveCustomGate();
+
+    $("#final-custom-" + gateName).remove();
+    $('label[for=final-custom-' + gateName + ']').remove();
     UpdateChart();
 }
 
@@ -319,6 +371,20 @@ function AddNewCustomGate() {
         $("#gate-name").focus();
         return;
     }
+
+    // check channel is used alread
+    let isChannelUsed = false;
+    for (let key in customGatePolygons) {
+        if (key != "finalGate" && customGatePolygons[key].channel1 == channel1 && customGatePolygons[key].channel2 == channel2) {
+            isChannelUsed = true;
+        }
+    };
+
+    if (isChannelUsed) {
+        alert("Current Channels are used already. Please update exsiting gate or choose other channels");
+        return;
+    }
+
     if (!confirm("Are you sure to create new gate on these channels?")) {
         return;
     }
@@ -337,16 +403,36 @@ function AddNewCustomGate() {
     newHtml += '</div>';
 
     $("#custom-btn-gate-div").append(newHtml);
+    AddGateChangeEvent();
 
+    newHtml = '<input type="checkbox" id="final-custom-' + editingGateName + '" data-gate="' + editingGateName + '" class="wbc-items" checked/>';
+    newHtml += '<label for= "final-custom-' + editingGateName + '" > ' + editingGateName + '</label >';
+    $("#custom-gate-checks").append(newHtml);
+
+    UpdateChart();
     StartEditPolygon();
     AddNewPolygon();
+
+    $("#fcs-chart-details").html("<h4> Editing Custom Gate - " + editingGateName + "</h4>");
     //UpdateChart();
 }
 
 function StartEditPolygon() {
+    if (isDefaultGate || currGateName == "finalGate") {
+        return;
+    }
+
+    $(".wbc-channels").prop("disabled", true);
+
     isGateEditing = true;
     $(".custom-gate-div").hide();
     $("#edit-custom-gate").show();
+    chartData.forEach(function (v, idx) {
+        if (v.type == "line") {
+            v.dragable = true;
+        }
+    });
+    $("#fcs-chart-details").html("<h4> Editing Custom Gate - " + editingGateName + "</h4>");
 }
 
 function AddNewPolygon() {
@@ -359,7 +445,7 @@ function AddNewPolygon() {
         fill: false,
         data: [],
         pointHitRadius: 10,
-        dragable: isGateEditing,
+        dragable: true,
         type: 'line',
         pointRadius: 5,
         pointHoverRadius: 10,
@@ -373,14 +459,16 @@ function CompleteEditPoygon() {
     $(".custom-gate-div").show();
     $("#edit-custom-gate").hide();
 
-    customGatePolygons[editingGateName].polys = [];
-    chartData.forEach(function (v, idx) {
-        if (v.type != "line" || v.data.length < 4) {
-            return;
-        }
-        customGatePolygons[editingGateName].polys.push(v.data);
-    });
+    $(".wbc-channels").prop("disabled", false);
 
+    customGatePolygons[editingGateName].polys = [];
+    chartData = chartData.filter(data => data.type != "line" || data.data.length > 3);
+    chartData.forEach(function (v, idx) {
+        if (v.type == "line") {
+            customGatePolygons[editingGateName].polys.push(v.data);    
+        }
+    });
+    SaveCustomGate();
     UpdateChart();
 }
 
@@ -416,7 +504,20 @@ function AddOrMoveCustomPoints(newXY) {
         // if current polygon is closed, don't add any point more
         let tmpData = chartData[choosenPolygon].data;
         if (tmpData.length > 1 && (tmpData[0].x == tmpData[tmpData.length - 1].x) && (tmpData[0].y == tmpData[tmpData.length - 1].y)) {
-            return;
+            let isClosed = false;
+            tmpData.forEach(function (v, idx) {
+                if (Math.abs(v.x - newXY.x) < chartGraph.scales['x-axis-0'].max / 60 &&
+                    Math.abs(v.y - newXY.y) < chartGraph.scales['y-axis-0'].max / 40) {
+                    isClosed = true;
+                }
+            });
+            if (isClosed) {
+                HighlightLine(choosenPolygon);
+                return;
+            } else {
+                AddNewPolygon();
+            }
+            
         }
         // When choosen point and new point isn't close, or not choosen any point, add new point
         if (choosenPoint < 0 ) {
@@ -441,6 +542,7 @@ function AddOrMoveCustomPoints(newXY) {
         AddNewPolygon();
     }
 }
+
 // -------------------- Events Control ----------------------------//
 
 
@@ -492,10 +594,13 @@ function UpdateChart() {
         }
         currGateName = gateDiv.find(".active").data("gate");
 
-        if (currGateName == "finalGate") {
-            $(".wbc-channels").prop("disabled", false);
-        } else {
+        if (isDefaultGate && currGateName != "finalGate") {
             $(".wbc-channels").prop("disabled", true);
+        } else {
+            $(".wbc-channels").prop("disabled", false);
+        }
+
+        if (currGateName != "finalGate") {
             if (isDefaultGate) {
                 currGatePolygon = defaultGatePolygons[currGateName];
             } else {
@@ -555,7 +660,7 @@ function GetFinalGateData() {
         selectedGates.push($(this).data('gate'));
     });
 
-    let gatePolygons = isDefaultGate ? defaultGatePolygons : currGatePolygon;
+    let gatePolygons = isDefaultGate ? defaultGatePolygons : customGatePolygons;
     let isContainsGate3 = false;
 
     let finalChannel1 = $("#channel-1").val();
@@ -893,7 +998,7 @@ function GetChartGateLineData() {
             fill: false,
             data: v,
             pointHitRadius: 10,
-            dragable: isGateEditing,
+            dragable: false,
             type: 'line',
             pointRadius: 5,
             pointHoverRadius: 10,
@@ -907,7 +1012,7 @@ function GetChartGateLineData() {
         fill: false,
         data: v,
         pointHitRadius: 10,
-        dragable: isGateEditing,
+        dragable: false,
         type: 'line',
         pointRadius: 5,
         pointHoverRadius: 10,
@@ -921,7 +1026,7 @@ function GetChartGateLineData() {
             fill: false,
             data: [],
             pointHitRadius: 10,
-            dragable: isGateEditing,
+            dragable: false,
             type: 'line',
             pointRadius: 5,
             pointHoverRadius: 10,
