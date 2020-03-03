@@ -79,7 +79,7 @@ function InitWbcTable() {
             { "data": "updatedAt", "name": "updatedAt" },
             {
                 data: null, render: function (data, type, row) {
-                    return "<a href='#' class='btn btn-danger' onclick=DeleteData('" + row.id + "'); >Delete</a>";
+                    return "<a href='#' class='btn btn-danger' onclick=DeleteData('" + row.id + "'); ><i class='fa fa-trash'></i>&nbsp;&nbsp;Delete</a>";
                 }
             },
         ],
