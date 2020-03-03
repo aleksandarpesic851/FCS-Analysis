@@ -24,8 +24,12 @@ var isDynamicGate = false;      // Flag for dynamic gate of default gate3
 var Gate3Names = ["Neutrophils", "Monocytes", "Lymphocytes"];
 var Gate3Colors = ["rgb(255, 189, 189)", "rgb(173, 233, 255)", "rgb(194, 228, 156)"];
 
-let wbc_table;      // wbc data table object
+var wbc_table;      // wbc data table object
 
+var isGateEditing = false;          // Flag for drawing custom gate
+var choosenPolygon = -1;                 // Choosen Polygon while editing custom polygon
+var choosenPoint = -1;                   // Choosen point while editing custom polygon
+var editingGateName;                // Editing Gate Name
 // -------------------- WBC Global Variables ------------------//
 
 
@@ -38,7 +42,7 @@ $(document).ready(function () {
     InitWbcTable();
 
     $(".wbc-items").prop("disabled", true);
-
+    
     InitGateEvent();
 
 });
@@ -195,6 +199,29 @@ function initWbc() {
         polys: wbcTotalData.gate3Polygon
     };
 
+    customGatePolygons = wbcTotalData.customGate;
+    $("#custom-btn-gate-div").empty();
+    if (!customGatePolygons) {
+        customGatePolygons = [];
+        $("#custom-final-gate").removeClass("active").addClass("active");
+    } else {
+        let newHtml, i = 0, active;
+        customGatePolygons.forEach(function (gate, idx) {
+            if (i == 0) {
+                actove = "active";
+            } else {
+                active = "";
+            }
+            newHtml = '<div class="alert alert-dismissible btn-gate pr-5 ' + active + '" data-gate="' + idx + '" id="custom-' + idx + '">';
+            newHtml += '<strong>' + idx + '</strong>';
+            newHtml += '<button type="button" class="close" data-dismiss="alert" onclick="RemoveGate(\'' + idx + '\')">×</button>';
+            newHtml += '</div>';
+
+            $("#custom-btn-gate-div").append(newHtml);
+            i++;
+        });
+    }
+
     $("#channel-1").val(defaultChannel1);
     $("#channel-2").val(defaultChannel2);
 
@@ -212,6 +239,10 @@ function initWbc() {
 
 // change channel name
 function ChangeChannel() {
+    if (isGateEditing) {
+        return;
+    }
+
     let channel1 = $("#channel-1").val();
     let channel2 = $("#channel-2").val();
     if (channel1 == channel2) {
@@ -254,6 +285,162 @@ function ChangeDynamic(isDynamic) {
     }
 }
 
+// Remove Custom Gate
+function RemoveGate(gateName) {
+    isGateEditing = false;
+
+    if (gateName == currGateName) {
+        $("#custom-gates").find(".active").removeClass("active");
+        $("#custom-gates .btn-gate:first-child").addClass("active");
+    }
+    customGatePolygons.splice(customGatePolygons.indexOf(gateName), 1);
+
+    UpdateChart();
+}
+
+// Add new custom gate
+function AddNewCustomGate() {
+    let channel1 = $("#channel-1").val();
+    let channel2 = $("#channel-2").val();
+    if (channel1 == channel2) {
+        alert("Please choose different channels!.");
+        return;
+    }
+
+    editingGateName = $("#gate-name").val();
+    if (!editingGateName) {
+        alert("Please insert gate name");
+        $("#gate-name").focus();
+        return;
+    }
+
+    if (editingGateName in customGatePolygons) {
+        alert("The gate name was already used. Please insert other gate name.");
+        $("#gate-name").focus();
+        return;
+    }
+    if (!confirm("Are you sure to create new gate on these channels?")) {
+        return;
+    }
+
+    customGatePolygons[editingGateName] = {
+        channel1: channel1,
+        channel2: channel2,
+        polys: [[]]
+    };
+
+    $("#custom-gates").find(".active").removeClass("active");
+
+    let newHtml = '<div class="alert alert-dismissible btn-gate pr-5 active" data-gate="' + editingGateName + '" id="custom-' + editingGateName + '">';
+    newHtml += '<strong>' + editingGateName + '</strong>';
+    newHtml += '<button type="button" class="close" data-dismiss="alert" onclick="RemoveGate(\'' + editingGateName + '\')">×</button>';
+    newHtml += '</div>';
+
+    $("#custom-btn-gate-div").append(newHtml);
+
+    StartEditPolygon();
+    AddNewPolygon();
+    //UpdateChart();
+}
+
+function StartEditPolygon() {
+    isGateEditing = true;
+    $(".custom-gate-div").hide();
+    $("#edit-custom-gate").show();
+}
+
+function AddNewPolygon() {
+    CleanHighlight();
+    choosenPolygon = chartData.length;
+    choosenPoint = -1;
+    chartData.push({
+        label: "Gate - " + editingGateName,
+        borderColor: lineHighlightColor,
+        fill: false,
+        data: [],
+        pointHitRadius: 10,
+        dragable: isGateEditing,
+        type: 'line',
+        pointRadius: 5,
+        pointHoverRadius: 10,
+        lineTension: 0,
+    });
+    chartGraph.update();
+}
+
+function CompleteEditPoygon() {
+    isGateEditing = false;
+    $(".custom-gate-div").show();
+    $("#edit-custom-gate").hide();
+
+    customGatePolygons[editingGateName].poly = [];
+    chartData.forEach(function (v, idx) {
+        if (v.type != "line") {
+            return;
+        }
+        customGatePolygons[editingGateName].poly.push(v.data);
+    });
+
+    UpdateChart();
+}
+
+function DeleteChoosenPolygon() {
+    if (choosenPolygon < 0) {
+        return;
+    }
+    chartData.splice(choosenPolygon, 1);
+    chartGraph.update();
+    choosenPolygon = -1;
+}
+
+function DeleteChoosenPoint() {
+    if (choosenPolygon < 0 || choosenPoint < 0) {
+        return;
+    }
+    // For Triangle polygon
+    // If the number of polygon points are less than 5 and closed polygon, remove the entire polygon
+    let tmpData = chartData[choosenPolygon].data;
+    if (tmpData.length < 5 && tmpData[0].x == tmpData[tmpData.length - 1].x && tmpData[0].y == tmpData[tmpData.length - 1].y) {
+        DeleteChoosenPolygon();
+        return;
+    }
+    chartData[choosenPolygon].data.splice(choosenPoint, 1);
+    chartGraph.update();
+    choosenPoint = -1;
+}
+
+// Add or Move Clicked points. When a point is closed to current selected point, move. Else, add
+function AddOrMoveCustomPoints(newXY) {
+
+    if (choosenPolygon > -1) {
+        // if current polygon is closed, don't add any point more
+        let tmpData = chartData[choosenPolygon].data;
+        if (tmpData.length > 1 && (tmpData[0].x == tmpData[tmpData.length - 1].x) && (tmpData[0].y == tmpData[tmpData.length - 1].y)) {
+            return;
+        }
+        // When choosen point and new point isn't close, or not choosen any point, add new point
+        if (choosenPoint < 0 ) {
+            choosenPoint = chartData[choosenPolygon].data.length;
+            chartData[choosenPolygon].data.push(newXY);
+        }
+        // When final point is close to first point, generate polygon by adding first point again
+        else if (Math.abs(chartData[choosenPolygon].data[0].x - newXY.x) < chartGraph.scales['x-axis-0'].max / 60 &&
+                Math.abs(chartData[choosenPolygon].data[0].y - newXY.y) < chartGraph.scales['y-axis-0'].max / 40) {
+                chartData[choosenPolygon].data.push(chartData[choosenPolygon].data[0]);
+                AddNewPolygon();
+                return;
+        } else if (Math.abs(chartData[choosenPolygon].data[choosenPoint].x - newXY.x) > chartGraph.scales['x-axis-0'].max / 60 ||
+            Math.abs(chartData[choosenPolygon].data[choosenPoint].y - newXY.y) > chartGraph.scales['y-axis-0'].max / 40) {
+            choosenPoint = chartData[choosenPolygon].data.length;
+            chartData[choosenPolygon].data.push(newXY);
+        } else {
+            chartData[choosenPolygon].data[choosenPoint] = newXY;
+        }
+        chartGraph.update();
+    } else {
+        AddNewPolygon();
+    }
+}
 // -------------------- Events Control ----------------------------//
 
 
@@ -280,6 +467,10 @@ function DrawHeatmap() {
 
 // Draw Chart
 function UpdateChart() {
+    if (!wbcTotalData) {
+        ClearChart();
+        return;
+    }
     // Draw or remove heatmap
     DrawHeatmap();
 
@@ -291,7 +482,6 @@ function UpdateChart() {
                 backgroundColor: 'rgba(0, 0, 0, 0)',
                 borderColor: 'rgba(0, 0, 0, 0)',
                 data: [{ x: 0, y: 0 }, { x: wbcTotalData.wbcData[defaultChannel1].range, y: wbcTotalData.wbcData[defaultChannel2].range }],
-                order: 1,
                 radius: 0
             }];
     } else {
@@ -306,7 +496,12 @@ function UpdateChart() {
             $(".wbc-channels").prop("disabled", false);
         } else {
             $(".wbc-channels").prop("disabled", true);
-            currGatePolygon = defaultGatePolygons[currGateName];
+            if (isDefaultGate) {
+                currGatePolygon = defaultGatePolygons[currGateName];
+            } else {
+                currGatePolygon = customGatePolygons[currGateName];
+            }
+            
             $("#channel-1").val(currGatePolygon.channel1);
             $("#channel-2").val(currGatePolygon.channel2);
         }
@@ -332,6 +527,11 @@ function UpdateChart() {
 
     // Update Graph And Redraw
     chartGraph.data.datasets = chartData;
+    chartGraph.update();
+}
+
+function ClearChart() {
+    chartGraph.data.datasets = [];
     chartGraph.update();
 }
 
@@ -438,7 +638,6 @@ function GetFinalGateData() {
                 backgroundColor: Gate3Colors[i],
                 borderColor: Gate3Colors[i],
                 data: finalRes.filter(xy => xy.isInside && xy.isNML[i]),
-                order: i + 1,
                 radius: 1
             };
         }
@@ -447,7 +646,6 @@ function GetFinalGateData() {
             backgroundColor: 'rgb(255, 99, 132)',
             borderColor: 'rgb(255, 99, 132)',
             data: outsideData,
-            order: 4,
             radius: 1
         };
     } else {
@@ -456,7 +654,6 @@ function GetFinalGateData() {
             backgroundColor: 'rgb(132, 99, 255)',
             borderColor: 'rgb(132, 99, 255)',
             data: insideData,
-            order: 1,
             radius: 1
         };
         data[1] = {
@@ -464,7 +661,6 @@ function GetFinalGateData() {
             backgroundColor: 'rgb(255, 99, 132)',
             borderColor: 'rgb(255, 99, 132)',
             data: outsideData,
-            order: 2,
             radius: 1
         };
     }
@@ -501,7 +697,6 @@ function GetPolygonGateData() {
         backgroundColor: 'rgb(132, 99, 255)',
         borderColor: 'rgb(132, 99, 255)',
         data: insideData,
-        order: 1,
         radius: 1
     };
     data[1] = {
@@ -509,7 +704,6 @@ function GetPolygonGateData() {
         backgroundColor: 'rgb(255, 99, 132)',
         borderColor: 'rgb(255, 99, 132)',
         data: outsideData,
-        order: 2,
         radius: 1
     };
 
@@ -551,8 +745,9 @@ function IsInsidePolygons(gatePolygon, xy) {
 
 // check whether current point (x,y) is inside polygon
 function IsInsidePoly(poly, x, y) {
-    if (!poly)
-        return false;
+    if (!poly || poly.length < 1)
+        return true;
+    
     let minX = poly[0].x;
     let maxX = poly[0].x;
     let minY = poly[0].y;
@@ -599,7 +794,6 @@ function GetDefaultGate3() {
                 backgroundColor: Gate3Colors[i],
                 borderColor: Gate3Colors[i],
                 data: nmlData[i],
-                order: i + 1,
                 radius: 1
             };
         }
@@ -609,7 +803,6 @@ function GetDefaultGate3() {
             backgroundColor: 'rgb(255, 99, 132)',
             borderColor: 'rgb(255, 99, 132)',
             data: outsideData,
-            order: 4,
             radius: 1
         };
     } else {
@@ -620,7 +813,6 @@ function GetDefaultGate3() {
                 backgroundColor: Gate3Colors[i],
                 borderColor: Gate3Colors[i],
                 data: nmlData[i],
-                order: i + 1,
                 radius: 1
             };
         }
@@ -630,7 +822,6 @@ function GetDefaultGate3() {
             backgroundColor: 'rgb(255, 99, 132)',
             borderColor: 'rgb(255, 99, 132)',
             data: outsideData,
-            order: 4,
             radius: 1
         };
     }
@@ -696,24 +887,49 @@ function FilterGate3Data(poygon, nIdx) {
 // Gate Polygon Gate Line Data
 function GetChartGateLineData() {
     if (currGateName == "finalGate") {
-        return [];
+        return [{
+            label: "Gate - " + currGateName,
+            borderColor: lineNormalColor,
+            fill: false,
+            data: v,
+            pointHitRadius: 10,
+            dragable: isGateEditing,
+            type: 'line',
+            pointRadius: 5,
+            pointHoverRadius: 10,
+            lineTension: 0,
+        }];
     }
 
-    let order = chartData.length;
-
-    return currGatePolygon.polys.map((v, i) => ({
+    let polygon = currGatePolygon.polys.map((v, i) => ({
         label: "Gate - " + currGateName,
         borderColor: 'rgb(100, 200, 100)',
         fill: false,
         data: v,
         pointHitRadius: 10,
-        dragable: !isDefaultGate,
+        dragable: isGateEditing,
         type: 'line',
         pointRadius: 5,
         pointHoverRadius: 10,
         lineTension: 0,
-        order: order + i
     }));
+
+    if (!polygon) {
+        polygon = [{
+            label: "Gate - " + currGateName,
+            borderColor: 'rgb(100, 200, 100)',
+            fill: false,
+            data: [],
+            pointHitRadius: 10,
+            dragable: isGateEditing,
+            type: 'line',
+            pointRadius: 5,
+            pointHoverRadius: 10,
+            lineTension: 0,
+        }];
+    }
+
+    return polygon;
 }
 
 // -------------------- Extract Chart Data from WBC Data --------//

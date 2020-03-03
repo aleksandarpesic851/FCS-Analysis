@@ -57,11 +57,12 @@
                 <label for="dynamic-gate">Dynamic Gate</label>
             </div>
             <div class="col-2 text-center channel-items custom-gate-div">
-                <button class="btn btn-primary mb-1 wbc-items channel-items">New Gate</button>
+                <button class="btn btn-primary mb-1 wbc-items channel-items" onclick="AddNewCustomGate()">New Gate</button>
                 <input class="form-control wbc-items" id="gate-name" placeholder="Gate Name" title="Insert your custom gate name" />
             </div>
             <div class="col-2 text-center channel-items mt-auto mb-auto custom-gate-div">
-                <button class="btn btn-primary wbc-items channel-items">Save</button>
+                <label for="save-custom-polygons">Save Your Custom Polygons on Server</label>
+                <button class="btn btn-primary wbc-items channel-items" id="save-custom-polygons">Save</button>
             </div>
         </div>
         <div class="row ml-4 mr-1 mt-4 mb-4 default-gate-div text-center" id="default-gates" style="display: none">
@@ -88,20 +89,27 @@
             </div>
         </div>
         <div class="row ml-4 mr-1 mt-4 mb-4 custom-gate-div" id="custom-gates">
-            <div class="alert alert-dismissible btn-gate pr-5" data-gate="customGate1">
-                <strong>Custom Gate1</strong>
-                <button type="button" class="close" data-dismiss="alert" onclick="RemoveGate('defaultGate1')">×</button>
+            <div class="d-flex" id="custom-btn-gate-div">
             </div>
-            <div class="btn-gate final" data-gate="finalGate">
+            <div class="btn-gate final active" data-gate="finalGate" id="custom-final-gate">
                 <strong>Final Gate &nbsp; : &nbsp;&nbsp;</strong>
+                <div id="custom-gate-checks">
+                </div>
             </div>
+            <button class="btn btn-primary ml-auto mr-5" id="btn-edit-custom-polygon" onclick="StartEditPolygon()">Edit Current Custom Gate Polygon</button>
+        </div>
+        <div class="row ml-4 mr-1 mt-4 mb-4" id="edit-custom-gate" style="display: none">
+            <button class="btn btn-info ml-5" onclick="AddNewPolygon()">Add New Polygon</button>
+            <button class="btn btn-danger ml-5" onclick="DeleteChoosenPolygon()">Delete Choosen Polygon</button>
+            <button class="btn btn-danger ml-5" onclick="DeleteChoosenPoint()">Delete Choosen Point</button>
+            <button class="btn btn-info ml-5" onclick="CompleteEditPoygon()">Complete Edit Polygon</button>
         </div>
         <div class="row">
             <div class="col-9 chart-container">
                 <canvas id="fcs-chart"></canvas>
             </div>
             <div class="col-2 ml-1" id="fcs-chart-details">
-
+                No WBC
             </div>
         </div>
         

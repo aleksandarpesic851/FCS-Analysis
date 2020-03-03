@@ -151,3 +151,7 @@ div.table .file-row:nth-child(odd) {
     margin-left: 0px;
     color: white;
 }
+
+#custom-gate-checks {
+    display: contents;
+}

@@ -1,5 +1,7 @@
 ﻿var chartData = [];
 var chartGraph;
+var lineNormalColor = 'rgb(100, 200, 100)';
+var lineHighlightColor = 'rgb(250, 20, 20)';
 
 $(document).ready(function () {
 	initChart();
@@ -20,6 +22,9 @@ $(document).ready(function () {
 
 function initChart() {
 	Chart.defaults.global.tooltips.custom = function (tooltipModel) {
+		if (isGateEditing) {
+			return;
+		}
 		// Tooltip Element
 		var tooltipEl = document.getElementById('chartjs-tooltip');
 
@@ -82,22 +87,25 @@ function initChart() {
 				enabled: false,
 			},
 			onClick: function (event, array) {
-				if (chartData.length > 1) {
+				if (isGateEditing && chartData.length > 1) {
 					let newXY = getCoordinate(event);
-					chartData[1].data.push(newXY);
+					AddOrMoveCustomPoints(newXY);
+					console.log(newXY);
 				}
 			},
 			dragData: true,
 			dragX: true,
 			onDragStart: function (e, target) {
-				if (!chartData[target._datasetIndex].dragable)
+				if (!chartData[target._datasetIndex].dragable || !isGateEditing)
 					return false;
-				// do something
-				console.log('start', e);
+				choosenPolygon = target._datasetIndex;
+				choosenPoint = target._index;
+				HighlightLine(choosenPolygon);
+				console.log('drage start', e);
 			},
 			onDrag: function (e, datasetIndex, index, value) {
 				// do something
-				console.log('drag', e, datasetIndex, index, value);
+				console.log('on drag', e, datasetIndex, index, value);
 			},
 			onDragEnd: function (e, datasetIndex, index, value) {
 				// do something
@@ -193,3 +201,17 @@ function GetChannelName(channelHandle, type)
 	return channelName;
 }
 
+// clean highlighted polygon
+function CleanHighlight() {
+	chartData.forEach(function (v, idx) {
+		if (v.type == "line") {
+			v.borderColor = lineNormalColor;
+		}
+	})
+}
+
+function HighlightLine(idx) {
+	CleanHighlight();
+	chartData[idx].borderColor = lineHighlightColor;
+	chartGraph.update();
+}
