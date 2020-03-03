@@ -351,9 +351,9 @@ function StartEditPolygon() {
 
 function AddNewPolygon() {
     CleanHighlight();
-    choosenPolygon = chartData.length;
+    choosenPolygon = 0;
     choosenPoint = -1;
-    chartData.push({
+    chartData.unshift({
         label: "Gate - " + editingGateName,
         borderColor: lineHighlightColor,
         fill: false,
@@ -373,12 +373,12 @@ function CompleteEditPoygon() {
     $(".custom-gate-div").show();
     $("#edit-custom-gate").hide();
 
-    customGatePolygons[editingGateName].poly = [];
+    customGatePolygons[editingGateName].polys = [];
     chartData.forEach(function (v, idx) {
-        if (v.type != "line") {
+        if (v.type != "line" || v.data.length < 4) {
             return;
         }
-        customGatePolygons[editingGateName].poly.push(v.data);
+        customGatePolygons[editingGateName].polys.push(v.data);
     });
 
     UpdateChart();
@@ -509,7 +509,7 @@ function UpdateChart() {
         chartData = [];
 
         //---------Update Chart-----//
-
+        
         // Add Points for gates
         if (currGateName == defaultGate3) {
             chartData = GetDefaultGate3();
@@ -519,9 +519,9 @@ function UpdateChart() {
             chartData = GetPolygonGateData();
         }
 
-        // Add Gate Lines
+        // Append Gate Lines
         if ((currGateName != defaultGate3 || !isDynamicGate) && currGateName != "finalGate") {
-            chartData = chartData.concat(GetChartGateLineData());
+            Array.prototype.unshift.apply(chartData, GetChartGateLineData());
         }
     }
 
