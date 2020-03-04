@@ -35,8 +35,14 @@
             this.tabRBC = new System.Windows.Forms.TabPage();
             this.tabWBC = new System.Windows.Forms.TabPage();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.btnFinalImage = new System.Windows.Forms.Button();
+            this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.radioOldName = new System.Windows.Forms.RadioButton();
             this.radioNewName = new System.Windows.Forms.RadioButton();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.btnFixed = new System.Windows.Forms.RadioButton();
+            this.btnDynamic = new System.Windows.Forms.RadioButton();
             this.button_ProcessList = new System.Windows.Forms.Button();
             this.btnSeparation = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -67,18 +73,15 @@
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.DataFile = new System.Windows.Forms.OpenFileDialog();
-            this.btnDynamic = new System.Windows.Forms.RadioButton();
-            this.btnFixed = new System.Windows.Forms.RadioButton();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.tabWBC.SuspendLayout();
             this.groupBox4.SuspendLayout();
+            this.groupBox6.SuspendLayout();
+            this.groupBox5.SuspendLayout();
+            this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chartData)).BeginInit();
             this.tabControl.SuspendLayout();
-            this.groupBox3.SuspendLayout();
-            this.groupBox5.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabRBC
@@ -100,7 +103,7 @@
             this.tabWBC.Location = new System.Drawing.Point(4, 43);
             this.tabWBC.Name = "tabWBC";
             this.tabWBC.Padding = new System.Windows.Forms.Padding(3);
-            this.tabWBC.Size = new System.Drawing.Size(1340, 917);
+            this.tabWBC.Size = new System.Drawing.Size(1589, 917);
             this.tabWBC.TabIndex = 0;
             this.tabWBC.Text = "WBC";
             this.tabWBC.UseVisualStyleBackColor = true;
@@ -108,6 +111,7 @@
             // groupBox4
             // 
             this.groupBox4.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.groupBox4.Controls.Add(this.groupBox6);
             this.groupBox4.Controls.Add(this.groupBox5);
             this.groupBox4.Controls.Add(this.groupBox3);
             this.groupBox4.Controls.Add(this.button_ProcessList);
@@ -116,11 +120,44 @@
             this.groupBox4.Controls.Add(this.groupBox1);
             this.groupBox4.Controls.Add(this.FileNameBox);
             this.groupBox4.Controls.Add(this.label4);
-            this.groupBox4.Location = new System.Drawing.Point(122, 5);
+            this.groupBox4.Location = new System.Drawing.Point(135, 5);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(1112, 202);
+            this.groupBox4.Size = new System.Drawing.Size(1312, 202);
             this.groupBox4.TabIndex = 31;
             this.groupBox4.TabStop = false;
+            // 
+            // groupBox6
+            // 
+            this.groupBox6.Controls.Add(this.btnFinalImage);
+            this.groupBox6.Location = new System.Drawing.Point(1112, 14);
+            this.groupBox6.Name = "groupBox6";
+            this.groupBox6.Size = new System.Drawing.Size(178, 179);
+            this.groupBox6.TabIndex = 35;
+            this.groupBox6.TabStop = false;
+            this.groupBox6.Text = "Report";
+            // 
+            // btnFinalImage
+            // 
+            this.btnFinalImage.Enabled = false;
+            this.btnFinalImage.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnFinalImage.Location = new System.Drawing.Point(19, 52);
+            this.btnFinalImage.Margin = new System.Windows.Forms.Padding(2);
+            this.btnFinalImage.Name = "btnFinalImage";
+            this.btnFinalImage.Size = new System.Drawing.Size(138, 40);
+            this.btnFinalImage.TabIndex = 31;
+            this.btnFinalImage.Text = "Save Final Gate As Image";
+            this.btnFinalImage.UseVisualStyleBackColor = true;
+            this.btnFinalImage.Click += new System.EventHandler(this.btnFinalImage_Click);
+            // 
+            // groupBox5
+            // 
+            this.groupBox5.Controls.Add(this.radioOldName);
+            this.groupBox5.Controls.Add(this.radioNewName);
+            this.groupBox5.Location = new System.Drawing.Point(718, 93);
+            this.groupBox5.Name = "groupBox5";
+            this.groupBox5.Size = new System.Drawing.Size(125, 64);
+            this.groupBox5.TabIndex = 34;
+            this.groupBox5.TabStop = false;
             // 
             // radioOldName
             // 
@@ -147,6 +184,42 @@
             this.radioNewName.Text = "New Name";
             this.radioNewName.UseVisualStyleBackColor = true;
             this.radioNewName.CheckedChanged += new System.EventHandler(this.radioNewName_CheckedChanged);
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.btnFixed);
+            this.groupBox3.Controls.Add(this.btnDynamic);
+            this.groupBox3.Location = new System.Drawing.Point(614, 93);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(96, 64);
+            this.groupBox3.TabIndex = 33;
+            this.groupBox3.TabStop = false;
+            // 
+            // btnFixed
+            // 
+            this.btnFixed.AutoSize = true;
+            this.btnFixed.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnFixed.Location = new System.Drawing.Point(8, 37);
+            this.btnFixed.Name = "btnFixed";
+            this.btnFixed.Size = new System.Drawing.Size(60, 19);
+            this.btnFixed.TabIndex = 32;
+            this.btnFixed.Text = "Fixed";
+            this.btnFixed.UseVisualStyleBackColor = true;
+            this.btnFixed.CheckedChanged += new System.EventHandler(this.btnFixed_CheckedChanged);
+            // 
+            // btnDynamic
+            // 
+            this.btnDynamic.AutoSize = true;
+            this.btnDynamic.Checked = true;
+            this.btnDynamic.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnDynamic.Location = new System.Drawing.Point(8, 13);
+            this.btnDynamic.Name = "btnDynamic";
+            this.btnDynamic.Size = new System.Drawing.Size(80, 19);
+            this.btnDynamic.TabIndex = 31;
+            this.btnDynamic.TabStop = true;
+            this.btnDynamic.Text = "Dynamic";
+            this.btnDynamic.UseVisualStyleBackColor = true;
+            this.btnDynamic.CheckedChanged += new System.EventHandler(this.btnDynamic_CheckedChanged);
             // 
             // button_ProcessList
             // 
@@ -489,7 +562,7 @@
             this.chartData.Legends.Add(legend1);
             this.chartData.Location = new System.Drawing.Point(11, 216);
             this.chartData.Name = "chartData";
-            this.chartData.Size = new System.Drawing.Size(1315, 691);
+            this.chartData.Size = new System.Drawing.Size(1564, 691);
             this.chartData.TabIndex = 0;
             this.chartData.Text = "chart2";
             title1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -509,7 +582,7 @@
             this.tabControl.Name = "tabControl";
             this.tabControl.Padding = new System.Drawing.Point(10, 10);
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(1348, 964);
+            this.tabControl.Size = new System.Drawing.Size(1597, 964);
             this.tabControl.TabIndex = 29;
             // 
             // tabPage1
@@ -525,58 +598,12 @@
             // 
             this.DataFile.FileName = "openFileDialog1";
             // 
-            // btnDynamic
-            // 
-            this.btnDynamic.AutoSize = true;
-            this.btnDynamic.Checked = true;
-            this.btnDynamic.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnDynamic.Location = new System.Drawing.Point(8, 13);
-            this.btnDynamic.Name = "btnDynamic";
-            this.btnDynamic.Size = new System.Drawing.Size(80, 19);
-            this.btnDynamic.TabIndex = 31;
-            this.btnDynamic.TabStop = true;
-            this.btnDynamic.Text = "Dynamic";
-            this.btnDynamic.UseVisualStyleBackColor = true;
-            this.btnDynamic.CheckedChanged += new System.EventHandler(this.btnDynamic_CheckedChanged);
-            // 
-            // btnFixed
-            // 
-            this.btnFixed.AutoSize = true;
-            this.btnFixed.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnFixed.Location = new System.Drawing.Point(8, 37);
-            this.btnFixed.Name = "btnFixed";
-            this.btnFixed.Size = new System.Drawing.Size(60, 19);
-            this.btnFixed.TabIndex = 32;
-            this.btnFixed.Text = "Fixed";
-            this.btnFixed.UseVisualStyleBackColor = true;
-            this.btnFixed.CheckedChanged += new System.EventHandler(this.btnFixed_CheckedChanged);
-            // 
-            // groupBox3
-            // 
-            this.groupBox3.Controls.Add(this.btnFixed);
-            this.groupBox3.Controls.Add(this.btnDynamic);
-            this.groupBox3.Location = new System.Drawing.Point(614, 93);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(96, 64);
-            this.groupBox3.TabIndex = 33;
-            this.groupBox3.TabStop = false;
-            // 
-            // groupBox5
-            // 
-            this.groupBox5.Controls.Add(this.radioOldName);
-            this.groupBox5.Controls.Add(this.radioNewName);
-            this.groupBox5.Location = new System.Drawing.Point(718, 93);
-            this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(125, 64);
-            this.groupBox5.TabIndex = 34;
-            this.groupBox5.TabStop = false;
-            // 
             // ChartForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(1348, 964);
+            this.ClientSize = new System.Drawing.Size(1597, 964);
             this.Controls.Add(this.tabControl);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(2);
@@ -587,16 +614,17 @@
             this.tabWBC.ResumeLayout(false);
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
+            this.groupBox6.ResumeLayout(false);
+            this.groupBox5.ResumeLayout(false);
+            this.groupBox5.PerformLayout();
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chartData)).EndInit();
             this.tabControl.ResumeLayout(false);
-            this.groupBox3.ResumeLayout(false);
-            this.groupBox3.PerformLayout();
-            this.groupBox5.ResumeLayout(false);
-            this.groupBox5.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -642,6 +670,8 @@
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.RadioButton btnFixed;
         private System.Windows.Forms.RadioButton btnDynamic;
+        private System.Windows.Forms.GroupBox groupBox6;
+        private System.Windows.Forms.Button btnFinalImage;
     }
 }
 

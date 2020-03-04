@@ -141,6 +141,8 @@ namespace Windows_FCS_Analysis
         Color.Gold, Color.Gray, Color.Indigo, Color.LawnGreen, Color.Cyan}; //MediumSlateBlue
         private void RebuildButton_Click(object sender, EventArgs e)
         {
+            btnFinalImage.Enabled = false;
+
             string channel1 = comboBox1.Text;
             string channel2 = comboBox2.Text;
             int number = 5; //4
@@ -638,6 +640,7 @@ namespace Windows_FCS_Analysis
                                 WBC_counts[1], pctLympocytes, WBC_counts[2], pctMonocytes, WBC_counts[3], pctEosinophils));
             }
 
+            btnFinalImage.Enabled = true;
         }
 
         private void Label1_Click(object sender, EventArgs e)
@@ -1835,6 +1838,8 @@ namespace Windows_FCS_Analysis
 
         private void BtnPlotOnly_Click(object sender, EventArgs e)
         {
+            btnFinalImage.Enabled = false;
+
             string channel1 = comboBox1.Text;
             string channel2 = comboBox2.Text;
             string fileTot;
@@ -2312,6 +2317,8 @@ namespace Windows_FCS_Analysis
 
         private void btnPlotKde_Click(object sender, EventArgs e)
         {
+            btnFinalImage.Enabled = false;
+
             checkValidFileName();
 
             if (Loaded_TotalFileName != null)
@@ -2476,6 +2483,19 @@ namespace Windows_FCS_Analysis
         private void btnFixed_CheckedChanged(object sender, EventArgs e)
         {
             isDynamicGating = false;
+        }
+
+        private void btnFinalImage_Click(object sender, EventArgs e)
+        {
+            string imagePath = "./final gate result";
+            if (!Directory.Exists(imagePath))
+            {
+                Directory.CreateDirectory(imagePath);
+            }
+            string fileName = Path.GetFileName(Loaded_TotalFileName) + "_" + Path.GetRandomFileName() + ".png";
+            imagePath = Path.Combine(imagePath, fileName);
+            chartData.SaveImage(imagePath, ChartImageFormat.Png);
+            Process.Start(imagePath);
         }
 
         private bool checkCultureCorrect()
