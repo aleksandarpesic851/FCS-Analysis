@@ -109,7 +109,7 @@ function AddGateChangeEvent() {
         }
         gateDiv.find(".active").removeClass("active");
         $(this).addClass("active");
-
+        
         UpdateChart();
     });
 }
@@ -217,7 +217,6 @@ function initWbc() {
         customGatePolygons = [];
         customGates.forEach(function (gate, idx) {
             let gateName = gate.gateName;
-
             customGatePolygons[gateName] = {
                 channel1: gate.channel1,
                 channel2: gate.channel2,
@@ -429,6 +428,8 @@ function StartEditPolygon() {
     if (isDefaultGate || currGateName == "finalGate") {
         return;
     }
+
+    editingGateName = currGateName;
 
     $(".wbc-channels").prop("disabled", true);
 
@@ -1042,6 +1043,11 @@ function GetChartGateLineData() {
             pointHoverRadius: 10,
             lineTension: 0,
         }];
+    } else {
+        // In order to update first and last points at the same time, set last points as first point
+        polygon.forEach(function (poly, idx) {
+            polygon[idx].data[polygon[idx].data.length - 1] = polygon[idx].data[0];
+        })
     }
 
     return polygon;
