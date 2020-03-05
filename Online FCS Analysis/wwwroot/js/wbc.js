@@ -573,7 +573,7 @@ function DrawHeatmap() {
 
         $("#fcs-chart").css("background", 'url("' + wbcTotalData.heatmapFile + '") ' + left + 'px ' + top + 'px / ' + width + 'px ' + height + 'px no-repeat white');
     } else {
-        $("#fcs-chart").css("background", '');
+        $("#fcs-chart").css("background", 'white');
     }
 }
 
@@ -1048,3 +1048,26 @@ function GetChartGateLineData() {
 }
 
 // -------------------- Extract Chart Data from WBC Data --------//
+
+
+
+
+
+
+// -------------------- Export Gate Results --------//
+function SaveChartAsImage() {
+    let wbc = wbc_table.fnGetData($("#fcs-table tbody tr.selected"));
+    if (!wbc || !wbc.fcs_name || !currGateName) {
+        return;
+    }
+
+    html2canvas(document.getElementById('fcs-chart'), {
+        onrendered: function (canvas) {
+            var link = document.createElement('a');
+            link.href = canvas.toDataURL('image/jpeg');
+            link.download = wbc.fcs_name + " - " + currGateName + '.png';
+            link.click();
+        }
+    });
+}
+// -------------------- Export Gate Results --------//

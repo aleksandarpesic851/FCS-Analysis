@@ -201,3 +201,19 @@ div.table .file-row:nth-child(odd) {
 .alert-dismissible .close {
     padding: .25rem .5rem;
 }
+
+.btn-download {
+    background-color: DodgerBlue;
+    border: none;
+    color: white;
+    padding: 12px 30px;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+/* Darker background on mouse-over */
+.btn-download:hover {
+    background-color: RoyalBlue;
+    
+    color: white;
+}
