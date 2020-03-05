@@ -33,8 +33,8 @@ namespace Online_FCS_Analysis.Controllers
             return View();
         }
 
-        #region Upload FCS Files
-        public async Task<IActionResult> UploadAsync()
+        #region Upload WBC Files
+        public async Task<IActionResult> UploadWbc()
         {
             var files = HttpContext.Request.Form.Files;
             foreach (var file in files)
@@ -202,6 +202,64 @@ namespace Online_FCS_Analysis.Controllers
         }
 
         #endregion Upload FCS Files
+
+
+        #region Upload RBC Files
+        public async Task<IActionResult> UploadRbc()
+        {
+            var files = HttpContext.Request.Form.Files;
+            foreach (var file in files)
+            {
+                if (file.Length > 0)
+                {
+                    string orgFileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                    string fileName = Path.GetRandomFileName() + "_" + orgFileName;
+                    string fullPath = Path.Combine(Constants.rbc_fcs_full_path, fileName);
+                    using (var stream = System.IO.File.Create(fullPath))
+                    {
+                        await file.CopyToAsync(stream);
+
+                    }
+
+                    if (!System.IO.File.Exists(fullPath))
+                        continue;
+
+                    try
+                    {
+                        using (FCMeasurement fcsMeasurement = new FCMeasurement(fullPath))
+                        {
+                            int nomenclature = fcsMeasurement.GetNomenclature();
+                            if (nomenclature < 0)
+                            {
+                                System.IO.File.Delete(fullPath);
+                                continue;
+                            }
+                            await Task.Run(() => CreateNewRBC(orgFileName, fileName, nomenclature));
+                        }
+                    }
+                    catch
+                    {
+                        System.IO.File.Delete(fullPath);
+                    }
+                }
+            }
+            return Ok();
+        }
+        private void CreateNewRBC(string orgFileName, string fileName, int nomenclature)
+        {
+            FCSModel newWbc = new FCSModel
+            {
+                fcs_name = orgFileName,
+                fcs_file_name = fileName,
+                fcs_path = Constants.rbc_fcs_path + fileName,
+                user_id = Convert.ToInt32(User.FindFirst(Constants.CLAIM_TYPE_USER_ID).Value),
+                fcs_type = Constants.FCS_TYPE_RBC,
+                nomenclature = nomenclature
+            };
+            _dbContext.FCSs.Add(newWbc);
+            _dbContext.SaveChangesAsync();
+        }
+        #endregion Upload RBC Files
 
         #region Delete FCS Files
         public IActionResult Delete(int id)

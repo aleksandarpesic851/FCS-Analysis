@@ -1,12 +1,12 @@
-﻿@model string
+﻿@model  FileUploadViewModel
 
-<div class="modal" id="file-upload-dialog">
+<div class="modal" id="@Model.dlg_id">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
 
             <!-- Modal Header -->
             <div class="modal-header">
-                <h4 class="modal-title">Upload FCS Files</h4>
+                <h4 class="modal-title">@Model.title</h4>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
 
@@ -35,7 +35,7 @@
                     </div>
 
                 </div>
-                <div class="table table-striped files" id="previews">
+                <div class="table table-striped files" id="@Model.dlg_id-previews">
                     <div id="template" class="file-row">
                         <!-- This is used as the file preview template -->
 
@@ -65,7 +65,7 @@
                 <input type="file" multiple="multiple" class="dz-hidden-input" style="visibility: hidden; position: absolute; top: 0px; left: 0px; height: 0px; width: 0px;" accept="fcs">
 
                 <div class="file-upload-wait">
-                    <span>File Was Uploaded Successfully. <br />Now doing initial analyze for new files. This will take some times.</span>
+                    <span>File Upload Started. Please don't close this dialog. <br />When upload files, the server generate initial values for this file so that this will take some times.</span>
                 </div>
             </div>
 
@@ -82,32 +82,23 @@
 <script>
     $(document).ready(function () {
         // Get the template HTML and remove it from the doumenthe template HTML and remove it from the doument
-        var previewNode = document.querySelector("#template");
+        let previewNode = document.querySelector("#@Model.dlg_id #template");
         previewNode.id = "";
-        var previewTemplate = previewNode.parentNode.innerHTML;
+        let previewTemplate = previewNode.parentNode.innerHTML;
         previewNode.parentNode.removeChild(previewNode);
 
-        let uploadStarted = false;
-        var myDropzone = new Dropzone(document.body, { // Make the whole body a dropzone
-            url: "@Model", // Set the url
+        let myDropzone = new Dropzone("div#@Model.dlg_id", { // Make the whole body a dropzone
+            url: "@Model.upload_url", // Set the url
             parallelUploads: 2,
             previewTemplate: previewTemplate,
             autoQueue: false, // Make sure the files aren't queued until manually added
-            previewsContainer: "#previews", // Define the container to display the previews
-            clickable: ".fileinput-button" // Define the element that should be used as click trigger to select files.
+            previewsContainer: "#@Model.dlg_id-previews", // Define the container to display the previews
+            clickable: "#@Model.dlg_id .fileinput-button" // Define the element that should be used as click trigger to select files.
         });
 
-/*        myDropzone.on("addedfile", function (file) {
-            // Hookup the start button
-            file.previewElement.querySelector(".start").onclick = function () { myDropzone.enqueueFile(file); };
-        });
-*/
         // Update the total progress bar
         myDropzone.on("totaluploadprogress", function (progress) {
             document.querySelector("#total-progress .progress-bar").style.width = progress + "%";
-            if (progress > 99 && uploadStarted) {
-                $(".file-upload-wait").show();
-            }
         });
 
         myDropzone.on("sending", function (file) {
@@ -115,28 +106,28 @@
             document.querySelector("#total-progress").style.opacity = "1";
             // And disable the start button
             //file.previewElement.querySelector(".start").setAttribute("disabled", "disabled");
-
-            uploadStarted = true;
         });
 
         // Hide the total progress bar when nothing's uploading anymore
         myDropzone.on("queuecomplete", function (progress) {
             document.querySelector("#total-progress").style.opacity = "0";
-            $("#file-upload-dialog").modal("hide");
-            let oTable = $('#fcs-table').DataTable();
+            $("#@Model.dlg_id").modal("hide");
+            let oTable = $('#@Model.table_id').DataTable();
             oTable.draw();
         });
 
         // Setup the buttons for all transfers
         // The "add files" button doesn't need to be setup because the config
         // `clickable` has already been specified.
-        document.querySelector("#actions .start").onclick = function () {
+        document.querySelector("#@Model.dlg_id #actions .start").onclick = function () {
+            if (myDropzone.getFilesWithStatus(Dropzone.ADDED).length > 0) {
+                $(".file-upload-wait").show();
+            }
             myDropzone.enqueueFiles(myDropzone.getFilesWithStatus(Dropzone.ADDED));
         };
-        $("#file-upload-dialog").on('hidden.bs.modal', function(){
+        $("#@Model.dlg_id").on('hidden.bs.modal', function(){
             myDropzone.removeAllFiles(true);
             $(".file-upload-wait").hide();
-            uploadStarted = false;
         });
         $(".file-upload-wait").hide();
     });

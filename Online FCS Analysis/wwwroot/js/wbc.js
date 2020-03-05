@@ -58,7 +58,7 @@ function InitWbcTable() {
         scrollY: "58vh",
         scrollCollapse: true,
         ajax: {
-            url: "/FCS/LoadFcsTable",
+            url: "/FCS/LoadWBCTable",
             type: "POST",
             datatype: "json"
         },

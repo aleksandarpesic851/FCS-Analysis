@@ -18,7 +18,7 @@
             <div class="tab-pane active" id="tab-file">
                 <div class="clearfix mb-3">
                     <h3 class="float-left">Choose WBC File To Analyze</h3>
-                    <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#file-upload-dialog" data-backdrop="static" data-keyboard="false">
+                    <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#wbc-upload-dialog" data-backdrop="static" data-keyboard="false">
                         <i class="fa fa-upload"></i>
                         Upload WBC Files
                     </button>
@@ -127,7 +127,7 @@
 </div>
 @if (User.Identity.IsAuthenticated)
 {
-    @await Html.PartialAsync("~/Views/FileManager/Index.cshtml", "/FileManager/Upload")
+    @await Html.PartialAsync("~/Views/FileManager/Index.cshtml", new FileUploadViewModel { upload_url = "/FileManager/UploadWbc" , title = "Upload WBC File to Server", dlg_id = "wbc-upload-dialog", table_id = "fcs-table" })
 }
 
 @section Stylesheet {

@@ -33,9 +33,11 @@ namespace Online_FCS_Analysis.Controllers
         {
             return View();
         }
-        
+
+        #region WBC
+
         [HttpPost]
-        public IActionResult LoadFcsTable()
+        public IActionResult LoadWBCTable()
         {
             try
             {
@@ -149,5 +151,68 @@ namespace Online_FCS_Analysis.Controllers
             }
             return Ok();
         }
+
+        #endregion WBC
+
+        #region RBC
+        [HttpPost]
+        public IActionResult LoadRBCTable()
+        {
+            try
+            {
+                var draw = HttpContext.Request.Form["draw"].FirstOrDefault();
+                // Skiping number of Rows count  
+                var start = Request.Form["start"].FirstOrDefault();
+                // Paging Length 10,20  
+                var length = Request.Form["length"].FirstOrDefault();
+                // Sort Column Name  
+                var sortColumn = Request.Form["columns[" + Request.Form["order[0][column]"].FirstOrDefault() + "][name]"].FirstOrDefault();
+                // Sort Column Direction ( asc ,desc)  
+                var sortColumnDirection = Request.Form["order[0][dir]"].FirstOrDefault();
+                // Search Value from (Search box)  
+                var searchValue = Request.Form["search[value]"].FirstOrDefault();
+
+                //Paging Size (10,20,50,100)  
+                int pageSize = length != null ? Convert.ToInt32(length) : 0;
+                int skip = start != null ? Convert.ToInt32(start) : 0;
+                int recordsTotal = 0;
+
+                int userId = Convert.ToInt32(User.FindFirst(Constants.CLAIM_TYPE_USER_ID).Value);
+                string type_rbc = Constants.FCS_TYPE_RBC;
+
+                // Getting all Customer data  
+                var rbcData = (from tempRbc in _dbContext.FCSs.Where(fcs => fcs.enabled && fcs.fcs_type == type_rbc && fcs.user_id == userId) select tempRbc);
+
+                //Sorting  
+                if (!(string.IsNullOrEmpty(sortColumn) && string.IsNullOrEmpty(sortColumnDirection)))
+                {
+                    if (sortColumnDirection == "asc")
+                        rbcData = rbcData.OrderBy(wbc => typeof(FCSModel).GetProperty(sortColumn).GetValue(wbc));
+                    else
+                        rbcData = rbcData.OrderByDescending(wbc => typeof(FCSModel).GetProperty(sortColumn).GetValue(wbc));
+                }
+                //Search  
+                if (!string.IsNullOrEmpty(searchValue))
+                {
+                    rbcData = rbcData.Where(m => m.fcs_name.Contains(searchValue));
+                }
+
+                //total number of rows count   
+                recordsTotal = rbcData.Count();
+
+                //Paging   
+                var data = rbcData.Skip(skip).Take(pageSize).ToList();
+
+                //Returning Json Data  
+                return Json(new { draw, recordsFiltered = recordsTotal, recordsTotal, data });
+
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion RBC
     }
 }
