@@ -90,7 +90,7 @@
         let uploadStarted = false;
         var myDropzone = new Dropzone(document.body, { // Make the whole body a dropzone
             url: "@Model", // Set the url
-            parallelUploads: 20,
+            parallelUploads: 2,
             previewTemplate: previewTemplate,
             autoQueue: false, // Make sure the files aren't queued until manually added
             previewsContainer: "#previews", // Define the container to display the previews

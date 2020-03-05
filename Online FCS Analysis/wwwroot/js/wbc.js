@@ -58,7 +58,7 @@ function InitWbcTable() {
         scrollY: "58vh",
         scrollCollapse: true,
         ajax: {
-            url: "/FCS/LoadWbcs",
+            url: "/FCS/LoadFcsTable",
             type: "POST",
             datatype: "json"
         },
@@ -444,6 +444,7 @@ function StartEditPolygon() {
     editingGateName = currGateName;
 
     $(".wbc-channels").prop("disabled", true);
+    $("#draw-heatmap").prop("disabled", true);
 
     isGateEditing = true;
     $(".custom-gate-div").hide();
@@ -481,6 +482,7 @@ function CompleteEditPoygon() {
     $("#edit-custom-gate").hide();
 
     $(".wbc-channels").prop("disabled", false);
+    $("#draw-heatmap").prop("disabled", false);
 
     if (editingGateName) {
         customGatePolygons[editingGateName].polys = [];

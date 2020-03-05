@@ -35,7 +35,7 @@ namespace Online_FCS_Analysis.Controllers
         }
         
         [HttpPost]
-        public IActionResult LoadWbcs()
+        public IActionResult LoadFcsTable()
         {
             try
             {
@@ -76,11 +76,11 @@ namespace Online_FCS_Analysis.Controllers
                     wbcData = wbcData.Where(m => m.fcs_name.Contains(searchValue));
                 }
 
+                //total number of rows count   
+                recordsTotal = wbcData.Count();
+
                 //Paging   
                 var data = wbcData.Skip(skip).Take(pageSize).ToList();
-
-                //total number of rows count   
-                recordsTotal = data.Count;
 
                 //Returning Json Data  
                 return Json(new { draw, recordsFiltered = recordsTotal, recordsTotal, data });
