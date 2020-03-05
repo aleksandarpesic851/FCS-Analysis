@@ -78,6 +78,7 @@ function initChart() {
 		// Configuration options go here
 		options: {
 			responsive: true,
+			maintainAspectRatio: false,
 			animation: false,
 			legend: {
 				display: false

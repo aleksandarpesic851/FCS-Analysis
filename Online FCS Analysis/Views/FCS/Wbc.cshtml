@@ -2,114 +2,122 @@
     ViewData["Title"] = "";
 }
 
-    <div class="body_first_area chart-area">
-        <div class="row shadow-sm rounded mb-5 p-4 fcs-file-container">
-            <div class="col-12">
-                <div class="clearfix mb-3">
-                    <h3 class="float-left">Choose WBC File</h3>
-                    <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#file-upload-dialog" data-backdrop="static" data-keyboard="false">
-                        <i class="fa fa-upload"></i>
-                        Upload FCS Files
-                    </button>
-                </div>
-                <table id="fcs-table" class="table table-striped table-bordered dt-responsive nowrap" width="100%">
-                    <thead>
-                        <tr>
-                            <th>id</th>
-                            <th>WBC</th>
-                            <th>Created At</th>
-                            <th>Updated At</th>
-                            <th>Delete</th>
-                        </tr>
-                    </thead>
-                </table>
-            </div>
-        </div>
+    <div class="body_first_area custom-container chart-area">
 
-        <!-- Chart Graph -->
-
-        <div class="row ml-3 mr-1">
+        <div class="shadow-sm rounded">
             <ul class="nav nav-tabs nav-fill gate-tab">
-                <li class="nav-item show" id="tab-custom">
-                    <a class="nav-link" onclick="CustomeGate()">Custom Gate</a>
+                <li class="nav-item active">
+                    <a class="nav-link active" href="#tab-file" data-toggle="tab">File Manage</a>
                 </li>
-                <li class="nav-item" id="tab-default">
-                    <a class="nav-link" onclick="DefaultGate()">Default Gate</a>
+                <li class="nav-item">
+                    <a class="nav-link" href="#tab-graph" data-toggle="tab" id="">WBC Analyze</a>
                 </li>
             </ul>
-        </div>
-        <div class="row ml-3 mr-1 mt-3">
-            <div class="col-3">
-                <label for="channel-1">Channel X :</label>
-                <select id="channel-1" name="channel-1" class="form-control wbc-items wbc-channels" onchange="ChangeChannel()">
-                </select>
-            </div>
-            <div class="col-3">
-                <label for="channel-2">Channel Y :</label>
-                <select id="channel-2" name="channel-2" class="form-control wbc-items wbc-channels" onchange="ChangeChannel()">
-                </select>
-            </div>
-            <div class="col-3 mt-auto mb-auto text-center">
-                <input class="wbc-items channel-items" type="checkbox" id="draw-heatmap" name="draw-heatmap" onchange="UpdateChart()" />
-                <label for="draw-heatmap" title="Draw heatmap only when ChannelX,Y are default channels">Heatmap</label>
-            </div>
-            <div class="col-3 mt-auto mb-auto text-center default-gate-div" style="display: none">
-                <input class="wbc-items" type="checkbox" id="dynamic-gate" name="dynamic-gate" onchange="ChangeDynamic(this.checked)" />
-                <label for="dynamic-gate">Dynamic Gate</label>
-            </div>
-            <div class="col-3 text-center channel-items custom-gate-div">
-                <button class="btn btn-primary mb-1 wbc-items channel-items" onclick="AddNewCustomGate()">New Gate</button>
-                <input class="form-control wbc-items" id="gate-name" placeholder="Gate Name" title="Insert your custom gate name" onchange="AddNewCustomGate()" />
-            </div>
-        </div>
-        <div class="row ml-4 mr-1 mt-4 mb-4 default-gate-div text-center" id="default-gates" style="display: none">
-            <div class="btn-gate active" data-gate="defaultGate1">
-                <strong>Default Gate 1</strong>
-            </div>
-            <div class="btn-gate" data-gate="defaultGate2">
-                <strong>Default Gate 2</strong>
-            </div>
-            <div class="btn-gate" data-gate="defaultGate3">
-                <strong>Default Gate 3</strong>
-            </div>
-            <div class="btn-gate final" data-gate="finalGate">
-                <strong>Final Gate &nbsp; : &nbsp;&nbsp;</strong>
-
-                <input type="checkbox" id="final-defaultGate1" data-gate="defaultGate1" class="wbc-items" checked/>
-                <label for="final-defaultGate1">Default Gate 1</label>
-
-                <input type="checkbox" id="final-defaultGate2" data-gate="defaultGate2" class="wbc-items" checked/>
-                <label for="final-defaultGate2">Default Gate 2</label>
-
-                <input type="checkbox" id="final-defaultGate3" data-gate="defaultGate3" class="wbc-items" checked/>
-                <label for="final-defaultGate3">Default Gate 3</label>
-            </div>
-        </div>
-        <div class="row ml-4 mr-1 mt-4 mb-4 custom-gate-div" id="custom-gates">
-            <div class="d-flex" id="custom-btn-gate-div">
-            </div>
-            <div class="btn-gate final active" data-gate="finalGate" id="custom-final-gate">
-                <strong>Final Gate &nbsp; : &nbsp;&nbsp;</strong>
-                <div id="custom-gate-checks">
+            <div class="row tab-content p-4">
+                <!-- File Manage -->
+                <div class="col-12 tab-pane active" id="tab-file">
+                    <div class="clearfix mb-3">
+                        <h3 class="float-left">Choose WBC File</h3>
+                        <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#file-upload-dialog" data-backdrop="static" data-keyboard="false">
+                            <i class="fa fa-upload"></i>
+                            Upload FCS Files
+                        </button>
+                    </div>
+                    <table id="fcs-table" class="table table-striped table-bordered dt-responsive nowrap" width="100%">
+                        <thead>
+                            <tr>
+                                <th>id</th>
+                                <th>WBC</th>
+                                <th>Created At</th>
+                                <th>Updated At</th>
+                                <th>Delete</th>
+                            </tr>
+                        </thead>
+                    </table>
+                    
                 </div>
+
+                <!-- Chart Graph -->
+                <div class="col-12 tab-pane" id="tab-graph">
+                    <div class="btn-group btn-group-justified custom-tabs" style="width: 100%">
+                        <button class="btn btn-default border-primary active" id="tab-custom" onclick="CustomeGate()">Custom Gate</button>
+                        <button class="btn btn-default border-primary" id="tab-default" onclick="DefaultGate()">Standard Gate</button>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-3">
+                            <label for="channel-1">Channel X :</label>
+                            <select id="channel-1" name="channel-1" class="form-control wbc-items wbc-channels" onchange="ChangeChannel()">
+                            </select>
+                        </div>
+                        <div class="col-3">
+                            <label for="channel-2">Channel Y :</label>
+                            <select id="channel-2" name="channel-2" class="form-control wbc-items wbc-channels" onchange="ChangeChannel()">
+                            </select>
+                        </div>
+                        <div class="col-3 mt-auto mb-auto text-center">
+                            <input class="wbc-items channel-items" type="checkbox" id="draw-heatmap" name="draw-heatmap" onchange="UpdateChart()" />
+                            <label for="draw-heatmap" title="Draw heatmap only when ChannelX,Y are default channels">Heatmap</label>
+                        </div>
+                        <div class="col-3 mt-auto mb-auto text-center default-gate-div" style="display: none">
+                            <input class="wbc-items" type="checkbox" id="dynamic-gate" name="dynamic-gate" onchange="ChangeDynamic(this.checked)" />
+                            <label for="dynamic-gate">Dynamic Gate</label>
+                        </div>
+                        <div class="col-3 text-center channel-items custom-gate-div">
+                            <button class="btn btn-primary mb-1 wbc-items channel-items" onclick="AddNewCustomGate()">New Gate</button>
+                            <input class="form-control wbc-items" id="gate-name" placeholder="Gate Name" title="Insert your custom gate name" onchange="AddNewCustomGate()" />
+                        </div>
+                    </div>
+                    <div class="row  mt-1 mb-1 default-gate-div text-center" id="default-gates" style="display: none">
+                        <div class="btn-gate active" data-gate="defaultGate1">
+                            <strong>Default Gate 1</strong>
+                        </div>
+                        <div class="btn-gate" data-gate="defaultGate2">
+                            <strong>Default Gate 2</strong>
+                        </div>
+                        <div class="btn-gate" data-gate="defaultGate3">
+                            <strong>Default Gate 3</strong>
+                        </div>
+                        <div class="btn-gate final" data-gate="finalGate">
+                            <strong>Final Gate &nbsp; : &nbsp;&nbsp;</strong>
+
+                            <input type="checkbox" id="final-defaultGate1" data-gate="defaultGate1" class="wbc-items" checked />
+                            <label for="final-defaultGate1">Default Gate 1</label>
+
+                            <input type="checkbox" id="final-defaultGate2" data-gate="defaultGate2" class="wbc-items" checked />
+                            <label for="final-defaultGate2">Default Gate 2</label>
+
+                            <input type="checkbox" id="final-defaultGate3" data-gate="defaultGate3" class="wbc-items" checked />
+                            <label for="final-defaultGate3">Default Gate 3</label>
+                        </div>
+                    </div>
+                    <div class="row  mt-1 mb-1 custom-gate-div" id="custom-gates">
+                        <div class="d-flex" id="custom-btn-gate-div">
+                        </div>
+                        <div class="btn-gate final active" data-gate="finalGate" id="custom-final-gate">
+                            <strong>Final Gate &nbsp; : &nbsp;&nbsp;</strong>
+                            <div id="custom-gate-checks">
+                            </div>
+                        </div>
+                        <button class="btn btn-info ml-auto mr-5" id="btn-edit-custom-polygon" onclick="StartEditPolygon()"><i class="fa fa-pencil-square-o"></i>&nbsp;&nbsp; Edit Current Polygon</button>
+                    </div>
+                    <div class="row mt-1 mb-1" id="edit-custom-gate" style="display: none">
+                        <button class="btn btn-info ml-5" onclick="AddNewPolygon()">Add New Polygon</button>
+                        <button class="btn btn-danger ml-5" onclick="DeleteChoosenPolygon()">Delete Choosen Polygon</button>
+                        <button class="btn btn-danger ml-5" onclick="DeleteChoosenPoint()">Delete Choosen Point</button>
+                        <button class="btn btn-info ml-5" onclick="CompleteEditPoygon()">Complete Edit Polygon</button>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12 col-lg-9 chart-container">
+                            <canvas id="fcs-chart"></canvas>
+                        </div>
+                        <div class="col-12 col-lg-3 pl-1" id="fcs-chart-details">
+                            No WBC
+                        </div>
+                    </div>
+                </div>
+
             </div>
-            <button class="btn btn-info ml-auto mr-5" id="btn-edit-custom-polygon" onclick="StartEditPolygon()"><i class="fa fa-pencil-square-o"></i>&nbsp;&nbsp; Current Custom Gate Polygon</button>
         </div>
-        <div class="row ml-4 mr-1 mt-4 mb-4" id="edit-custom-gate" style="display: none">
-            <button class="btn btn-info ml-5" onclick="AddNewPolygon()">Add New Polygon</button>
-            <button class="btn btn-danger ml-5" onclick="DeleteChoosenPolygon()">Delete Choosen Polygon</button>
-            <button class="btn btn-danger ml-5" onclick="DeleteChoosenPoint()">Delete Choosen Point</button>
-            <button class="btn btn-info ml-5" onclick="CompleteEditPoygon()">Complete Edit Polygon</button>
-        </div>
-        <div class="row mt-5">
-            <div class="col-9 chart-container">
-                <canvas id="fcs-chart"></canvas>
-            </div>
-            <div class="col-2 ml-1" id="fcs-chart-details">
-                No WBC
-            </div>
-        </div>
-        
     </div>
 @if (User.Identity.IsAuthenticated)
 {

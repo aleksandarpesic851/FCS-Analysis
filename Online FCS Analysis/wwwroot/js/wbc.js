@@ -55,7 +55,7 @@ function InitWbcTable() {
         filter: true, // this is for disable filter (search box)
         orderMulti: false, // for disable multiple column at once
         scrollX: true,
-        scrollY: "30vh",
+        scrollY: "58vh",
         scrollCollapse: true,
         ajax: {
             url: "/FCS/LoadWbcs",
@@ -303,24 +303,24 @@ function ChangeChannel() {
 
 // change to default gate state
 function DefaultGate() {
+    $("#tab-custom").removeClass("active");
+    $("#tab-default").addClass("active")
+    $(".custom-gate-div").hide();
+    $(".default-gate-div").show();
+
     if (isGateEditing) {
         CompleteEditPoygon();
     }
 
     isDefaultGate = true;
-    $("#tab-custom").removeClass("show");
-    $("#tab-default").addClass("show")
-    $(".custom-gate-div").hide();
-    $(".default-gate-div").show();
-
     UpdateChart();
 }
 
 // change to custom gate state
 function CustomeGate() {
     isDefaultGate = false;
-    $("#tab-custom").addClass("show");
-    $("#tab-default").removeClass("show")
+    $("#tab-custom").addClass("active");
+    $("#tab-default").removeClass("active")
     $(".custom-gate-div").show();
     $(".default-gate-div").hide();
 
@@ -337,6 +337,10 @@ function ChangeDynamic(isDynamic) {
 
 // Remove Custom Gate
 function RemoveGate(gateName) {
+    if (!confirm("Are you sure to delete this gate - " + gateName + "?")) {
+        return;
+    }
+
     isGateEditing = false;
 
     if (gateName == currGateName) {
