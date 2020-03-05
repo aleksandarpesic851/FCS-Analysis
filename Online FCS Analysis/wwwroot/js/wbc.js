@@ -106,7 +106,10 @@ function AddGateChangeEvent() {
         let gateDiv = $("#custom-gates");
         if (isDefaultGate) {
             gateDiv = $("#default-gates");
+        } else if (!($(this).data("gate") in customGatePolygons)) {
+                return; // In the case of deleting a custom gate, ignore the click event
         }
+
         gateDiv.find(".active").removeClass("active");
         $(this).addClass("active");
         
@@ -230,7 +233,7 @@ function initWbc() {
             }
             newHtml = '<div class="alert alert-dismissible btn-gate pr-5 ' + active + '" data-gate="' + gateName + '" id="custom-' + gateName + '">';
             newHtml += '<strong>' + gateName + '</strong>';
-            newHtml += '<button type="button" class="close" data-dismiss="alert" onclick="RemoveGate(\'' + gateName + '\')">×</button>';
+            newHtml += '<button type="button" class="close" data-dismiss="alert" data-gate="' + gateName + '">×</button>';
             newHtml += '</div>';
 
             $("#custom-btn-gate-div").append(newHtml);
@@ -240,6 +243,10 @@ function initWbc() {
             $("#custom-gate-checks").append(newHtml);
 
             i++;
+        });
+        $("#custom-btn-gate-div .alert .close").on("click", function (event) {
+            event.preventDefault();
+            return RemoveGate($(this).data("gate"));
         });
     }
 
@@ -339,7 +346,7 @@ function ChangeDynamic(isDynamic) {
 // Remove Custom Gate
 function RemoveGate(gateName) {
     if (!confirm("Are you sure to delete this gate - " + gateName + "?")) {
-        return;
+        return false;
     }
 
     isGateEditing = false;
@@ -352,8 +359,8 @@ function RemoveGate(gateName) {
     delete customGatePolygons[gateName];
     SaveCustomGate();
 
-    $("#final-custom-" + gateName).remove();
-    $('label[for=final-custom-' + gateName + ']').remove();
+    $("[id='final-custom-" + gateName + "']").remove();
+    $('label[for="final-custom-' + gateName + '"]').remove();
     UpdateChart();
 }
 
@@ -406,10 +413,15 @@ function AddNewCustomGate() {
 
     let newHtml = '<div class="alert alert-dismissible btn-gate pr-5 active" data-gate="' + editingGateName + '" id="custom-' + editingGateName + '">';
     newHtml += '<strong>' + editingGateName + '</strong>';
-    newHtml += '<button type="button" class="close" data-dismiss="alert" onclick="RemoveGate(\'' + editingGateName + '\')">×</button>';
+    newHtml += '<button type="button" class="close" data-dismiss="alert" data-gate="' + editingGateName + '">×</button>';
     newHtml += '</div>';
 
     $("#custom-btn-gate-div").append(newHtml);
+    $("#custom-btn-gate-div .alert .close").on("click", function (event) {
+        event.preventDefault();
+        return RemoveGate($(this).data("gate"));
+    });
+
     AddGateChangeEvent();
 
     newHtml = '<input type="checkbox" id="final-custom-' + editingGateName + '" data-gate="' + editingGateName + '" class="wbc-items" checked/>';
