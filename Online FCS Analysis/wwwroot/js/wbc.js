@@ -252,6 +252,8 @@ function initWbc() {
     
     AddGateChangeEvent();
     UpdateChart();
+
+    $("#btn-tab-graph").trigger("click");
 }
 
 // -------------------- Load WBC file, Initialize wbc objects ----------------------------//
