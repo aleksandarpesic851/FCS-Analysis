@@ -5,19 +5,6 @@ var lineHighlightColor = 'rgb(250, 20, 20)';
 
 $(document).ready(function () {
 	initChart();
-	function getMousePosition(canvas, event) {
-		let rect = canvas.getBoundingClientRect();
-		let x = event.clientX - rect.left;
-		let y = event.clientY - rect.top;
-		console.log("Coordinate x: " + x,
-			"Coordinate y: " + y);
-	}
-
-	let canvasElem = document.getElementById('fcs-chart');
-
-	canvasElem.addEventListener("mousedown", function (e) {
-		getMousePosition(canvasElem, e);
-	}); 
 });
 
 function initChart() {

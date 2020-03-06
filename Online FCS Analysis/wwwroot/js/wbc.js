@@ -106,7 +106,7 @@ function AddGateChangeEvent() {
         let gateDiv = $("#custom-gates");
         if (isDefaultGate) {
             gateDiv = $("#default-gates");
-        } else if (!($(this).data("gate") in customGatePolygons)) {
+        } else if (!($(this).data("gate") in customGatePolygons) && $(this).data("gate") != "finalGate") {
                 return; // In the case of deleting a custom gate, ignore the click event
         }
 

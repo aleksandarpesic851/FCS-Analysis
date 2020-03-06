@@ -4,70 +4,140 @@
 
 <div class="body_first_area custom-container chart-area">
 
-    <div class="shadow-sm rounded">
-        <ul class="nav nav-tabs nav-fill gate-tab">
-            <li class="nav-item active">
-                <a class="nav-link active" href="#tab-file" data-toggle="tab">File Manage</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#tab-graph" data-toggle="tab" id="btn-tab-graph">RBC Analyze</a>
-            </li>
-        </ul>
-        <div class="tab-content p-4">
-            <!-- File Manage -->
-            <div class="tab-pane active" id="tab-file">
-                <div class="row">
-                    <div class="col-12 col-lg-6">
-                        <div class="clearfix mb-3">
-                            <h3 class="float-left">Choose RBC File To Analyze</h3>
-                            <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#rbc-upload-dialog" data-backdrop="static" data-keyboard="false">
-                                <i class="fa fa-upload"></i>
-                                Upload RBC Files
-                            </button>
-                        </div>
-                        <table id="rbc-table" class="table table-striped table-bordered dt-responsive nowrap" width="100%">
-                            <thead>
-                                <tr>
-                                    <th>id</th>
-                                    <th>RBC</th>
-                                    <th>Created At</th>
-                                    <th>Updated At</th>
-                                    <th>Delete</th>
-                                </tr>
-                            </thead>
-                        </table>
+    
+    <ul class="nav nav-tabs nav-fill gate-tab">
+        <li class="nav-item active">
+            <a class="nav-link active" href="#tab-file" data-toggle="tab">File Manage</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#tab-graph" data-toggle="tab" id="btn-tab-graph">RBC Analyze</a>
+        </li>
+    </ul>
+    <div class="tab-content p-4">
+        <!-- File Manage -->
+        <div class="tab-pane active" id="tab-file">
+            <div class="row">
+                <!-- RBC Table -->
+                <div class="col-12 col-lg-6 mb-5 mb-lg-0 shadow rounded p-2">
+                    <div class="clearfix mb-3">
+                        <h3 class="float-left">Choose RBC File To Analyze</h3>
+                        <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#rbc-upload-dialog" data-backdrop="static" data-keyboard="false">
+                            <i class="fa fa-upload"></i>
+                            Upload RBC Files
+                        </button>
                     </div>
-                    <div class="col-12 col-lg-6">
-                        <div class="clearfix mb-3">
-                            <h3 class="float-left">Choose WBC File Related with Selected RBC</h3>
-                            <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#wbc-upload-dialog" data-backdrop="static" data-keyboard="false">
-                                <i class="fa fa-upload"></i>
-                                Upload WBC Files
-                            </button>
-                        </div>
-                        <table id="wbc-table" class="table table-striped table-bordered dt-responsive nowrap" width="100%">
-                            <thead>
-                                <tr>
-                                    <th>id</th>
-                                    <th>WBC</th>
-                                    <th>Created At</th>
-                                    <th>Updated At</th>
-                                    <th>Delete</th>
-                                </tr>
-                            </thead>
-                        </table>
-                    </div>
+                    <table id="rbc-table" class="table table-striped table-bordered dt-responsive nowrap" width="100%">
+                        <thead>
+                            <tr>
+                                <th>id</th>
+                                <th>RBC</th>
+                                <th>Created At</th>
+                                <th>Updated At</th>
+                                <th>Delete</th>
+                            </tr>
+                        </thead>
+                    </table>
                 </div>
-
-            </div>
-
-            <!-- Chart Graph -->
-            <div class="tab-pane" id="tab-graph">
-                Graph
+                <!-- WBC Table -->
+                <div class="col-12 col-lg-6 shadow rounded p-2">
+                    <div class="clearfix mb-3">
+                        <h3 class="float-left">Choose WBC File Related with Selected RBC</h3>
+                        <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#wbc-upload-dialog" data-backdrop="static" data-keyboard="false">
+                            <i class="fa fa-upload"></i>
+                            Upload WBC Files
+                        </button>
+                    </div>
+                    <table id="wbc-table" class="table table-striped table-bordered dt-responsive nowrap" width="100%">
+                        <thead>
+                            <tr>
+                                <th>id</th>
+                                <th>WBC</th>
+                                <th>Created At</th>
+                                <th>Updated At</th>
+                                <th>Delete</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
             </div>
 
         </div>
+
+        <!-- Chart Graph -->
+        <div class="tab-pane" id="tab-graph">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <!-- RBC Chart -->
+                    <strong>RBC</strong>
+                    <div class="row shadow rounded mb-3">
+                        <div class="col-9">
+                            <div class="container-2">
+                                <canvas id="rbc-chart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="container-2">
+                                <label for="rbc-channel-1">Channel X :</label>
+                                <select id="rbc-channel-1" class="form-control rbc-items rbc-channels" onchange="ChangeRbcChannel()"></select>
+                                <label for="rbc-channel-2">Channel Y :</label>
+                                <select id="rbc-channel-2" class="form-control rbc-items rbc-channels" onchange="ChangeRbcChannel()"></select>
+                                <hr class="mt-4 mb-4">
+                                <div id="rbc-detail">
+                                    Not Selected RBC File
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- WBC Chart -->
+                    <strong>WBC</strong>
+                    <div class="row shadow rounded">
+                        <div class="col-9">
+                            <div class="container-2">
+                                <canvas id="wbc-chart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="container-2">
+                                <label for="wbc-channel-1">Channel X :</label>
+                                <select id="wbc-channel-1" class="form-control rbc-items wbc-channels" onchange="ChangeWbcChannel()"></select>
+                                <label for="wbc-channel-2">Channel Y :</label>
+                                <select id="wbc-channel-2" class="form-control rbc-items wbc-channels" onchange="ChangeWbcChannel()"></select>
+                                <hr class="mt-4 mb-4">
+                                <div id="wbc-detail">
+                                    Not Selected WBC File
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-4">
+                    <!-- Calculation Result -->
+                    <strong>Calculation Results</strong>
+                    <div class="mb-2 shadow rounded">
+                        <div class="container-3 ">
+                            Parameters
+                        </div>
+                    </div>
+                    <!-- V Histogram -->
+                    <strong>V Histogram</strong>
+                    <div class="mb-2 shadow rounded">
+                        <div class="container-3">
+                            <canvas id="v-chart"></canvas>
+                        </div>
+                    </div>
+                    <!-- HC Histogram -->
+                    <strong>HC Histogram</strong>
+                    <div class="mb-2 shadow rounded">
+                        <div class="container-3">
+                            <canvas id="hc-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
+    
 </div>
 @if (User.Identity.IsAuthenticated)
 {
@@ -83,9 +153,9 @@
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
-    <script src="~/js/chartjs-plugin-dragdata.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
     <script src="~/js/rbc.js"></script>
+    <script src="~/js/rbc-chart.js"></script>
 }

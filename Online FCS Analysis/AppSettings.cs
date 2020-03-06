@@ -28,5 +28,6 @@ namespace Online_FCS_Analysis
         public string gateEos { get; set; }
         public string gateBaso { get; set; }
         public string gateBasoClusterCenter { get; set; }
+        public string gateRBC { get; set; }
     }
 }

@@ -28,12 +28,43 @@
         height: 58vh;
         margin: auto;
     }
+    .total-container {
+        height: 78vh;
+        width: 100%;
+        overflow: auto;
+    }
+    .container-2 {
+        height: 39vh;
+        width: 100%;
+        overflow: auto;
+    }
+    .container-3 {
+        height: 25vh;
+        width: 100%;
+        overflow: auto;
+    }
 }
 
 @media (orientation: portrait) {
     .chart-container {
+        height: 90vw;
+        width: 100%;
+    }
+    .total-container {
         width: 100%;
         height: 90vw;
+        overflow: auto;
+    }
+    .container-2 {
+        width: 100%;
+        height: 45vw;
+        overflow: auto;
+    }
+
+    .container-3 {
+        width: 100%;
+        height: 30vw;
+        overflow: auto;
     }
 }
 
@@ -107,8 +138,12 @@ div.table .file-row:nth-child(odd) {
     vertical-align: middle;
 }
 
-#fcs-table tr {
+#tab-file table tbody tr {
     cursor: pointer;
+}
+
+#tab-file table tbody tr:hover {
+    background-color: rgba(0, 0, 0, .2);
 }
 
 .gate-tab {

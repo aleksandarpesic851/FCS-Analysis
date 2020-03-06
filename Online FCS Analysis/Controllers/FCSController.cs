@@ -213,6 +213,28 @@ namespace Online_FCS_Analysis.Controllers
             }
         }
 
+        [HttpPost]
+        public IActionResult LoadRbcData(int rbcId)
+        {
+            int userId = Convert.ToInt32(User.FindFirst(Constants.CLAIM_TYPE_USER_ID).Value);
+            FCSModel fcsData = _dbContext.FCSs.FirstOrDefault(e => e.id == rbcId && e.user_id == userId);
+            if (fcsData == null)
+                return Ok();
+
+            string fcsFile = Constants.wwwroot_abs_path + fcsData.fcs_path;
+            string gateFile = Path.Combine(Constants.wwwroot_abs_path, _appSettings.Value.defaultGateSetting.path, _appSettings.Value.defaultGateSetting.gateRBC);
+
+            FCMeasurement fcsMeasurement = new FCMeasurement(fcsFile);
+            List<Polygon> gatePolygon = FCMeasurement.loadPolygon(gateFile);
+            return Json(
+                new
+                {
+                    rbcData = fcsMeasurement.Channels,
+                    gatePolygon = gatePolygon.Select(e => e.poly),
+                    nomenclature = Constants.WBC_NOMENCLATURES[fcsData.nomenclature]
+                });
+        }
+
         #endregion RBC
     }
 }
