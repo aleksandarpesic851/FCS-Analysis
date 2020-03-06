@@ -43,6 +43,8 @@ namespace Online_FCS_Analysis.Utilities
         public static string avatar_path = "/uploads/avatars/";
         public static string avatar_full_path = Path.Combine(wwwroot_abs_path, "uploads/avatars");
 
+        public static string vhc_path = "record_table/result.txt";
+
         /* ---------- Heat Color ----------------*/
         public static byte Alpha = 0xff;
         public static List<Color> ColorsOfMap = new List<Color>()
@@ -55,5 +57,15 @@ namespace Online_FCS_Analysis.Utilities
             Color.FromArgb(Alpha, 0xFF, 0, 0) ,//Red
             Color.FromArgb(Alpha, 0xFF, 0xFF, 0xFF) // White
         };
+
+
+        /* ---------- V, HC Param ----------------*/
+        private const double MEAN_S1 = 0.30327732397673;
+        private const double MEAN_S2 = 0.323369234247477;
+        private const int MEAN_RBC_1 = 5710;
+        private const int MEAN_RBC_2 = 4187;
+        public  static double Kx = MEAN_S1 / MEAN_RBC_1;  // s1 = fcs1 * Kx
+        public  static double Ky = MEAN_S2 / MEAN_RBC_2;  // s2 = fcs2 * Ky
+
     }
 }

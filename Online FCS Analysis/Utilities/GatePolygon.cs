@@ -17,7 +17,7 @@ namespace Online_FCS_Analysis.Utilities
     [Serializable]
     public class SPoint
     {
-        public float x { get; set; }
-        public float y { get; set; }
+        public int x { get; set; }
+        public int y { get; set; }
     }
 }

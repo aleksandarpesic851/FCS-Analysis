@@ -4,11 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using FlowCytometry;
+using FlowCytometry.Mie_Scatter;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Online_FCS_Analysis.Models;
 using Online_FCS_Analysis.Models.Entities;
+using Online_FCS_Analysis.Models.ViewModel;
 using Online_FCS_Analysis.Utilities;
 
 namespace Online_FCS_Analysis.Controllers
@@ -18,7 +20,6 @@ namespace Online_FCS_Analysis.Controllers
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly IOptions<AppSettings> _appSettings;
-
         public FCSController(ApplicationDbContext dbContext, IOptions<AppSettings> appSettings)
         {
             _dbContext = dbContext;
@@ -223,7 +224,6 @@ namespace Online_FCS_Analysis.Controllers
 
             string fcsFile = Constants.wwwroot_abs_path + fcsData.fcs_path;
             string gateFile = Path.Combine(Constants.wwwroot_abs_path, _appSettings.Value.defaultGateSetting.path, _appSettings.Value.defaultGateSetting.gateRBC);
-
             FCMeasurement fcsMeasurement = new FCMeasurement(fcsFile);
             List<Polygon> gatePolygon = FCMeasurement.loadPolygon(gateFile);
             return Json(
@@ -235,6 +235,32 @@ namespace Online_FCS_Analysis.Controllers
                 });
         }
 
+        [HttpPost]
+        public IActionResult CalculateVHC([FromBody]List<SPoint> rbcData)
+        {
+            //List<SPoint> rbcData = formData.data;
+            List<int> arrV = new List<int>();
+            List<int> arrHC = new List<int>();
+            double s1, s2;
+            foreach (SPoint pt in rbcData)
+            {
+                s1 = pt.x * Constants.Kx;
+                s2 = pt.y * Constants.Ky;
+
+                Record record = VHC.arrVHC.Aggregate((e1, e2) =>
+                    Math.Abs(e1.S1 - s1) + Math.Abs(e1.S2 - s2) <
+                    Math.Abs(e2.S1 - s1) + Math.Abs(e2.S2 - s2) ?
+                    e1 : e2);
+
+                arrV.Add(record.V);
+                arrHC.Add(record.HC);
+            }
+            return Json(new
+            {
+                arrV,
+                arrHC
+            });
+        }
         #endregion RBC
     }
 }

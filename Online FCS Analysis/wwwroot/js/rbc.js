@@ -29,6 +29,8 @@ var rbc_loaded = false;
 var rbcPlatelete = [];
 var rbcGeneral = [];
 
+var rbcV = [];
+var rbcHC = [];
 //------------- Initialize Controls when document ready ------------//
 
 
@@ -174,7 +176,6 @@ function Delete(tableId, fcsID) {
             } else {
                 rbc_loaded = false;
             }
-            UpdateChart();
         }
         else {
             alert("Something Went Wrong!");
@@ -191,6 +192,8 @@ function Delete(tableId, fcsID) {
 
 function LoadRbcData(rbcId) {
     let url = "/FCS/LoadRbcData";
+    rbcV = [];
+    rbcHC = [];
     $.post(url, { rbcId: rbcId }, function (data) {
         if (data) {
             rbcTotalData = data;
@@ -198,6 +201,29 @@ function LoadRbcData(rbcId) {
         }
         else {
             alert("Something Went Wrong!");
+        }
+    });
+}
+
+// Load V HC Data for RBC Cell
+function LoadVHC() {
+    let url = "/FCS/CalculateVHC";
+    let points = JSON.stringify( rbcGeneral );
+    $.ajax({
+        url,
+        data: points,
+        contentType: 'application/json',
+        type: 'POST',
+        success: function (data) {
+            if (data) {
+                rbcV = data.arrV;
+                rbcHC = data.arrHC;
+                DrawVHC();
+                CalculateRBC();
+            }
+            else {
+                console.log("Error in get VHC");
+            }
         }
     });
 }
@@ -239,7 +265,9 @@ function InitWbc() {
 
     ExtractWBCData();
 
-    UpdateChart();
+    DrawWBC();
+
+    CalculateRBC();
 }
 
 function InitRbc() {
@@ -260,8 +288,7 @@ function InitRbc() {
     $("#rbc-channel-2").val(rbcDefaultChannels[1]);
 
     ExtractRBCData();
-
-    UpdateChart();
+    LoadVHC();
 }
 
 // -------------------- Load WBC file, Initialize wbc objects ----------------------------//
@@ -270,11 +297,6 @@ function InitRbc() {
 
 
 // ------------------------------------------ Draw Charts--------------------------------//
-
-// calculate & draw chart
-function UpdateChart() {
-    DrawRBC();
-}
 
 // Draw RBC Chart
 function DrawRBC() {
@@ -306,6 +328,9 @@ function DrawWBC() {
 
 }
 
+function DrawVHC() {
+
+}
 // ------------------------------------------ Draw Charts--------------------------------//
 
 
@@ -441,3 +466,15 @@ function GetChannelName(channelHandle, type) {
 }
 
 // ------------------------------------------ Extract Chart Data--------------------------------//
+
+
+
+
+
+// ------------------------------------------ Calculate RBC Based on Extracted RBC & WBC--------------------------------//
+
+function CalculateRBC() {
+
+}
+
+// ------------------------------------------ Calculate RBC Based on Extracted RBC & WBC--------------------------------//
