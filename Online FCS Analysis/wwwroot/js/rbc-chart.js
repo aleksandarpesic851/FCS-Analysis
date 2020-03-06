@@ -58,13 +58,10 @@ function initChart(canvas_id, data, type) {
 			tooltips: {
 				callbacks: {
 					label: function (tooltipItem, data) {
-						var label = data.datasets[tooltipItem.datasetIndex].label || '';
-
-						if (label) {
-							label += ': ';
-						}
-						label += '(' + tooltipItem.xLabel + ', ' + tooltipItem.yLabel + ')';
-						return label;
+						return '(' + tooltipItem.xLabel + ', ' + tooltipItem.yLabel + ')';
+					},
+					title: function (tooltipItem, data) {
+						return data.datasets[tooltipItem[0].datasetIndex].label || '';
 					}
 				}
 			}

@@ -31,6 +31,11 @@ var rbcGeneral = [];
 
 var rbcV = [];
 var rbcHC = [];
+var minV = 31;
+var maxV = 179;
+var minHC = 21;
+var maxHC = 45;
+
 //------------- Initialize Controls when document ready ------------//
 
 
@@ -288,6 +293,8 @@ function InitRbc() {
     $("#rbc-channel-2").val(rbcDefaultChannels[1]);
 
     ExtractRBCData();
+    DrawRBC();
+
     LoadVHC();
 }
 
@@ -329,7 +336,59 @@ function DrawWBC() {
 }
 
 function DrawVHC() {
+    DrawV();
+    DrawHC();
+}
 
+function DrawV() {
+    let vLabels = [];
+    let vData = [];
+    let vBgColor = [];
+    let vBorderColor = [];
+
+    for (let x = minV; x <= maxV; x++) {
+        vLabels.push(x);
+        vData.push(rbcV.filter(e => e == x).length);
+        vBgColor.push(bgColor[x % 7]);
+        vBorderColor.push(bdColor[x % 7]);
+    }
+
+    chartVGraph.data.labels = vLabels;
+    chartVData = [];
+    chartVData[0] = {
+        label: "V - Histogram",
+        data: vData,
+        backgroundColor: vBgColor,
+        borderColor: vBorderColor
+    };
+    chartVGraph.data.datasets = chartVData;
+    chartVGraph.update();
+}
+
+function DrawHC() {
+    let hcLabels = [];
+    let hcData = [];
+    let hcBgColor = [];
+    let hcBorderColor = [];
+
+    for (let x = minHC; x <= maxHC; x++) {
+        hcLabels.push(x);
+        hcData.push(rbcHC.filter(e => e == x).length);
+        hcBgColor.push(bgColor[x % 7]);
+        hcBorderColor.push(bdColor[x % 7]);
+    }
+
+    chartHCGraph.data.labels = hcLabels;
+    chartHCData = [];
+    chartHCData[0] = {
+        label: "HC - Histogram",
+        data: hcData,
+        backgroundColor: hcBgColor,
+        borderColor: hcBorderColor
+    };
+
+    chartHCGraph.data.datasets = chartHCData;
+    chartHCGraph.update();
 }
 // ------------------------------------------ Draw Charts--------------------------------//
 
