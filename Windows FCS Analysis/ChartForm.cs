@@ -580,6 +580,8 @@ namespace Windows_FCS_Analysis
             }
             else if (WBC_file_type == "EOS")
             {
+                gate_EOS(sample);
+/*
                 var TupleIn = new_gate_3diff(sample);
 
                 bool[] NeutrophilsTF = TupleIn.Item2;
@@ -608,7 +610,7 @@ namespace Windows_FCS_Analysis
                     }
                 }
 
-/*                double[][] Neutrophils_array = Neutrophils_hs.ToArray();
+                double[][] Neutrophils_array = Neutrophils_hs.ToArray();
                 bool[,] indexGate_EOS = FCMeasurement.GateArray(Neutrophils_array, Loaded_TotalFileName, FL_H_max, SSC_H_max);
                 bool[] EOS_Max = FCMeasurement.GetColumn(indexGate_EOS, 0); //getColumn
                 bool[] EOS_Gate = FCMeasurement.GetColumn(indexGate_EOS, 1);
@@ -616,15 +618,11 @@ namespace Windows_FCS_Analysis
                 int count_GateEOS = CountBoolTrue(EOS_Gate);
                 EOSreport[3] = count_GateEOS;
                 Console.WriteLine(String.Format("EOS (max): {0} \nInside EOS gate: {1}", count_EOS_Max, count_GateEOS));
-*/            
-
-                int[] WBC_counts = FCMeasurement.processEOS(Loaded_TotalFileName, filePath_gates, channelNomenclature, isDynamicGating, false); 
-                int totalWBC = WBC_counts[0] + WBC_counts[1] + WBC_counts[2] + WBC_counts[3];
-
-                double pctNeutrophils = 100 * WBC_counts[0] / totalWBC; // percent Neutrophils
-                double pctLympocytes = 100 * WBC_counts[1] / totalWBC; // percent Lymphocytes
-                double pctMonocytes = 100 * WBC_counts[2] / totalWBC;  // percent Monocytes
-                double pctEosinophils = 100 * WBC_counts[3] / totalWBC;  // percent Eosinophils
+            
+                double pctNeutrophils = 100 * EOSreport[0] / TotalDataLength; // percent Neutrophils
+                double pctLympocytes = 100 * EOSreport[1] / TotalDataLength; // percent Lymphocytes
+                double pctMonocytes = 100 * EOSreport[2] / TotalDataLength;  // percent Monocytes
+                double pctEosinophils = 100 * EOSreport[3] / TotalDataLength;  // percent Eosinophils
 
                 pctNeutrophils = Math.Round(pctNeutrophils, 1);
                 pctLympocytes = Math.Round(pctLympocytes, 1);
@@ -636,8 +634,8 @@ namespace Windows_FCS_Analysis
                                "Neutrophils: {2}, {3}%\n" +
                                "Monocytes: {4}, {5}%\n" +
                                "Lymphocytes: {6}, {7}%\n" +
-                               "Eosinophils: {8}, {9}%\n", Loaded_TotalFileName, totalWBC, WBC_counts[0], pctNeutrophils,
-                                WBC_counts[1], pctLympocytes, WBC_counts[2], pctMonocytes, WBC_counts[3], pctEosinophils));
+                               "Eosinophils: {8}, {9}%\n", Loaded_TotalFileName, TotalDataLength, EOSreport[0], pctNeutrophils,
+                                EOSreport[1], pctLympocytes, EOSreport[2], pctMonocytes, EOSreport[3], pctEosinophils));*/
             }
 
             btnFinalImage.Enabled = true;
@@ -913,61 +911,20 @@ namespace Windows_FCS_Analysis
             #endregion
         }
 
-        public Tuple<int[], bool[]> new_gate_3diff(FCMeasurement sample)
+        public Tuple<int[], bool[]> new_gate_3diff(FCMeasurement fcsMeasure)
         {
             string FSC1_H = FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
             string SSC_H = FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
-            string FSC1_A = FCMeasurement.GetChannelName("FCS1area", channelNomenclature);
 
-            string gate1File = Path.Combine(filePath_gates, "gating Cells.csv");
-            string gate3File = Path.Combine(filePath_gates, "gating Cell Types.csv");
-
-            int nTotalCnt = sample.Counts, i;
+            int nTotalCnt = fcsMeasure.Counts, i;
             int[] NML = new int[3];
             int[] NML_COUNTS = new int[3];
             bool[] NeutrophilsTF = new bool[nTotalCnt];
             string strMsg;
+            
+            List<GateResult> arrGateResults = GetGatesResult(fcsMeasure);
 
-            List<GateResult> arrGateResults = new List<GateResult>();
-
-            // Do always gate1, even though it's not checked so that it can draw at least gate1.
-            GateResult gate1Result = FCMeasurement.Gate_1(gate1File, sample, channelNomenclature);
-            if (checkBoxGate1.Checked)
-            {
-                DrawGateResult(gate1Result, FSC1_H, SSC_H);
-                strMsg = String.Format("Total data length = {0} \nInside gate - 1 = {1}", nTotalCnt, gate1Result.nValidCnt);
-                MessageBox.Show(strMsg, "Gate - 1 Results");
-
-                arrGateResults.Add(gate1Result);
-            }
-
-            if (checkBoxGate2.Checked)
-            {
-                GateResult gate2Result = FCMeasurement.Gate_2(sample, channelNomenclature);
-                DrawGateResult(gate2Result, FSC1_A, FSC1_H);
-
-                strMsg = String.Format("Slope = {0}, Y-intercept = {1}, Standard Error = {2}",
-                                Math.Round(gate2Result.SingletsFit[0], 5), Math.Round(gate2Result.SingletsFit[1], 1), Math.Round(gate2Result.SingletsFit[2], 1));
-                MessageBox.Show(strMsg, "Gate - 2 Results");
-                strMsg = String.Format("Total data length = {0} \nInside Singlets gate = {1}", nTotalCnt, gate2Result.nValidCnt);
-                MessageBox.Show(strMsg, "Gate - 2 Results");
-
-                arrGateResults.Add(gate2Result);
-            }
-
-            if (checkBoxGate3.Checked)
-            {
-                GateResult gate3Result = FCMeasurement.Gate_3(gate3File, sample, channelNomenclature, isDynamicGating);
-                DrawGateResult(gate3Result, FSC1_H, SSC_H);
-
-                NML = new int[3] { gate3Result.nNCnt * 100 / nTotalCnt, gate3Result.nMCnt * 100 / nTotalCnt, gate3Result.nLCnt * 100 / nTotalCnt };
-                strMsg = String.Format("Total data length = {0} \nNeutrophils = {1} ( {2}% )\nMonocytes = {3} ( {4}% ) \nLymphocytes = {5} ( {6}% )",
-                                nTotalCnt, gate3Result.nNCnt, NML[0], gate3Result.nMCnt, NML[1], gate3Result.nLCnt, NML[2]);
-                MessageBox.Show(strMsg, "Gate - 3 Results");
-                arrGateResults.Add(gate3Result);
-            }
-
-            GateResult finalResult = new GateResult(gate1Result.arrData);
+            GateResult finalResult = new GateResult(arrGateResults[0].arrData);
             finalResult.initAllAsTrue();
 
             foreach (GateResult gateResult in arrGateResults)
@@ -1011,6 +968,139 @@ namespace Windows_FCS_Analysis
             return tuple;
         }
 
+        public void gate_EOS(FCMeasurement fcsMeasure)
+        {
+            string FSC1_H = FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
+            string SSC_H = FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
+
+            int nTotalCnt = fcsMeasure.Counts, i;
+            int[] NMLE = new int[4];
+            int[] NMLE_COUNTS = new int[4];
+            bool[] NeutrophilsTF = new bool[nTotalCnt];
+            string strMsg;
+
+            List<GateResult> arrGateResults = GetGatesResult(fcsMeasure, true);
+            GateResult finalResult = new GateResult(arrGateResults[0].arrData);
+            finalResult.initAllAsTrue();
+
+            foreach (GateResult gateResult in arrGateResults)
+            {
+                if (gateResult.isEOS)
+                {
+                    continue;
+                }
+                if (gateResult.isGate3)
+                {
+                    finalResult.isGate3 = true;
+                    foreach (Color color in gateResult.arrColor)
+                    {
+                        finalResult.arrColor.Add(color);
+                    }
+                }
+
+                for (i = 0; i < nTotalCnt; i++)
+                {
+                    finalResult.arrValid[i] &= gateResult.arrValid[i];
+                    finalResult.arrValid_Max[i] &= gateResult.arrValid_Max[i];
+                    if (gateResult.isGate3)
+                    {
+                        finalResult.arrN[i] &= gateResult.arrN[i] & finalResult.arrValid[i];
+                        finalResult.arrM[i] &= gateResult.arrM[i] & finalResult.arrValid[i];
+                        finalResult.arrL[i] &= gateResult.arrL[i] & finalResult.arrValid[i];
+                        finalResult.arrValid[i] &= (gateResult.arrN[i] | gateResult.arrM[i] | gateResult.arrL[i]);
+                    }
+                }
+            }
+            finalResult.arrEOS = arrGateResults.Last().arrEOS;
+            finalResult.isEOS = true;
+
+            DrawGateResult(finalResult, FSC1_H, SSC_H);
+
+            strMsg = String.Format("Total data length = {0} \n3-Diff Gated data length = {1} \nOut side gates data length = {2} \n", nTotalCnt, finalResult.nValidCnt, finalResult.nInvalidCnt);
+            if (finalResult.isGate3)
+            {
+                NMLE = new int[4] { finalResult.nNCnt * 100 / nTotalCnt, finalResult.nMCnt * 100 / nTotalCnt, finalResult.nLCnt * 100 / nTotalCnt,  finalResult.nEOSCnt * 100 / nTotalCnt};
+                NMLE_COUNTS = new int[4] { finalResult.nNCnt, finalResult.nMCnt, finalResult.nLCnt, finalResult.nEOSCnt };
+                strMsg += String.Format(" Neutrophils = {0} ( {1}% )\n Monocytes = {2} ( {3}% ) \n Lymphocytes = {4} ( {5}%  \n EOS = {6} ( {7}% )",
+                                    NMLE_COUNTS[0], NMLE[0], NMLE_COUNTS[1], NMLE[1], NMLE_COUNTS[2], NMLE[2], NMLE_COUNTS[3], NMLE[3]);
+                finalResult.arrN.CopyTo(NeutrophilsTF);
+            }
+
+            MessageBox.Show(strMsg, "Gate - Final Results");
+        }
+
+        private List<GateResult> GetGatesResult(FCMeasurement fcsMeasure, bool isEOS = false)
+        {
+            string FSC1_H = FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
+            string SSC_H = FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
+            string FSC1_A = FCMeasurement.GetChannelName("FCS1area", channelNomenclature);
+            string FL_H = FCMeasurement.GetChannelName("FLpeak", channelNomenclature);
+
+            string gate1File = Path.Combine(filePath_gates, "gating Cells.csv");
+            string gate3File = Path.Combine(filePath_gates, "gating Cell Types.csv");
+            string gateEOSFile = Path.Combine(filePath_gates, "gating Eosinophils.csv");
+
+            int nTotalCnt = fcsMeasure.Counts;
+            int[] NML = new int[3];
+            int[] NML_COUNTS = new int[3];
+
+            string strMsg;
+
+            List<GateResult> arrGateResults = new List<GateResult>();
+
+            // Do always gate1, even though it's not checked so that it can draw at least gate1.
+            GateResult gate1Result = FCMeasurement.Gate_1(gate1File, fcsMeasure, channelNomenclature);
+            if (checkBoxGate1.Checked)
+            {
+                DrawGateResult(gate1Result, FSC1_H, SSC_H);
+                strMsg = String.Format("Total data length = {0} \nInside gate - 1 = {1}", nTotalCnt, gate1Result.nValidCnt);
+                MessageBox.Show(strMsg, "Gate - 1 Results");
+
+                arrGateResults.Add(gate1Result);
+            }
+
+            if (checkBoxGate2.Checked)
+            {
+                GateResult gate2Result = FCMeasurement.Gate_2(fcsMeasure, channelNomenclature);
+                DrawGateResult(gate2Result, FSC1_A, FSC1_H);
+
+                strMsg = String.Format("Slope = {0}, Y-intercept = {1}, Standard Error = {2}",
+                                Math.Round(gate2Result.SingletsFit[0], 5), Math.Round(gate2Result.SingletsFit[1], 1), Math.Round(gate2Result.SingletsFit[2], 1));
+                MessageBox.Show(strMsg, "Gate - 2 Results");
+                strMsg = String.Format("Total data length = {0} \nInside Singlets gate = {1}", nTotalCnt, gate2Result.nValidCnt);
+                MessageBox.Show(strMsg, "Gate - 2 Results");
+
+                arrGateResults.Add(gate2Result);
+            }
+
+            if (checkBoxGate3.Checked || isEOS)
+            {
+                GateResult gate3Result = FCMeasurement.Gate_3(gate3File, fcsMeasure, channelNomenclature, isDynamicGating);
+                if (checkBoxGate3.Checked)
+                {
+                    DrawGateResult(gate3Result, FSC1_H, SSC_H);
+
+                    NML = new int[3] { gate3Result.nNCnt * 100 / nTotalCnt, gate3Result.nMCnt * 100 / nTotalCnt, gate3Result.nLCnt * 100 / nTotalCnt};
+                    NML_COUNTS = new int[3] { gate3Result.nNCnt, gate3Result.nMCnt, gate3Result.nLCnt};
+                    strMsg = String.Format("Total data length = {0} \nNeutrophils = {1} ( {2}% )\nMonocytes = {3} ( {4}% ) \nLymphocytes = {5} ( {6}% )",
+                                    nTotalCnt, NML_COUNTS[0], NML[0], NML_COUNTS[1], NML[1], NML_COUNTS[2], NML[2]);
+                    MessageBox.Show(strMsg, "Gate - 3 Results");
+                }
+                arrGateResults.Add(gate3Result);
+            }
+
+            if (isEOS)
+            {
+                GateResult gateEOSResult = FCMeasurement.Gate_EOS(gateEOSFile, fcsMeasure, channelNomenclature, arrGateResults.Last());
+                DrawGateResult(gateEOSResult, FL_H, SSC_H);
+
+                strMsg = String.Format("Total data length = {0} \n Total Neutrophils = {1} ( {2}% )\n Total EOS = {3} ( {4}% )", nTotalCnt, NML_COUNTS[0], NML[0], gateEOSResult.nValidCnt, gateEOSResult.nValidCnt * 100 / nTotalCnt);
+                MessageBox.Show(strMsg, "Gate - 1 Results");
+
+                arrGateResults.Add(gateEOSResult);
+            }
+            return arrGateResults;
+        }
         private void DrawGateResult(GateResult gateResult, string axisX, string axisY)
         {
             int nTotalCnt = gateResult.arrData.Count, i;
@@ -1019,6 +1109,7 @@ namespace Windows_FCS_Analysis
             string neutrophils = "Neutrophils";
             string monocytes = "Monocytes";
             string lymphocytes = "Lymphocytes";
+            string eos = "EOS";
             double x, y;
 
             chartData.ChartAreas[0].AxisX.Title = axisX;
@@ -1030,10 +1121,16 @@ namespace Windows_FCS_Analysis
                 addChartSeries(monocytes,   gateResult.arrColor[1]);
                 addChartSeries(lymphocytes, gateResult.arrColor[2]);
             }
-            else
+            else if(!gateResult.isEOS)
             {
                 addChartSeries(threeDiffGated, Color.Blue);
             }
+            
+            if (gateResult.isEOS)
+            {
+                addChartSeries(eos, Color.Green);
+            }
+            
             addChartSeries(outsideFixedGates, Color.Red);
             // Add Chart Points
             for (i = 0; i < nTotalCnt; i++)   // for (int j = 0; j < Gate1Max_Length; j++)
@@ -1043,6 +1140,11 @@ namespace Windows_FCS_Analysis
 
                 if (gateResult.arrValid[i])
                 {
+                    if (gateResult.isEOS && gateResult.arrEOS[i])
+                    {
+                        chartData.Series[eos].Points.AddXY(x, y);
+                    }
+                    
                     if (gateResult.isGate3)
                     {
                         if (gateResult.arrN[i])
@@ -1058,7 +1160,7 @@ namespace Windows_FCS_Analysis
                         if (gateResult.arrL[i])
                             chartData.Series[lymphocytes].Points.AddXY(x, y);
                     }
-                    else
+                    else if (!gateResult.isEOS)
                     {
                         chartData.Series[threeDiffGated].Points.AddXY(x, y);
                     }
@@ -1210,7 +1312,7 @@ namespace Windows_FCS_Analysis
             double intercept = SingletsFit[1];
             double expect1=0, expect2 = 0;
             double delta_slope = 0.35;
-            double delta_intercept = 0.5;
+            //double delta_intercept = 0.5;
 
             /*double[] X1Y1X2Y2 = new double[4];
             X1Y1X2Y2[0] = 0;

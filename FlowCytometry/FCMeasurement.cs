@@ -1901,6 +1901,47 @@ namespace FlowCytometry
             return result;
         }
 
+        // Gate EOS
+        public static GateResult Gate_EOS(string gateFile, FCMeasurement fcsData, string channelNomenclature, GateResult gate3Result)
+        {
+            string channel1 = GetChannelName("FLpeak", channelNomenclature);
+            string channel2 = GetChannelName("SSCpeak", channelNomenclature);
+            int i = -1;
+            int Channel1_Max = fcsData.Channels[channel1].Range;
+            int Channel2_Max = fcsData.Channels[channel2].Range;
+
+            List<double[]> arrData = GetChannelData(fcsData, channel1, channel2);
+            GateResult result = new GateResult(arrData);
+            result.isEOS = true;
+
+            List<Polygon> polygons = loadPolygon(gateFile);
+
+            foreach (double[] xy in arrData)
+            {
+                i++;
+                // Gate Max
+                if (xy[0] > Channel1_Max || xy[1] > Channel2_Max)
+                    continue;
+
+                result.arrValid_Max[i] = true;
+                
+                // Gate by Polygon for valid Neutrophils.
+                if (polygons != null && gate3Result.arrN[i])
+                {
+                    foreach (Polygon polygon in polygons)
+                    {
+                        if (polygon.IsInsidePoly(xy[0], xy[1]))
+                        {
+                            result.arrEOS[i] = true;
+                            result.arrValid[i] = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
         public static List<double[]> GetChannelData(FCMeasurement fcsData, string channel1, string channel2)
         {
             List<double[]> arrData = new List<double[]>();
@@ -1966,9 +2007,12 @@ namespace FlowCytometry
         public List<bool> arrN;
         public List<bool> arrM;
         public List<bool> arrL;
+        public List<bool> arrEOS;
         public double[] SingletsFit { get; set; }
         public List<Color> arrColor;
         public bool isGate3;
+        public bool isEOS;
+
         public GateResult(List<double[]> arrData)
         {
             this.arrData = arrData;
@@ -1977,6 +2021,7 @@ namespace FlowCytometry
             arrN = new List<bool>(new bool[arrData.Count]);
             arrM = new List<bool>(new bool[arrData.Count]);
             arrL = new List<bool>(new bool[arrData.Count]);
+            arrEOS = new List<bool>(new bool[arrData.Count]);
             arrColor = new List<Color>();
         }
 
@@ -1990,6 +2035,7 @@ namespace FlowCytometry
                 arrN[i] = true;
                 arrM[i] = true;
                 arrL[i] = true;
+                arrEOS[i] = true;
             }
         }
 
@@ -2048,7 +2094,13 @@ namespace FlowCytometry
                 return getValidCnt(arrL);
             }
         }
-
+        public int nEOSCnt
+        {
+            get
+            {
+                return getValidCnt(arrEOS);
+            }
+        }
         private int getInvalidCnt(List<bool> arrData)
         {
             return arrData.Count(e => !e);

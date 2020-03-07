@@ -514,7 +514,7 @@ namespace Windows_FCS_Analysis
                 clusters = meanshift.CalculateCluster();
             }
 
-            int nNeutrophils = 0, nLymphocytes = 0, nMonocytes = 0, i = 0;
+            int nNeutrophils = 0, nLymphocytes = 0, nMonocytes = 0;
             foreach (Cluster cluster in clusters)
             {
                 switch (cluster.clusterName)
