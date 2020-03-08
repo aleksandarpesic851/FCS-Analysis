@@ -655,8 +655,8 @@ namespace FlowCytometry.CustomCluster
         {
 
             DetectCell(0, (int)(Global.T_Y_2 * (nGridCnt / normalY)), nGridCnt);
-            DetectCell(1, 0, (int)(Global.T_Y_1 * (nGridCnt / normalY)));
-            DetectCell(2, (int)(Global.T_Y_1 * (nGridCnt / normalY)), (int)(Global.T_Y_2 * (nGridCnt / normalY)));
+            DetectCell(1, (int)(Global.T_Y_1 * (nGridCnt / normalY)), (int)(Global.T_Y_2 * (nGridCnt / normalY)));
+            DetectCell(2, 0, (int)(Global.T_Y_1 * (nGridCnt / normalY)));
         }
 
         private void DetectCell(int nType, int nT1, int nT2)

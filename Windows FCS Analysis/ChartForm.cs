@@ -1095,7 +1095,7 @@ namespace Windows_FCS_Analysis
                 DrawGateResult(gateEOSResult, FL_H, SSC_H);
 
                 strMsg = String.Format("Total data length = {0} \n Total Neutrophils = {1} ( {2}% )\n Total EOS = {3} ( {4}% )", nTotalCnt, NML_COUNTS[0], NML[0], gateEOSResult.nValidCnt, gateEOSResult.nValidCnt * 100 / nTotalCnt);
-                MessageBox.Show(strMsg, "Gate - 1 Results");
+                MessageBox.Show(strMsg, "Gate - EOS Results");
 
                 arrGateResults.Add(gateEOSResult);
             }
