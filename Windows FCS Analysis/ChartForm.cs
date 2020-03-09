@@ -559,14 +559,12 @@ namespace Windows_FCS_Analysis
 
             chartData.Series.Add(outsideFixedGates);
             chartData.Series[outsideFixedGates].ChartType = SeriesChartType.Point;
-            chartData.Series[outsideFixedGates].MarkerSize = 4;;
+            chartData.Series[outsideFixedGates].MarkerSize = 4;
             chartData.Series[outsideFixedGates].MarkerStyle = MarkerStyle.Circle;
             chartData.Series[outsideFixedGates].MarkerColor = Color.Red; //colors[index];
 
             #endregion
 
-            double x;
-            double y;
             //int FSC1_H_max = sample.Channels[FSC1_H].Range;
             int SSC_H_max = sample.Channels[SSC_H].Range;
 

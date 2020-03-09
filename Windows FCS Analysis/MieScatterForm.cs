@@ -53,7 +53,6 @@ namespace Windows_FCS_Analysis
         List<double> arrRes1 = new List<double>();
         List<double> arrRes2 = new List<double>();
 
-        double maxRes = 0;
         public MieScatterForm()
         {
             InitializeComponent();

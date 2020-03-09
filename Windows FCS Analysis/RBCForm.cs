@@ -79,7 +79,7 @@ namespace Windows_FCS_Analysis
         private string WBC_channel2 = "";                                   //channel name
         private List<double[]> totalWBCData = new List<double[]>();
         private string gate1 = "gating Cells.csv";
-        private string gate2 = "gating Singlets.csv";
+        //private string gate2 = "gating Singlets.csv";
         private string gate3 = "gating Cell Types.csv";
         private List<Polygon> arrGatePolygon_WBC = null;
         private List<Polygon> arrGate3Polygon = null;
