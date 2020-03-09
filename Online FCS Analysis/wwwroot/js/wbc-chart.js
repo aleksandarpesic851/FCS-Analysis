@@ -78,7 +78,6 @@ function initChart() {
 				if (isGateEditing && chartData.length > 1) {
 					let newXY = getCoordinate(event);
 					AddOrMoveCustomPoints(newXY);
-					console.log('drage start', choosenPolygon + " - " + choosenPoint);
 				}
 			},
 			dragData: true,
@@ -89,16 +88,13 @@ function initChart() {
 				choosenPolygon = target._datasetIndex;
 				choosenPoint = target._index;
 				HighlightLine(choosenPolygon);
-				console.log('drage start', choosenPolygon + " - " + choosenPoint);
 			},
-			onDrag: function (e, datasetIndex, index, value) {
+			/*onDrag: function (e, datasetIndex, index, value) {
 				// do something
-				console.log('on drag', e, datasetIndex, index, value);
 			},
 			onDragEnd: function (e, datasetIndex, index, value) {
 				// do something
-				console.log('dragEnd', e, datasetIndex, index, value);
-			}
+			}*/
 		}
 	});
 }

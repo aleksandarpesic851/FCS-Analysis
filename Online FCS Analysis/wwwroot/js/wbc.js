@@ -22,7 +22,7 @@ var currGateName;               // current gate name
 var isDefaultGate = false;      // Flag for dynamic or custom
 var isDynamicGate = false;      // Flag for dynamic gate of default gate3
 
-var Gate3Names = ["Neutrophils", "Monocytes", "Lymphocytes"];
+var Gate3Names = ["Neutrophils", "Lymphocytes", "Monocytes"];
 var Gate3Colors = ["rgb(255, 189, 189)", "rgb(173, 233, 255)", "rgb(194, 228, 156)"];
 
 var wbc_table;      // wbc data table object
@@ -772,7 +772,7 @@ function GetFinalGateData() {
             };
         }
         data[3] = {
-            label: 'Outside Gate' + currGateName,
+            label: 'Outside ' + currGateName,
             backgroundColor: 'rgb(255, 99, 132)',
             borderColor: 'rgb(255, 99, 132)',
             data: outsideData,
@@ -780,14 +780,14 @@ function GetFinalGateData() {
         };
     } else {
         data[0] = {
-            label: 'Inside Gate' + currGateName,
+            label: 'Inside ' + currGateName,
             backgroundColor: 'rgb(132, 99, 255)',
             borderColor: 'rgb(132, 99, 255)',
             data: insideData,
             radius: 1
         };
         data[1] = {
-            label: 'Outside Gate' + currGateName,
+            label: 'Outside ' + currGateName,
             backgroundColor: 'rgb(255, 99, 132)',
             borderColor: 'rgb(255, 99, 132)',
             data: outsideData,
@@ -823,14 +823,14 @@ function GetPolygonGateData() {
     let outsideData = FilterGateData(currGatePolygon, false);
     let data = [];
     data[0] = {
-        label: 'Inside Gate' + currGateName,
+        label: 'Inside ' + currGateName,
         backgroundColor: 'rgb(132, 99, 255)',
         borderColor: 'rgb(132, 99, 255)',
         data: insideData,
         radius: 1
     };
     data[1] = {
-        label: 'Outside Gate' + currGateName,
+        label: 'Outside ' + currGateName,
         backgroundColor: 'rgb(255, 99, 132)',
         borderColor: 'rgb(255, 99, 132)',
         data: outsideData,
