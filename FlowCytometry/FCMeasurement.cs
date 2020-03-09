@@ -1826,9 +1826,10 @@ namespace FlowCytometry
                    result.arrValid_Max[i] = true;
             }
 
-            result.arrColor.Add(polygons[0].color);
-            result.arrColor.Add(polygons[2].color);
-            result.arrColor.Add(polygons[1].color);
+            foreach(Polygon polygon in polygons)
+            {
+                result.arrColor.Add(polygon.color);
+            }
             
             i = 0;
             List<CustomCluster.Cluster> clusters;
@@ -1851,10 +1852,10 @@ namespace FlowCytometry
                                 result.arrN[point] = true;
                                 break;
                             case 1:
-                                result.arrM[point] = true;
+                                result.arrL[point] = true;
                                 break;
                             case 2:
-                                result.arrL[point] = true;
+                                result.arrM[point] = true;
                                 break;
                         }
                         result.arrValid[point] = true;

@@ -1118,8 +1118,8 @@ namespace Windows_FCS_Analysis
             if (gateResult.isGate3)
             {
                 addChartSeries(neutrophils, gateResult.arrColor[0]);
-                addChartSeries(monocytes,   gateResult.arrColor[1]);
-                addChartSeries(lymphocytes, gateResult.arrColor[2]);
+                addChartSeries(lymphocytes, gateResult.arrColor[1]);
+                addChartSeries(monocytes,   gateResult.arrColor[2]);
             }
             else if(!gateResult.isEOS)
             {

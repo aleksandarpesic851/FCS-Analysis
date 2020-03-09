@@ -11,7 +11,7 @@ namespace FlowCytometry.CustomCluster
     public class Global
     {
         public const int LEFT_BOTTOM_T = 2100;
-        public static string[] CELL_NAME = new string[] { "Neutrophils", "Monocytes", "Lymphocytes" };
+        public static string[] CELL_NAME = new string[] { "Neutrophils", "Lymphocytes", "Monocytes" };
         public static PointF[] CELL_CENTER = new PointF[3];      // centers of polygon
         public static bool diff3_enable = true; // true when diff3 is enabled, i.e FCS-H : SSC:H (Channel)
         public static int T_Y_1 = 0;
