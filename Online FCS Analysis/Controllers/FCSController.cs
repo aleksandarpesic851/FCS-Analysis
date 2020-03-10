@@ -30,6 +30,17 @@ namespace Online_FCS_Analysis.Controllers
         {
             return View();
         }
+
+        public IActionResult WbcFullItem()
+        {
+            return View();
+        }
+
+        public IActionResult WbcCompare()
+        {
+            return View();
+        }
+
         public IActionResult Rbc()
         {
             return View();

@@ -28,6 +28,11 @@
         height: 58vh;
         margin: auto;
     }
+    .wbc-item-chart-container {
+        width: 100%;
+        height: 100vh;
+        margin: auto;
+    }
     .chart-details {
         width: 100%;
         height: 58vh;
@@ -52,6 +57,10 @@
 
 @media (orientation: portrait) {
     .chart-container {
+        height: 90vw;
+        width: 100%;
+    }
+    .wbc-item-chart-container {
         height: 90vw;
         width: 100%;
     }
@@ -278,4 +287,13 @@ div.table .file-row:nth-child(odd) {
     top: calc(50% - 35px);
     left: calc(50% - 35px);
     position: fixed;
+}
+
+.wbc-container {
+    margin: 0;
+    padding: 0;
+}
+.wbc-child-container {
+    max-height: 100vh;
+    overflow: auto;
 }
