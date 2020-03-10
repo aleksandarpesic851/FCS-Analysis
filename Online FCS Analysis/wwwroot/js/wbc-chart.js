@@ -129,9 +129,9 @@ function getCoordinate(event) {
 
 function getTooltipContent(datasetIdx, idx) {
 	var innerHtml = "";
-	innerHtml += "<b> Category: </b>" + chartData[datasetIdx].label + " <br> ";
-	innerHtml += "<b> " + $("#channel-1").val() + ": </b>" + chartData[datasetIdx].data[idx].x + " <br> ";
-	innerHtml += "<b> " + $("#channel-2").val() + ": </b>" + chartData[datasetIdx].data[idx].y + " <br> ";
+	innerHtml += "<strong> Category: </strong>" + chartData[datasetIdx].label + " <br> ";
+	innerHtml += "<strong> " + $("#channel-1").val() + ": </strong>" + chartData[datasetIdx].data[idx].x + " <br> ";
+	innerHtml += "<strong> " + $("#channel-2").val() + ": </strong>" + chartData[datasetIdx].data[idx].y + " <br> ";
 	return innerHtml;
 }
 
