@@ -1945,7 +1945,7 @@ namespace FlowCytometry
 
         public bool IsEOS(string channelNomenclature)
         {
-            string channel2 = GetChannelName("SSCpeak", channelNomenclature);
+            string channel2 = GetChannelName("FLpeak", channelNomenclature);
             return ChannelsNames.Contains(channel2);
         }
         public static List<double[]> GetChannelData(FCMeasurement fcsData, string channel1, string channel2)

@@ -53,6 +53,7 @@ $(document).ready(function () {
 });
 
 function InitWbcTable() {
+    let hiddenCouls = typeof simpleTable == 'undefined' ? [0] : [0, 2, 3];
     wbc_table = $('#fcs-table').dataTable({
         processing: true, // for show progress bar
         serverSide: true, // for process server side
@@ -68,7 +69,7 @@ function InitWbcTable() {
         },
         columnDefs:
             [{
-                targets: [0],
+                targets: hiddenCouls,
                 visible: false,
                 searchable: false
             },
@@ -83,13 +84,16 @@ function InitWbcTable() {
             { "data": "updatedAt", "name": "updatedAt" },
             {
                 data: null, render: function (data, type, row) {
-                    return "<a href='#' class='btn btn-danger' onclick=DeleteData('" + row.id + "'); ><i class='fa fa-trash'></i>&nbsp;&nbsp;Delete</a>";
+                    return "<a href='#' class='btn btn-danger' onclick='DeleteData(event, " + row.id + ")'; ><i class='fa fa-trash'></i>&nbsp;&nbsp;Delete</a>";
                 }
             },
         ],
     });
 
-    $('#fcs-table tbody').on("click", "tr", function () {
+    $('#fcs-table tbody').on("click", "tr", function (event) {
+        if (typeof event.target.cellIndex == 'undefined') {
+            return;
+        }
         const tr = $(this);
         const isSelected = tr.hasClass("selected");
         if (!isSelected) {
@@ -98,10 +102,6 @@ function InitWbcTable() {
             const data = wbc_table.fnGetData(tr);
             LoadWbcData(data.id);
         }
-    });
-
-    $('#fcs-table tbody td:last-child').click(function (event) {
-        event.preventDefault();
     });
 }
 
@@ -129,7 +129,7 @@ function AddGateChangeEvent() {
 
 // -------------------- Delete WBC file ----------------------------//
 
-function DeleteData(wbcId) {
+function DeleteData(event, wbcId) {
     if (confirm("Are you sure you want to delete this wbc data?")) {
         Delete(wbcId);
     }
