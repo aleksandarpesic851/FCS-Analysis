@@ -2,6 +2,10 @@
     ViewData["Title"] = "WBC";
 }
 
+<div class="loading" style="display: none">
+    <img src="~/img/loading.gif" class="gif"/>
+</div>
+
 <div class="body_first_area custom-container chart-area">
 
     <ul class="nav nav-tabs nav-fill gate-tab">
@@ -115,7 +119,7 @@
                 <div class="col-12 col-lg-9 chart-container" id="fcs-chart-container">
                     <canvas id="fcs-chart"></canvas>
                 </div>
-                <div class="col-12 col-lg-3 p-3 border border-info">
+                <div class="col-12 col-lg-3 p-3 border border-info chart-details">
                     <div class="mt-2 mb-5 ">
                         <button class="btn btn-download" onclick="SaveChartAsImage()"><i class="fa fa-download"></i>&nbsp;&nbsp; Save As Image</button>
                     </div>

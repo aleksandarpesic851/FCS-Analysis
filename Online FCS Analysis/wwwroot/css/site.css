@@ -28,6 +28,11 @@
         height: 58vh;
         margin: auto;
     }
+    .chart-details {
+        width: 100%;
+        height: 58vh;
+        overflow: auto;
+    }
     .total-container {
         height: 78vh;
         width: 100%;
@@ -49,6 +54,11 @@
     .chart-container {
         height: 90vw;
         width: 100%;
+    }
+    .chart-details {
+        width: 100%;
+        height: 90vw;
+        overflow: auto;
     }
     .total-container {
         width: 100%;
@@ -251,4 +261,21 @@ div.table .file-row:nth-child(odd) {
     background-color: RoyalBlue;
     
     color: white;
+}
+
+.loading {
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,.7);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+}
+.gif {
+    width: 70px;
+    height: 70px;
+    top: calc(50% - 35px);
+    left: calc(50% - 35px);
+    position: fixed;
 }

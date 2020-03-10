@@ -616,11 +616,13 @@ function DrawHeatmap() {
 }
 
 // Draw Chart
-function UpdateChart() {
+async function UpdateChart() {
     if (!wbcTotalData) {
         ClearChart();
         return;
     }
+    $(".loading").show();
+    await new Promise(r => setTimeout(r, 20));
     // Draw or remove heatmap
     DrawHeatmap();
 
@@ -681,6 +683,7 @@ function UpdateChart() {
     // Update Graph And Redraw
     chartGraph.data.datasets = chartData;
     chartGraph.update();
+    $(".loading").hide();
 }
 
 function ClearChart() {
@@ -710,6 +713,7 @@ function GetFinalGateData() {
 
     let gatePolygons = isDefaultGate ? defaultGatePolygons : customGatePolygons;
     let isContainsGate3 = false;
+    let isContainsEOS = false;
 
     let finalChannel1 = $("#channel-1").val();
     let finalChannel2 = $("#channel-2").val();
@@ -767,6 +771,30 @@ function GetFinalGateData() {
                     c3: [nN, nM, nL]
                 };
             }
+        } else if (gateName == defaultGateEOS && isDefaultGate) {
+            let isN = false;
+            isContainsEOS = true;
+
+            xys.forEach(function (xy, idx) {
+                xys[idx].isInside = IsInsidePolygons(gatePolygon, xy);
+                if (xys[idx].isInside) {
+                    if (isDynamicGate) {
+                        isN = wbcTotalData.wbc3Cell.wbc_n.includes(idx);
+                    } else {
+                        isN = IsInsidePoly(gatePolygons[defaultGate3].polys[0], wbcTotalData.wbcData[defaultChannel1].data[idx], wbcTotalData.wbcData[defaultChannel2].data[idx]);
+                    }
+                    xys[idx].isEOS = isN;
+                    finalRes[idx].isEOS = isN;
+                } else {
+                    xys[idx].isEOS = false;
+                    finalRes[idx].isEOS = false;
+                }
+            });
+            selectedGates[idx] = {
+                gateName: defaultGateEOS,
+                inside: xys.filter(xy => xy.isInside).length,
+                outside: xys.filter(xy => !xy.isInside).length
+            };
         } else {
             xys.forEach(function (xy, idx) {
                 xys[idx].isInside = IsInsidePolygons(gatePolygon, xy);
@@ -783,10 +811,21 @@ function GetFinalGateData() {
     let insideData = finalRes.filter(xy => xy.isInside);
     let outsideData = finalRes.filter(xy => !xy.isInside);
     let data = [];
+    let nSIdx = 0;
 
+    if (isContainsEOS) {
+        nSIdx = 1;
+        data[0] = {
+            label: 'EOS',
+            backgroundColor: 'rgb(50, 50, 250)',
+            borderColor: 'rgb(50, 50, 250)',
+            data: finalRes.filter(xy => xy.isInside && xy.isEOS),
+            radius: 1
+        };
+    }
     if (isContainsGate3) {
         for (let i = 0; i < 3; i++) {
-            data[i] = {
+            data[i + nSIdx] = {
                 label: Gate3Names[i],
                 backgroundColor: Gate3Colors[i],
                 borderColor: Gate3Colors[i],
@@ -794,7 +833,7 @@ function GetFinalGateData() {
                 radius: 1
             };
         }
-        data[3] = {
+        data[3 + nSIdx] = {
             label: 'Outside ' + currGateName,
             backgroundColor: 'rgb(255, 99, 132)',
             borderColor: 'rgb(255, 99, 132)',
@@ -802,14 +841,14 @@ function GetFinalGateData() {
             radius: 1
         };
     } else {
-        data[0] = {
+        data[0 + nSIdx] = {
             label: 'Inside ' + currGateName,
             backgroundColor: 'rgb(132, 99, 255)',
             borderColor: 'rgb(132, 99, 255)',
             data: insideData,
             radius: 1
         };
-        data[1] = {
+        data[1 + nSIdx] = {
             label: 'Outside ' + currGateName,
             backgroundColor: 'rgb(255, 99, 132)',
             borderColor: 'rgb(255, 99, 132)',
@@ -826,6 +865,9 @@ function GetFinalGateData() {
             for (let i = 0; i < 3; i++) {
                 detailHtml += "<br><strong> &nbsp; &nbsp;" + Gate3Names[i] + " : </strong>" + v.c3[i];
             }
+        } else if (v.gateName == defaultGateEOS) {
+            detailHtml += "<br><strong> &nbsp; &nbsp;EOS : </strong>" + v.inside;
+            detailHtml += "<br><strong> &nbsp; &nbsp;Others : </strong>" + v.outside;
         } else {
             detailHtml += "<br><strong> &nbsp; &nbsp;Inside : </strong>" + v.inside;
             detailHtml += "<br><strong> &nbsp; &nbsp;Outside : </strong>" + v.outside;
