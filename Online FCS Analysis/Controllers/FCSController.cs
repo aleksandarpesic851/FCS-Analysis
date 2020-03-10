@@ -41,6 +41,11 @@ namespace Online_FCS_Analysis.Controllers
             return View();
         }
 
+        public IActionResult WbcReport()
+        {
+            return View();
+        }
+
         public IActionResult Rbc()
         {
             return View();
