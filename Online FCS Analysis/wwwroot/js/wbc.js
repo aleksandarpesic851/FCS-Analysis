@@ -388,7 +388,7 @@ function RemoveGate(gateName) {
 }
 
 // Add new custom gate
-function AddNewCustomGate() {
+async function AddNewCustomGate() {
     let channel1 = $("#channel-1").val();
     let channel2 = $("#channel-2").val();
     if (channel1 == channel2) {
@@ -451,7 +451,7 @@ function AddNewCustomGate() {
     newHtml += '<label for= "final-custom-' + editingGateName + '" > ' + editingGateName + '</label >';
     $("#custom-gate-checks").append(newHtml);
 
-    UpdateChart();
+    await UpdateChart();
     StartEditPolygon();
     AddNewPolygon();
 
