@@ -278,7 +278,10 @@ function initWbc() {
 
     $("#custom-gates").find(".active").removeClass("active");
     $("#custom-gates .btn-gate").first().addClass("active");
-    
+
+    $("#default-gates").find(".active").removeClass("active");
+    $("#default-gates .btn-gate").first().addClass("active");
+
     AddGateChangeEvent();
     UpdateChart();
 
@@ -679,11 +682,22 @@ async function UpdateChart() {
             Array.prototype.unshift.apply(chartData, GetChartGateLineData());
         }
     }
-
     // Update Graph And Redraw
     chartGraph.data.datasets = chartData;
     chartGraph.update();
     $(".loading").hide();
+}
+
+function RemoveSameData() {
+    chartData.forEach(function (data, idx) {
+        if (data.data.length < 100) {
+            return;
+        }
+        chartData[idx].data = data.data.map((v, i) => ({ x: Math.round(v.x / 10) * 10, y: Math.round(v.y / 10) * 10 }))
+            .map(JSON.stringify).reverse()  // convert to JSON string the array content, then reverse it (to check from end to begining)
+            .filter(function (item, index, arr) { return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
+            .reverse().map(JSON.parse);
+    });
 }
 
 function ClearChart() {
