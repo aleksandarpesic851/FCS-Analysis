@@ -157,7 +157,7 @@ div.table .file-row:nth-child(odd) {
     vertical-align: middle;
 }
 
-#tab-file table tbody tr {
+table tbody tr {
     cursor: pointer;
 }
 

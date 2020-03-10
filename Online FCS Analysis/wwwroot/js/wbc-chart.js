@@ -75,6 +75,9 @@ function initChart() {
 				enabled: false,
 			},
 			onClick: function (event, array) {
+				if (event.cancelable) {
+					event.preventDefault();
+				}
 				if (isGateEditing && chartData.length > 1) {
 					let newXY = getCoordinate(event);
 					AddOrMoveCustomPoints(newXY);
@@ -83,6 +86,9 @@ function initChart() {
 			dragData: true,
 			dragX: true,
 			onDragStart: function (e, target) {
+				if (e.cancelable) {
+					e.preventDefault();
+				}
 				if (!chartData[target._datasetIndex].dragable || !isGateEditing)
 					return false;
 				choosenPolygon = target._datasetIndex;
