@@ -59,13 +59,14 @@ namespace Online_FCS_Analysis.Controllers
                         using (FCMeasurement fcsMeasurement = new FCMeasurement(fullPath))
                         {
                             int nomenclature = fcsMeasurement.GetNomenclature();
+                            string wbc_type = fcsMeasurement.IsEOS(Constants.WBC_NOMENCLATURES[nomenclature]) ? Constants.FCS_TYPE_WBC_EOS : Constants.FCS_TYPE_WBC;
                             if (nomenclature < 0)
                             {
                                 System.IO.File.Delete(fullPath);
                                 continue;
                             }
                             await Task.Run(() => StoreDynamicGateResultsOnDisk(fcsMeasurement, fileName, nomenclature));
-                            await Task.Run(() => CreateNewWBC(orgFileName, fileName, nomenclature));
+                            await Task.Run(() => CreateNewWBC(orgFileName, fileName, nomenclature, wbc_type));
                         }
                     }
                     catch
@@ -77,7 +78,7 @@ namespace Online_FCS_Analysis.Controllers
             return Ok();
         }
 
-        private void CreateNewWBC(string orgFileName, string fileName, int nomenclature)
+        private void CreateNewWBC(string orgFileName, string fileName, int nomenclature, string wbc_type)
         {
             FCSModel newWbc = new FCSModel
             {
@@ -85,7 +86,7 @@ namespace Online_FCS_Analysis.Controllers
                 fcs_file_name = fileName,
                 fcs_path = Constants.wbc_fcs_path+ fileName,
                 user_id = Convert.ToInt32(User.FindFirst(Constants.CLAIM_TYPE_USER_ID).Value),
-                fcs_type = Constants.FCS_TYPE_WBC,
+                fcs_type = wbc_type,
                 wbc_3cells = Constants.wbc_3cell_path + fileName + ".obj",
                 wbc_gate2 = Constants.wbc_gate2_path + fileName + ".obj",
                 wbc_heatmap = Constants.wbc_heatmap_path + fileName + ".png",

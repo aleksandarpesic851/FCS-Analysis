@@ -61,9 +61,9 @@ namespace Online_FCS_Analysis.Controllers
 
                 int userId = Convert.ToInt32(User.FindFirst(Constants.CLAIM_TYPE_USER_ID).Value);
                 string type_wbc = Constants.FCS_TYPE_WBC;
-
+                string type_eos = Constants.FCS_TYPE_WBC_EOS;
                 // Getting all Customer data  
-                var wbcData = (from tempWbc in _dbContext.FCSs.Where(fcs => fcs.enabled && fcs.fcs_type == type_wbc && fcs.user_id == userId) select tempWbc);
+                var wbcData = (from tempWbc in _dbContext.FCSs.Where(fcs => fcs.enabled && (fcs.fcs_type == type_wbc || fcs.fcs_type == type_eos) && fcs.user_id == userId) select tempWbc);
 
                 //Sorting  
                 if (!(string.IsNullOrEmpty(sortColumn) && string.IsNullOrEmpty(sortColumnDirection)))
@@ -109,13 +109,16 @@ namespace Online_FCS_Analysis.Controllers
             string fcsFile = Constants.wwwroot_abs_path + fcsData.fcs_path;
             string gate1File = Path.Combine(Constants.wwwroot_abs_path, _appSettings.Value.defaultGateSetting.path, _appSettings.Value.defaultGateSetting.gate1);
             string gate3File = Path.Combine(Constants.wwwroot_abs_path, _appSettings.Value.defaultGateSetting.path, _appSettings.Value.defaultGateSetting.gate3);
+            string gateEOSFile = Path.Combine(Constants.wwwroot_abs_path, _appSettings.Value.defaultGateSetting.path, _appSettings.Value.defaultGateSetting.gateEos);
             string customGatePath = Path.Combine(Constants.wbc_custom_full_gate, fcsData.fcs_file_name);
-            
+            bool isEOS = fcsData.fcs_type == Constants.FCS_TYPE_WBC_EOS;
+
             FCMeasurement fcsMeasurement = new FCMeasurement(fcsFile);
             WBC3Cell wbc3Cell = Global.ReadFromBinaryFile<WBC3Cell>(cellsFile);
             List<Polygon> gate1Polygon = FCMeasurement.loadPolygon(gate1File);
             List<Polygon> gate2Polygon = Global.ReadFromBinaryFile<List<Polygon>>(gate2File);
             List<Polygon> gate3Polygon = FCMeasurement.loadPolygon(gate3File);
+            List<Polygon> gateEOSPolygon = FCMeasurement.loadPolygon(gateEOSFile);
             List<GatePolygon> customGate = Global.ReadFromBinaryFile<List<GatePolygon>>(customGatePath);
             return Json( 
                 new { 
@@ -125,13 +128,15 @@ namespace Online_FCS_Analysis.Controllers
                         wbc3Cell.wbc_m,
                         wbc3Cell.wbc_l,
                     },
-                    gate1Polygon = gate1Polygon.Select(e=>e.poly),
-                    gate2Polygon = gate2Polygon.Select(e => e.poly),
-                    gate3Polygon = gate3Polygon.Select(e => e.poly),
                     customGate,
                     heatmapFile,
-                    nomenclature = Constants.WBC_NOMENCLATURES[fcsData.nomenclature]
-                } );
+                    nomenclature = Constants.WBC_NOMENCLATURES[fcsData.nomenclature],
+                    isEOS,
+                    gate1Polygon = gate1Polygon.Select(e => e.poly),
+                    gate2Polygon = gate2Polygon.Select(e => e.poly),
+                    gate3Polygon = gate3Polygon.Select(e => e.poly),
+                    gateEOSPolygon = gateEOSPolygon.Select(e => e.poly),
+                });
         }
 
         [HttpPost]

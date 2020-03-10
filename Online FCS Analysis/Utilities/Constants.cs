@@ -21,6 +21,7 @@ namespace Online_FCS_Analysis.Utilities
         public const string CLAIM_TYPE_USER_AVATAR = "user_avatar";
 
         public const string FCS_TYPE_WBC = "wbc";
+        public const string FCS_TYPE_WBC_EOS = "wbc_eos";
         public const string FCS_TYPE_RBC = "rbc";
 
         public static string[] WBC_NOMENCLATURES = new string[] { "old_names", "middleaged_names", "new_names" };

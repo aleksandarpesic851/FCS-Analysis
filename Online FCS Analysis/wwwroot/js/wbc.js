@@ -8,10 +8,14 @@ var wbcNomenclature;                // wbc nomenclature : new_names, old_names, 
 var defaultChannel1;                // default gate channel names
 var defaultChannel2;                // default gate channel names
 var defaultChannel3;                // default gate channel names
+var defaultChannel4;                // default gate channel names
 
-var defaultGate1 = "defaultGate1";  // default gate names
-var defaultGate2 = "defaultGate2";  // default gate names
-var defaultGate3 = "defaultGate3";  // default gate names
+var defaultGate1 = "defaultGate1";  // default gate names               FCS1peak
+var defaultGate2 = "defaultGate2";  // default gate names               SSCpeak
+var defaultGate3 = "defaultGate3";  // default gate names               FCS1area
+var defaultGateEOS = "defaultGateEOS"; // default gate names            FLpeak
+
+var isEOS;                          // is eos wbc
 
 var defaultGatePolygons = [];        // the array of default Gate Polygons
 var customGatePolygons = [];         // the array of custom Gate Polygons
@@ -191,6 +195,20 @@ function initWbc() {
     defaultChannel1 = GetChannelName("FCS1peak", wbcNomenclature);
     defaultChannel2 = GetChannelName("SSCpeak", wbcNomenclature);
     defaultChannel3 = GetChannelName("FCS1area", wbcNomenclature);
+    defaultChannel4 = GetChannelName("FLpeak", wbcNomenclature);
+    isEOS = wbcTotalData.isEOS;
+
+    $("#final-defaultGateEOS").remove();
+    $('label[for="final-defaultGateEOS"]').remove();
+
+    if (isEOS) {
+        $("#default-gate-eos").show();
+        let eosHtml = '<input type="checkbox" id="final-defaultGateEOS" data-gate="defaultGateEOS" class="wbc-items gate-eos" checked />';
+        eosHtml += '<label for="final-defaultGateEOS">Default Gate EOS</label>';
+        $("#default-gates .final").append(eosHtml);
+    } else {
+        $("#default-gate-eos").hide();
+    }
 
     defaultGatePolygons[defaultGate1] = {
         channel1: defaultChannel1,
@@ -206,6 +224,11 @@ function initWbc() {
         channel1: defaultChannel1,
         channel2: defaultChannel2,
         polys: wbcTotalData.gate3Polygon
+    };
+    defaultGatePolygons[defaultGateEOS] = {
+        channel1: defaultChannel4,
+        channel2: defaultChannel2,
+        polys: wbcTotalData.gateEOSPolygon
     };
 
     let customGates = wbcTotalData.customGate;
