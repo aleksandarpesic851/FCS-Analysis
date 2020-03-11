@@ -14,6 +14,7 @@ namespace FlowCytometry.CustomCluster
         public static string[] CELL_NAME = new string[] { "Neutrophils", "Lymphocytes", "Monocytes" };
         public static PointF[] CELL_CENTER = new PointF[3];      // centers of polygon
         public static bool diff3_enable = true; // true when diff3 is enabled, i.e FCS-H : SSC:H (Channel)
+        public static bool is_aml = false;      // the flg for aml cell types
         public static int T_Y_1 = 0;
         public static int T_Y_2 = 0;
         public static PointF GetCentroid(PointF[] poly)

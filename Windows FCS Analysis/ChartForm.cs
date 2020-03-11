@@ -1038,6 +1038,15 @@ namespace Windows_FCS_Analysis
             string gate3File = Path.Combine(filePath_gates, "gating Cell Types.csv");
             string gateEOSFile = Path.Combine(filePath_gates, "gating Eosinophils.csv");
 
+            bool isAML = false;
+            if (channelNomenclature == "aml_names")
+            {
+                gate1File = Path.Combine(filePath_gates, "AML gating Cells.csv");
+                gate3File = Path.Combine(filePath_gates, "AML gating Cell Types.csv");
+                isEOS = false;
+                isAML = true;
+            }
+
             int nTotalCnt = fcsMeasure.Counts;
             int[] NML = new int[3];
             int[] NML_COUNTS = new int[3];
@@ -1057,7 +1066,7 @@ namespace Windows_FCS_Analysis
                 arrGateResults.Add(gate1Result);
             }
 
-            if (checkBoxGate2.Checked)
+            if (checkBoxGate2.Checked && !isAML)
             {
                 GateResult gate2Result = FCMeasurement.Gate_2(fcsMeasure, channelNomenclature);
                 DrawGateResult(gate2Result, FSC1_A, FSC1_H);
@@ -2549,13 +2558,19 @@ namespace Windows_FCS_Analysis
         private void radioNewName_CheckedChanged(object sender, EventArgs e)
         {
             channelNomenclature = "new_names";
+            FlowCytometry.CustomCluster.Global.is_aml = false;
         }
 
         private void radioOldName_CheckedChanged(object sender, EventArgs e)
         {
             channelNomenclature = "old_names";
+            FlowCytometry.CustomCluster.Global.is_aml = false;
         }
-
+        private void radioAmlName_CheckedChanged(object sender, EventArgs e)
+        {
+            channelNomenclature = "aml_names";
+            FlowCytometry.CustomCluster.Global.is_aml = true;
+        }
         private void button_SetGateFolder_Click(object sender, EventArgs e)
         {
             //string filePath_gates = " C:/Users/begem/OneDrive/Desktop/General Fluidics/Fixed gating";

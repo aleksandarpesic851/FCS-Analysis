@@ -587,6 +587,9 @@ namespace FlowCytometry.CustomCluster
 
         private void ManualAction()
         {
+            if (Global.is_aml)
+                return;
+
             Cluster lCluster = null;
             Cluster mCluster = null;
 
@@ -653,10 +656,53 @@ namespace FlowCytometry.CustomCluster
         //detect cluster type
         private void DetectCellType()
         {
+            if (Global.is_aml)
+            {
+                DetectAmlCell(0, (int)(0.6 * nGridCnt), nGridCnt);
+                DetectAmlCell(1, 0, (int)(0.25 * nGridCnt));
+                DetectAmlCell(2, (int)(0.25 * nGridCnt), (int)(0.6 * nGridCnt));
+            }
+            else
+            {
+                DetectCell(0, (int)(Global.T_Y_2 * (nGridCnt / normalY)), nGridCnt);
+                DetectCell(1, 0, (int)(Global.T_Y_1 * (nGridCnt / normalY)));
+                DetectCell(2, (int)(Global.T_Y_1 * (nGridCnt / normalY)), (int)(Global.T_Y_2 * (nGridCnt / normalY)));
+            }
+        }
 
-            DetectCell(0, (int)(Global.T_Y_2 * (nGridCnt / normalY)), nGridCnt);
-            DetectCell(1, 0, (int)(Global.T_Y_1 * (nGridCnt / normalY)));
-            DetectCell(2, (int)(Global.T_Y_1 * (nGridCnt / normalY)), (int)(Global.T_Y_2 * (nGridCnt / normalY)));
+        // Detect AML Cell Types
+        private void DetectAmlCell(int nType, int nT1, int nT2)
+        {
+            int i = 0;
+            double sumPoints = 0;
+            Cluster orientCluster = null;
+            for (i = clusters.Count - 1; i > -1; i--)
+            {
+                // because of right tail of Monocytes, added this extra condition
+                if (clusters[i].centerX >= nT1 && clusters[i].centerX < nT2)
+                {
+                    if (nType == 1 && clusters[i].centerY > 0.5 * nGridCnt)
+                        continue;
+                    if (nType == 2 && clusters[i].centerY > 0.6 * nGridCnt)
+                        continue;
+
+                    if (orientCluster == null)
+                    {
+                        orientCluster = clusters[i];
+                        orientCluster.clusterName = Global.CELL_NAME[nType];
+                    }
+                    else
+                    {
+                        sumPoints = orientCluster.points.Count + clusters[i].points.Count;
+                        orientCluster.centerX = (int)(clusters[i].points.Count / sumPoints * clusters[i].centerX +
+                            orientCluster.points.Count / sumPoints * orientCluster.centerX);
+                        orientCluster.centerY = (int)(clusters[i].points.Count / sumPoints * clusters[i].centerY +
+                            orientCluster.points.Count / sumPoints * orientCluster.centerY);
+                        orientCluster.points.AddRange(clusters[i].points);
+                        clusters.RemoveAt(i);
+                    }
+                }
+            }
         }
 
         private void DetectCell(int nType, int nT1, int nT2)

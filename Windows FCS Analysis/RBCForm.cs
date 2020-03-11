@@ -37,9 +37,9 @@ namespace Windows_FCS_Analysis
         private List<Polygon> arrGatePolygon = null;                    // gate data in csv file
         private int nWBCCnt = 0;                                        // the number of WBC 
 
-        string[] FCS1_H = new string[] { "FSC1LG,Peak", "FSC1HG,Peak", "BS1CH1; fsc1lg-H" };
+        string[] FCS1_H = new string[] { "FSC1LG,Peak", "FSC1HG,Peak", "BS1CH1; fsc1lg-H", "FS Lin" };
         string[] FCS2_H = new string[] { "FSC2LG,Peak", "FSC2HG,Peak", "BS1CH2; fsc2lg-H" };
-        string[] SSC_H = new string[] { "BS1CH2; ssclg-H", "SSCLG,Peak", "BS1CH4; ssclg-H" };
+        string[] SSC_H = new string[] { "BS1CH2; ssclg-H", "SSCLG,Peak", "BS1CH4; ssclg-H", "SS Log" };
 
         private string GATE_FILE = "";
 
@@ -81,6 +81,10 @@ namespace Windows_FCS_Analysis
         private string gate1 = "gating Cells.csv";
         //private string gate2 = "gating Singlets.csv";
         private string gate3 = "gating Cell Types.csv";
+        
+        private string aml_gate1 = "AML gating Cells.csv";
+        private string aml_gate3 = "AML gating Cell Types.csv";
+
         private List<Polygon> arrGatePolygon_WBC = null;
         private List<Polygon> arrGate3Polygon = null;
         private string WBCGatePath;
@@ -641,8 +645,18 @@ namespace Windows_FCS_Analysis
             arrGatePolygon_WBC = null;
             arrGate3Polygon = null;
 
-            arrGatePolygon_WBC = FCMeasurement.loadPolygon(Path.Combine(WBCGatePath, gate1));
-            arrGate3Polygon = FCMeasurement.loadPolygon(Path.Combine(WBCGatePath, gate3));
+            if (channel1 == "FS Lin" || channel2 == "SS Log")
+            {
+                Global.is_aml = true;
+                arrGatePolygon_WBC = FCMeasurement.loadPolygon(Path.Combine(WBCGatePath, aml_gate1));
+                arrGate3Polygon = FCMeasurement.loadPolygon(Path.Combine(WBCGatePath, aml_gate3));
+            }
+            else
+            {
+                arrGatePolygon_WBC = FCMeasurement.loadPolygon(Path.Combine(WBCGatePath, gate1));
+                arrGate3Polygon = FCMeasurement.loadPolygon(Path.Combine(WBCGatePath, gate3));
+            }
+            
             if (arrGate3Polygon.Count < 3)
             {
                 MessageBox.Show("The Cell Type gate file is incorrect.");

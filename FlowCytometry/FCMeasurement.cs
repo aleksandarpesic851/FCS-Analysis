@@ -421,7 +421,7 @@ namespace FlowCytometry
                 char[] header = new char[256];
                 reader.Read(header, 0, 6);
                 String str = new String(header, 0, 6);
-                if (str != "FCS3.0" && str != "FCS3.1")
+                if (str != "FCS3.0" && str != "FCS3.1" && str != "FCS2.0")
                     throw new InvalidDataException("Header is not valid for FCS 3.0 or 3.1 format");
 
                 // Skip 4 spaces
@@ -431,8 +431,9 @@ namespace FlowCytometry
                 long endTextSegment = ReadLong(reader);
                 long startDataSegment = ReadLong(reader);
                 long endDataSegment = ReadLong(reader);
-                long startAnalyticsSegment = ReadLong(reader);
-                long endAnalyticsSegment = ReadLong(reader);
+
+                //long startAnalyticsSegment = ReadLong(reader);
+                //long endAnalyticsSegment = ReadLong(reader);
 
                 reader.BaseStream.Seek(startTextSegment, SeekOrigin.Begin);
 
@@ -446,7 +447,7 @@ namespace FlowCytometry
                     metaDict.Add(name, value);
                 } while (reader.BaseStream.Position < endTextSegment);
 
-                meta = (IReadOnlyDictionary<string, string>)metaDict.ToDictionary(pair => pair.Key, pair => pair.Value);
+                meta = metaDict.ToDictionary(pair => pair.Key, pair => pair.Value);
 
                 List<string> channelNames = new List<string>();
                 Dictionary<string, Channel> channelDict = new Dictionary<string, Channel>();
@@ -1070,7 +1071,14 @@ namespace FlowCytometry
         public static string GetChannelName(string channelHandle, string type)
         {
             string channelName = null;
-            if (type == "old_names")
+            if (type == "aml_names")
+            {
+                if (channelHandle == "FCS1peak")
+                    channelName = "FS Lin";
+                else if (channelHandle == "SSCpeak")
+                    channelName = "SS Log";
+            }
+            else if (type == "old_names")
             {
                 if (channelHandle == "FCS1peak")
                     channelName = "FSC1LG,Peak"; //string FSC1peak = "FSC1LG,Peak"; 
