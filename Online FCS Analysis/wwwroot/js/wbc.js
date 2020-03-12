@@ -551,6 +551,10 @@ function AddNewPolygon() {
 }
 
 function CompleteEditPoygon() {
+    if (!isGateEditing) {
+        return;
+    }
+
     isGateEditing = false;
     $(".custom-gate-div").show();
     $("#edit-custom-gate").hide();
@@ -560,12 +564,18 @@ function CompleteEditPoygon() {
 
     if (editingGateName) {
         customGatePolygons[editingGateName].polys = [];
-        chartData = chartData.filter(data => data.type != "line" || data.data.length > 3);
+        // Remove Uncompleted line when complete edit.
+        chartData = chartData.filter(polygon => polygon.type != "line" ||
+            ( polygon.data.length > 0 &&
+              polygon.data[0].x == polygon.data[polygon.data.length - 1].x &&
+              polygon.data[0].y == polygon.data[polygon.data.length - 1].y ) );
+
         chartData.forEach(function (v, idx) {
             if (v.type == "line") {
                 customGatePolygons[editingGateName].polys.push(v.data);
             }
         });
+
         SaveCustomGate();
         UpdateChart();
     }
@@ -991,6 +1001,9 @@ function FilterGateData(gatePolygon, isInside) {
 
 // Check whether current point xy is inside polygons
 function IsInsidePolygons(gatePolygon, xy) {
+    if (!gatePolygon.polys || gatePolygon.polys.length < 1) {
+        return true;
+    }
     let i = 0;
     for (i = 0; i < gatePolygon.polys.length; i++) {
         if (IsInsidePoly(gatePolygon.polys[i], xy.x, xy.y)) {
@@ -1158,18 +1171,22 @@ function GetChartGateLineData() {
         }];
     }
 
-    let polygon = currGatePolygon.polys.map((v, i) => ({
-        label: "Gate - " + currGateName,
-        borderColor: 'rgb(100, 200, 100)',
-        fill: false,
-        data: v,
-        pointHitRadius: 10,
-        dragable: false,
-        type: 'line',
-        pointRadius: 5,
-        pointHoverRadius: 10,
-        lineTension: 0,
-    }));
+    let polygon = null;
+
+    if (currGatePolygon.polys) {
+        polygon = currGatePolygon.polys.map((v, i) => ({
+            label: "Gate - " + currGateName,
+            borderColor: 'rgb(100, 200, 100)',
+            fill: false,
+            data: v,
+            pointHitRadius: 10,
+            dragable: false,
+            type: 'line',
+            pointRadius: 5,
+            pointHoverRadius: 10,
+            lineTension: 0,
+        }));
+    }
 
     if (!polygon) {
         polygon = [{
