@@ -144,7 +144,13 @@ function getTooltipContent(datasetIdx, idx) {
 function GetChannelName(channelHandle, type)
 {
 	let channelName = "";
-	if (type == "old_names") {
+	if (type == "aml_names") {
+		if (channelHandle == "FCS1peak")
+			channelName = "FS Lin";
+		else if (channelHandle == "SSCpeak")
+			channelName = "SS Log";
+	}
+	else if (type == "old_names") {
 		if (channelHandle == "FCS1peak")
 			channelName = "FSC1LG,Peak"; //string FSC1peak = "FSC1LG,Peak"; 
 		else if (channelHandle == "SSCpeak")

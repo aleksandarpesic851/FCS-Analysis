@@ -16,6 +16,7 @@ var defaultGate3 = "defaultGate3";  // default gate names               FCS1area
 var defaultGateEOS = "defaultGateEOS"; // default gate names            FLpeak
 
 var isEOS;                          // is eos wbc
+var isAML;                          // is aml wbc
 
 var defaultGatePolygons = [];        // the array of default Gate Polygons
 var customGatePolygons = [];         // the array of custom Gate Polygons
@@ -213,8 +214,31 @@ function initWbc() {
     defaultChannel2 = GetChannelName("SSCpeak", wbcNomenclature);
     defaultChannel3 = GetChannelName("FCS1area", wbcNomenclature);
     defaultChannel4 = GetChannelName("FLpeak", wbcNomenclature);
-    isEOS = wbcTotalData.isEOS;
 
+    isEOS = wbcTotalData.isEOS;
+    isAML = wbcTotalData.isAML;
+
+    // Add default Gate 2 when wbc isn't aml. For AML file, not apply gate2.
+    $("#final-defaultGate2").remove();
+    $('label[for="final-defaultGate2"]').remove();
+
+    $("#final-defaultGate3").remove();
+    $('label[for="final-defaultGate3"]').remove();
+
+    if (!isAML) {
+        $("#default-gate-2").show();
+        let tmpHtml = '<input type="checkbox" id="final-defaultGate2" data-gate="defaultGate2" class="wbc-items" checked />';
+        tmpHtml += '<label for="final-defaultGate2"> Default Gate 2 </label>';
+        $("#default-gates .final").append(tmpHtml);
+    } else {
+        $("#default-gate-2").hide();
+    }
+
+    let tmpHtml = '<input type="checkbox" id="final-defaultGate3" data-gate="defaultGate3" class="wbc-items" checked />';
+    tmpHtml += '<label for="final-defaultGate3"> Default Gate 3 </label>';
+    $("#default-gates .final").append(tmpHtml);
+
+    // Add Default EOS gate for Eos file
     $("#final-defaultGateEOS").remove();
     $('label[for="final-defaultGateEOS"]').remove();
 
@@ -232,21 +256,28 @@ function initWbc() {
         channel2: defaultChannel2,
         polys: wbcTotalData.gate1Polygon
     };
-    defaultGatePolygons[defaultGate2] = {
-        channel1: defaultChannel3,
-        channel2: defaultChannel1,
-        polys: wbcTotalData.gate2Polygon
-    };
+
+    if (!isAML) {
+        defaultGatePolygons[defaultGate2] = {
+            channel1: defaultChannel3,
+            channel2: defaultChannel1,
+            polys: wbcTotalData.gate2Polygon
+        };
+    }
+    
     defaultGatePolygons[defaultGate3] = {
         channel1: defaultChannel1,
         channel2: defaultChannel2,
         polys: wbcTotalData.gate3Polygon
     };
-    defaultGatePolygons[defaultGateEOS] = {
-        channel1: defaultChannel4,
-        channel2: defaultChannel2,
-        polys: wbcTotalData.gateEOSPolygon
-    };
+
+    if (isEOS) {
+        defaultGatePolygons[defaultGateEOS] = {
+            channel1: defaultChannel4,
+            channel2: defaultChannel2,
+            polys: wbcTotalData.gateEOSPolygon
+        };
+    }
 
     let customGates = wbcTotalData.customGate;
     $("#custom-btn-gate-div").empty();
@@ -1074,7 +1105,7 @@ function GetDynamicGateData(Idxs) {
 
 // Get Data outside of Dynamic Gate
 function GetDynamicGateOutData() {
-    let i = 0, nCnt = wbcTotalData.wbcData.Count.data.length;
+    let i = 0, nCnt = wbcTotalData.wbcData[defaultChannel1].data.length;
     let data = [];
     for (i = 0; i < nCnt; i++) {
         if (wbcTotalData.wbc3Cell.wbc_n.includes(i)) {

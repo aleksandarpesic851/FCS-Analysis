@@ -116,16 +116,19 @@ namespace Online_FCS_Analysis.Controllers
             string gate2File = Path.Combine(Constants.wbc_gate2_full_path, fileName + ".obj");
             string heatmapFile = Path.Combine(Constants.wbc_heatmap_full_path, fileName + ".png");
             string channelNomenclature = Constants.WBC_NOMENCLATURES[nomenclature];
-
-            if (fcsMeasurement.IsAML())
-            {
-                gate3File = Path.Combine(Constants.wwwroot_abs_path, _appSettings.Value.defaultGateSetting.path, _appSettings.Value.defaultGateSetting.aml_gate3);
-            }
             string channel1 = FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
             string channel2 = FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
             string channel3 = FCMeasurement.GetChannelName("FCS1area", channelNomenclature);
             List<double[]> arrData = FCMeasurement.GetChannelData(fcsMeasurement, channel1, channel2);
-            List<double[]> arrGate2Data = FCMeasurement.GetChannelData(fcsMeasurement, channel3, channel1);
+            List<double[]> arrGate2Data = new List<double[]>();
+
+            if (fcsMeasurement.IsAML())
+            {
+                gate3File = Path.Combine(Constants.wwwroot_abs_path, _appSettings.Value.defaultGateSetting.path, _appSettings.Value.defaultGateSetting.aml_gate3);
+            } else
+            {
+                arrGate2Data = FCMeasurement.GetChannelData(fcsMeasurement, channel3, channel1);
+            }
             List<Polygon> polygons = FCMeasurement.loadPolygon(gate3File);
             
             if (polygons.Count < 3)
