@@ -414,6 +414,142 @@ namespace FlowCytometry
             return sb.ToString();
         }
 
+        // Original FCS Read Module - can read only FCS 3.0 and 3.1
+        private void _InternalRead(Stream stream)
+        {
+            using (BinaryReader reader = new BinaryReader(stream))
+            {
+                char[] header = new char[256];
+                reader.Read(header, 0, 6);
+                String str = new String(header, 0, 6);
+                if (str != "FCS3.0" && str != "FCS3.1")
+                    throw new InvalidDataException("Header is not valid for FCS 3.0 or 3.1 format");
+
+                // Skip 4 spaces
+                reader.Read(header, 0, 4);
+
+                long startTextSegment = ReadLong(reader);
+                long endTextSegment = ReadLong(reader);
+                long startDataSegment = ReadLong(reader);
+                long endDataSegment = ReadLong(reader);
+
+                long startAnalyticsSegment = ReadLong(reader);
+                long endAnalyticsSegment = ReadLong(reader);
+
+                reader.BaseStream.Seek(startTextSegment, SeekOrigin.Begin);
+
+                byte textSeparator = reader.ReadByte();
+
+                Dictionary<string, string> metaDict = new Dictionary<string, string>();
+                do
+                {
+                    string name = ReadStringFromMetadata(reader, textSeparator);
+                    string value = ReadStringFromMetadata(reader, textSeparator);
+                    metaDict.Add(name, value);
+                } while (reader.BaseStream.Position < endTextSegment);
+
+                meta = metaDict.ToDictionary(pair => pair.Key, pair => pair.Value);
+
+                List<string> channelNames = new List<string>();
+                Dictionary<string, Channel> channelDict = new Dictionary<string, Channel>();
+                int paramCount = Convert.ToInt32(meta["$PAR"]);
+                counts = Convert.ToInt32(meta["$TOT"].Trim());
+                for (int i = 1; i <= paramCount; i++)
+                {
+                    string name = meta[String.Format("$P{0}N", i)].Trim();
+                    int bits = Convert.ToInt32(meta[String.Format("$P{0}B", i)].Trim());
+                    int range = Convert.ToInt32(meta[String.Format("$P{0}R", i)].Trim());
+                    string ampType = meta[String.Format("$P{0}E", i)].Trim();
+
+                    string beginTime = meta["$BTIM"].Trim();
+                    string endTime = meta["$ETIM"].Trim();
+                    string date = meta["$DATE"].Trim();
+
+                    #region skipped meta
+                    //string opticalFilter = meta[String.Format("$P{0}F", i)].Trim();
+                    //string visScale = meta[String.Format("$P{0}D", i)].Trim();
+                    //string wavelength = meta[String.Format("$P{0}L", i)].Trim();
+                    //string power = meta[String.Format("$P{0}O", i)].Trim();
+                    //string percent = meta[String.Format("$P{0}P", i)].Trim();
+                    //string sname = meta[String.Format("$P{0}S", i)].Trim();
+                    //string detectorType = meta[String.Format("$P{0}T", i)].Trim();
+                    //string detectorVoltage = meta[String.Format("$P{0}V", i)].Trim();
+                    //string gatingRegion = meta[String.Format("$R{0}I", i)].Trim();
+                    //string windowSetting = meta[String.Format("$R{0}W", i)].Trim();
+                    #endregion
+
+                    channelNames.Add(name);
+
+                    channelDict.Add(name, new Channel(i, bits, name, range, beginTime, endTime, date, ampType, counts));
+                    //  channelDict.Add(name, new Channel(i, bits, name, range, ampType, counts));
+                    string gainKey = String.Format("$P{0}G", i);
+                    if (meta.ContainsKey(gainKey))
+                        channelDict[name].Gain = Convert.ToDouble(meta[gainKey].Trim());
+                }
+
+                this.channelNames = channelNames.AsReadOnly();
+                this.channels = (IReadOnlyDictionary<string, Channel>)channelDict.ToDictionary(pair => pair.Key, pair => pair.Value);
+
+                bool reverse = meta["$BYTEORD"].Trim().Equals("4,3,2,1");
+                string dataType = meta["$DATATYPE"].Trim();
+                reader.BaseStream.Seek(startDataSegment, SeekOrigin.Begin);
+                for (int i = 0; i < counts; i++)
+                {
+                    for (int j = 1; j <= paramCount; j++)
+                    {
+                        if (dataType == "F")
+                        {
+                            byte[] b1 = reader.ReadBytes(4);
+                            if (reverse)
+                                Array.Reverse(b1);
+                            channels[channelNames[j - 1]].AddData(i, BitConverter.ToSingle(b1, 0));
+                        }
+                        else if (dataType == "D")
+                        {
+                            byte[] b1 = reader.ReadBytes(8);
+                            if (reverse)
+                                Array.Reverse(b1);
+                            channels[channelNames[j - 1]].AddData(i, BitConverter.ToDouble(b1, 0));
+                        }
+                        else if (dataType == "I")
+                        {
+                            int width = 0;
+                            if (meta[String.Format("$P{0}B", j)] == "8")
+                                width = 1;
+                            if (meta[String.Format("$P{0}B", j)] == "16")
+                                width = 2;
+                            if (meta[String.Format("$P{0}B", j)] == "24")
+                                width = 3;
+                            if (meta[String.Format("$P{0}B", j)] == "32")
+                                width = 4;
+
+                            if (width == 0)
+                                throw new NotSupportedException("This datatype is not supported yet");
+
+                            byte[] b1 = new byte[4];
+                            Array.Copy(reader.ReadBytes(width), b1, width);
+
+                            if (reverse)
+                                Array.Reverse(b1);
+
+                            channels[channelNames[j - 1]].AddData(i, BitConverter.ToInt32(b1, 0));
+                        }
+                        else
+                        {
+                            throw new NotSupportedException("This datatype is not supported yet");
+                        }
+                    }
+                }
+
+                for (int j = 1; j <= paramCount; j++)
+                {
+                    channels[channelNames[j - 1]].FlushData();
+                }
+
+                reader.Close();
+            }
+        }
+
         private void InternalRead(Stream stream)
         {
             using (BinaryReader reader = new BinaryReader(stream))
