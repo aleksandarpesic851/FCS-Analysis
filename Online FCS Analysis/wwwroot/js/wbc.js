@@ -35,6 +35,9 @@ var isGateEditing = false;          // Flag for drawing custom gate
 var choosenPolygon = -1;                 // Choosen Polygon while editing custom polygon
 var choosenPoint = -1;                   // Choosen point while editing custom polygon
 var editingGateName;                // Editing Gate Name
+
+var wbcTypes = { wbc: "Normal", "wbc_eos": "EOS", "wbc_aml": "AML" };
+
 // -------------------- WBC Global Variables ------------------//
 
 
@@ -53,7 +56,40 @@ $(document).ready(function () {
 });
 
 function InitWbcTable() {
-    let hiddenCouls = typeof simpleTable == 'undefined' ? [0] : [0, 2, 3];
+    let isSimpleTable = typeof simpleTable != 'undefined';
+    let colDef = [
+        {
+            targets: [0],
+            visible: false,
+            searchable: false
+        },
+        {
+            targets: [5],
+            sortable: false
+        }
+    ];
+    let columns = [
+        { "data": "id", "name": "id" },
+        { "data": "fcs_name", "name": "fcs_name" },
+        {
+            data: "fcs_type", name: "fcs_type", render: function (data, type, row) {
+                return wbcTypes[data];
+            }
+        },
+        { "data": "createdAt", "name": "createdAt" },
+        { "data": "updatedAt", "name": "updatedAt" },
+        {
+            data: null, render: function (data, type, row) {
+                return "<a href='#' class='btn btn-danger' onclick='DeleteData(event, " + row.id + ")'; ><i class='fa fa-trash'></i>&nbsp;&nbsp;Delete</a>";
+            }
+        },
+    ];
+
+    if (isSimpleTable) {
+        colDef[1].targets = [3];
+        columns.splice(3, 2);
+    }
+
     wbc_table = $('#fcs-table').dataTable({
         processing: true, // for show progress bar
         serverSide: true, // for process server side
@@ -67,27 +103,8 @@ function InitWbcTable() {
             type: "POST",
             datatype: "json"
         },
-        columnDefs:
-            [{
-                targets: hiddenCouls,
-                visible: false,
-                searchable: false
-            },
-            {
-                targets: [-1],
-                sortable: false
-            }],
-        columns: [
-            { "data": "id", "name": "id" },
-            { "data": "fcs_name", "name": "fcs_name" },
-            { "data": "createdAt", "name": "createdAt" },
-            { "data": "updatedAt", "name": "updatedAt" },
-            {
-                data: null, render: function (data, type, row) {
-                    return "<a href='#' class='btn btn-danger' onclick='DeleteData(event, " + row.id + ")'; ><i class='fa fa-trash'></i>&nbsp;&nbsp;Delete</a>";
-                }
-            },
-        ],
+        columnDefs: colDef,
+        columns: columns,
     });
 
     $('#fcs-table tbody').on("click", "tr", function (event) {

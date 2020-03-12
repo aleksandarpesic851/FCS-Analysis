@@ -77,9 +77,8 @@ namespace Online_FCS_Analysis.Controllers
 
                 int userId = Convert.ToInt32(User.FindFirst(Constants.CLAIM_TYPE_USER_ID).Value);
                 string type_wbc = Constants.FCS_TYPE_WBC;
-                string type_eos = Constants.FCS_TYPE_WBC_EOS;
                 // Getting all Customer data  
-                var wbcData = (from tempWbc in _dbContext.FCSs.Where(fcs => fcs.enabled && (fcs.fcs_type == type_wbc || fcs.fcs_type == type_eos) && fcs.user_id == userId) select tempWbc);
+                var wbcData = (from tempWbc in _dbContext.FCSs.Where(fcs => fcs.enabled && fcs.fcs_type.Contains(type_wbc) && fcs.user_id == userId) select tempWbc);
 
                 //Sorting  
                 if (!(string.IsNullOrEmpty(sortColumn) && string.IsNullOrEmpty(sortColumnDirection)))
@@ -100,7 +99,7 @@ namespace Online_FCS_Analysis.Controllers
 
                 //Paging   
                 var data = wbcData.Skip(skip).Take(pageSize).ToList();
-
+                
                 //Returning Json Data  
                 return Json(new { draw, recordsFiltered = recordsTotal, recordsTotal, data });
 
