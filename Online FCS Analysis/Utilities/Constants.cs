@@ -22,9 +22,10 @@ namespace Online_FCS_Analysis.Utilities
 
         public const string FCS_TYPE_WBC = "wbc";
         public const string FCS_TYPE_WBC_EOS = "wbc_eos";
+        public const string FCS_TYPE_WBC_AML = "wbc_aml";
         public const string FCS_TYPE_RBC = "rbc";
 
-        public static string[] WBC_NOMENCLATURES = new string[] { "old_names", "middleaged_names", "new_names" };
+        public static string[] WBC_NOMENCLATURES = new string[] { "old_names", "middleaged_names", "new_names", "aml_names" };
 
         /* -----------File paths ----------*/
         public static string wwwroot_abs_path = Path.GetFullPath("./wwwroot");

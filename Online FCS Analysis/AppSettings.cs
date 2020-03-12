@@ -23,8 +23,10 @@ namespace Online_FCS_Analysis
     {
         public string path { get; set; }
         public string gate1 { get; set; }
+        public string aml_gate1 { get; set; }
         public string gate2 { get; set; }
         public string gate3 { get; set; }
+        public string aml_gate3 { get; set; }
         public string gateEos { get; set; }
         public string gateBaso { get; set; }
         public string gateBasoClusterCenter { get; set; }

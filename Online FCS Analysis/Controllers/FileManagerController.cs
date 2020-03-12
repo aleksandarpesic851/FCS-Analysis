@@ -59,7 +59,7 @@ namespace Online_FCS_Analysis.Controllers
                         using (FCMeasurement fcsMeasurement = new FCMeasurement(fullPath))
                         {
                             int nomenclature = fcsMeasurement.GetNomenclature();
-                            string wbc_type = fcsMeasurement.IsEOS(Constants.WBC_NOMENCLATURES[nomenclature]) ? Constants.FCS_TYPE_WBC_EOS : Constants.FCS_TYPE_WBC;
+                            string wbc_type = GetWBCType(fcsMeasurement, nomenclature);
                             if (nomenclature < 0)
                             {
                                 System.IO.File.Delete(fullPath);
@@ -78,6 +78,17 @@ namespace Online_FCS_Analysis.Controllers
             return Ok();
         }
 
+        private string GetWBCType(FCMeasurement fcsMeasurement, int nomenclature)
+        {
+            string wbc_type = Constants.FCS_TYPE_WBC;
+            if (fcsMeasurement.IsEOS(Constants.WBC_NOMENCLATURES[nomenclature]))
+                wbc_type = Constants.FCS_TYPE_WBC_EOS;
+            if (fcsMeasurement.IsAML())
+                wbc_type = Constants.FCS_TYPE_WBC_AML;
+            return wbc_type;
+        }
+
+        // Save WBC Information on DB
         private void CreateNewWBC(string orgFileName, string fileName, int nomenclature, string wbc_type)
         {
             FCSModel newWbc = new FCSModel
@@ -88,7 +99,7 @@ namespace Online_FCS_Analysis.Controllers
                 user_id = Convert.ToInt32(User.FindFirst(Constants.CLAIM_TYPE_USER_ID).Value),
                 fcs_type = wbc_type,
                 wbc_3cells = Constants.wbc_3cell_path + fileName + ".obj",
-                wbc_gate2 = Constants.wbc_gate2_path + fileName + ".obj",
+                wbc_gate2 = wbc_type == Constants.FCS_TYPE_WBC_AML ? "" : Constants.wbc_gate2_path + fileName + ".obj",
                 wbc_heatmap = Constants.wbc_heatmap_path + fileName + ".png",
                 nomenclature = nomenclature
             };
@@ -96,6 +107,7 @@ namespace Online_FCS_Analysis.Controllers
             _dbContext.SaveChangesAsync();
         }
 
+        // Save Calculate results for wbc on DISK.
         private void StoreDynamicGateResultsOnDisk(FCMeasurement fcsMeasurement, string fileName, int nomenclature)
         {
             #region initialize Objects
@@ -105,6 +117,10 @@ namespace Online_FCS_Analysis.Controllers
             string heatmapFile = Path.Combine(Constants.wbc_heatmap_full_path, fileName + ".png");
             string channelNomenclature = Constants.WBC_NOMENCLATURES[nomenclature];
 
+            if (fcsMeasurement.IsAML())
+            {
+                gate3File = Path.Combine(Constants.wwwroot_abs_path, _appSettings.Value.defaultGateSetting.path, _appSettings.Value.defaultGateSetting.aml_gate3);
+            }
             string channel1 = FCMeasurement.GetChannelName("FCS1peak", channelNomenclature);
             string channel2 = FCMeasurement.GetChannelName("SSCpeak", channelNomenclature);
             string channel3 = FCMeasurement.GetChannelName("FCS1area", channelNomenclature);
@@ -126,33 +142,37 @@ namespace Online_FCS_Analysis.Controllers
             FlowCytometry.CustomCluster.Global.diff3_enable = true;
             FlowCytometry.CustomCluster.Global.T_Y_1 = (int)polygons[2].poly[0].Y;
             FlowCytometry.CustomCluster.Global.T_Y_2 = (int)polygons[0].poly[0].Y;
+            FlowCytometry.CustomCluster.Global.is_aml = fcsMeasurement.IsAML();
 
             #endregion initialize Objects
 
             #region Calculate gate2 and save on disk
-            double[] singletsFit = FCMeasurement.NewLinearRegression(arrGate2Data.ToArray());
-            double slope = singletsFit[0];
-            double intercept = singletsFit[1];
-            double delta_slope = 0.3;
-            double delta_intercept = 0.5;
-            double minDelta = 7000 * slope * delta_slope;
-            int yMax = fcsMeasurement.Channels[channel1].Range;
-            int xMax = fcsMeasurement.Channels[channel3].Range;
-            
-            List<PointF> gate2Points = new List<PointF>();
-            gate2Points.Add(new PointF(0, 0));
-            gate2Points.Add(new PointF((float)(intercept * (1 + delta_intercept) + minDelta), 0));
-            gate2Points.Add(new PointF((float)(slope * 7000 + intercept * (1 + delta_intercept) + minDelta), 7000));
-            gate2Points.Add(new PointF((float)((1 + delta_slope) * slope * yMax + intercept * (1 + delta_intercept)), yMax));
-            gate2Points.Add(new PointF((float)((1 - delta_slope) * slope * yMax + intercept * (1 - delta_intercept)), yMax));
-            gate2Points.Add(new PointF((float)(slope * 7000 + intercept * (1 - delta_intercept) - minDelta), 7000));
-            gate2Points.Add(new PointF(0, (float)((minDelta - intercept * (1 - delta_intercept)) / slope)));
-            gate2Points.Add(new PointF(0, 0));
+            if (!fcsMeasurement.IsAML())
+            {
+                double[] singletsFit = FCMeasurement.NewLinearRegression(arrGate2Data.ToArray());
+                double slope = singletsFit[0];
+                double intercept = singletsFit[1];
+                double delta_slope = 0.3;
+                double delta_intercept = 0.5;
+                double minDelta = 7000 * slope * delta_slope;
+                int yMax = fcsMeasurement.Channels[channel1].Range;
+                int xMax = fcsMeasurement.Channels[channel3].Range;
 
-            List<Polygon> gate2Polygon = new List<Polygon>();
-            gate2Polygon.Add(new Polygon(gate2Points.ToArray(), Color.OrangeRed));
+                List<PointF> gate2Points = new List<PointF>();
+                gate2Points.Add(new PointF(0, 0));
+                gate2Points.Add(new PointF((float)(intercept * (1 + delta_intercept) + minDelta), 0));
+                gate2Points.Add(new PointF((float)(slope * 7000 + intercept * (1 + delta_intercept) + minDelta), 7000));
+                gate2Points.Add(new PointF((float)((1 + delta_slope) * slope * yMax + intercept * (1 + delta_intercept)), yMax));
+                gate2Points.Add(new PointF((float)((1 - delta_slope) * slope * yMax + intercept * (1 - delta_intercept)), yMax));
+                gate2Points.Add(new PointF((float)(slope * 7000 + intercept * (1 - delta_intercept) - minDelta), 7000));
+                gate2Points.Add(new PointF(0, (float)((minDelta - intercept * (1 - delta_intercept)) / slope)));
+                gate2Points.Add(new PointF(0, 0));
 
-            Global.WriteToBinaryFile(gate2File, gate2Polygon);
+                List<Polygon> gate2Polygon = new List<Polygon>();
+                gate2Polygon.Add(new Polygon(gate2Points.ToArray(), Color.OrangeRed));
+
+                Global.WriteToBinaryFile(gate2File, gate2Polygon);
+            }
             #endregion Calculate gate2 and save on disk
 
             //#region Generate Heatmap Image and save on disk

@@ -2092,6 +2092,12 @@ namespace FlowCytometry
             string channel2 = GetChannelName("FLpeak", channelNomenclature);
             return ChannelsNames.Contains(channel2);
         }
+
+        public bool IsAML()
+        {
+            return ChannelsNames.Contains("FS Lin");
+        }
+
         public static List<double[]> GetChannelData(FCMeasurement fcsData, string channel1, string channel2)
         {
             List<double[]> arrData = new List<double[]>();
@@ -2111,6 +2117,8 @@ namespace FlowCytometry
                 return 1;
             if (ChannelsNames.Contains("BS1CH4; ssclg-H"))
                 return 2;
+            if (ChannelsNames.Contains("FS Lin"))
+                return 3;
 
             return -1;
         }
